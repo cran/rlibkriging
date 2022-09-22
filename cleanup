@@ -1,0 +1,10 @@
+#!/usr/bin/env sh
+
+rm -fr src/*.o src/*.so autom4te.cache config.log config.status inst
+
+RLIBKRIGING_PATH="src/libK/bindings/R/rlibkriging"
+
+# sync Version number
+VERSION=`grep "Version:" $RLIBKRIGING_PATH/DESCRIPTION`
+sed -i.bak "s/Version:.*/$VERSION/g" DESCRIPTION
+rm -f DESCRIPTION.bak
