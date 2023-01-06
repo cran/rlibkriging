@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: Apache-2.0
+// 
 // Copyright 2008-2016 Conrad Sanderson (http://conradsanderson.id.au)
 // Copyright 2008-2016 National ICT Australia (NICTA)
 // 
@@ -20,7 +22,7 @@
 
 
 
-class glue_solve_gen
+class glue_solve_gen_default
   {
   public:
   
@@ -32,9 +34,28 @@ class glue_solve_gen
     static constexpr bool is_xvec = false;
     };
   
-  template<typename T1, typename T2> inline static void apply(Mat<typename T1::elem_type>& out, const Glue<T1,T2,glue_solve_gen>& X);
+  template<typename T1, typename T2> inline static void apply(Mat<typename T1::elem_type>& out, const Glue<T1,T2,glue_solve_gen_default>& X);
   
-  template<typename eT, typename T1, typename T2> inline static bool apply(Mat<eT>& out, const Base<eT,T1>& A_expr, const Base<eT,T2>& B_expr, const uword flags);
+  template<typename eT, typename T1, typename T2> inline static bool apply(Mat<eT>& out, const Base<eT,T1>& A_expr, const Base<eT,T2>& B_expr);
+  };
+
+
+
+class glue_solve_gen_full
+  {
+  public:
+  
+  template<typename T1, typename T2>
+  struct traits
+    {
+    static constexpr bool is_row  = false;
+    static constexpr bool is_col  = T2::is_col;
+    static constexpr bool is_xvec = false;
+    };
+  
+  template<typename T1, typename T2> inline static void apply(Mat<typename T1::elem_type>& out, const Glue<T1,T2,glue_solve_gen_full>& X);
+  
+  template<typename eT, typename T1, typename T2, const bool has_user_flags = true> inline static bool apply(Mat<eT>& out, const Base<eT,T1>& A_expr, const Base<eT,T2>& B_expr, const uword flags);
   };
 
 
@@ -58,7 +79,7 @@ class glue_solve_tri_default
 
 
 
-class glue_solve_tri
+class glue_solve_tri_full
   {
   public:
   
@@ -70,7 +91,7 @@ class glue_solve_tri
     static constexpr bool is_xvec = false;
     };
   
-  template<typename T1, typename T2> inline static void apply(Mat<typename T1::elem_type>& out, const Glue<T1,T2,glue_solve_tri>& X);
+  template<typename T1, typename T2> inline static void apply(Mat<typename T1::elem_type>& out, const Glue<T1,T2,glue_solve_tri_full>& X);
   
   template<typename eT, typename T1, typename T2> inline static bool apply(Mat<eT>& out, const Base<eT,T1>& A_expr, const Base<eT,T2>& B_expr, const uword flags);
   };
@@ -117,6 +138,7 @@ namespace solve_opts
   static constexpr uword flag_likely_sympd = uword(1u <<  8);
   static constexpr uword flag_refine       = uword(1u <<  9);
   static constexpr uword flag_no_trimat    = uword(1u << 10);
+  static constexpr uword flag_force_approx = uword(1u << 11);
   
   struct opts_none         : public opts { inline opts_none()         : opts(flag_none        ) {} };
   struct opts_fast         : public opts { inline opts_fast()         : opts(flag_fast        ) {} };
@@ -130,6 +152,7 @@ namespace solve_opts
   struct opts_likely_sympd : public opts { inline opts_likely_sympd() : opts(flag_likely_sympd) {} };
   struct opts_refine       : public opts { inline opts_refine()       : opts(flag_refine      ) {} };
   struct opts_no_trimat    : public opts { inline opts_no_trimat()    : opts(flag_no_trimat   ) {} };
+  struct opts_force_approx : public opts { inline opts_force_approx() : opts(flag_force_approx) {} };
   
   static const opts_none         none;
   static const opts_fast         fast;
@@ -143,6 +166,7 @@ namespace solve_opts
   static const opts_likely_sympd likely_sympd;
   static const opts_refine       refine;
   static const opts_no_trimat    no_trimat;
+  static const opts_force_approx force_approx;
   }
 
 

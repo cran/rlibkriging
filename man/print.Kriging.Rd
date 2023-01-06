@@ -2,7 +2,7 @@
 % Please edit documentation in R/KrigingClass.R
 \name{print.Kriging}
 \alias{print.Kriging}
-\title{Print a \code{Kriging} object}
+\title{Print the content of a \code{Kriging} object.}
 \usage{
 \method{print}{Kriging}(x, ...)
 }

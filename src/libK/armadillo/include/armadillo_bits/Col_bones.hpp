@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: Apache-2.0
+// 
 // Copyright 2008-2016 Conrad Sanderson (http://conradsanderson.id.au)
 // Copyright 2008-2016 National ICT Australia (NICTA)
 // 
@@ -86,13 +88,13 @@ class Col : public Mat<eT>
   inline            Col(const subview_cube<eT>& X);
   inline Col& operator=(const subview_cube<eT>& X);
   
-  arma_cold inline mat_injector<Col> operator<<(const eT val);
+  arma_deprecated inline mat_injector<Col> operator<<(const eT val);
   
-  arma_inline const Op<Col<eT>,op_htrans>  t() const;
-  arma_inline const Op<Col<eT>,op_htrans> ht() const;
-  arma_inline const Op<Col<eT>,op_strans> st() const;
+  arma_inline arma_warn_unused const Op<Col<eT>,op_htrans>  t() const;
+  arma_inline arma_warn_unused const Op<Col<eT>,op_htrans> ht() const;
+  arma_inline arma_warn_unused const Op<Col<eT>,op_strans> st() const;
   
-  arma_inline const Op<Col<eT>,op_strans> as_row() const;
+  arma_inline arma_warn_unused const Op<Col<eT>,op_strans> as_row() const;
   
   arma_inline       subview_col<eT> row(const uword row_num);
   arma_inline const subview_col<eT> row(const uword row_num) const;
@@ -136,7 +138,9 @@ class Col : public Mat<eT>
   
   template<typename T1> inline void shed_rows(const Base<uword, T1>& indices);
   
-                        inline void insert_rows(const uword row_num, const uword N, const bool set_to_zero = true);
+  arma_deprecated inline void insert_rows(const uword row_num, const uword N, const bool set_to_zero);
+                  inline void insert_rows(const uword row_num, const uword N);
+  
   template<typename T1> inline void insert_rows(const uword row_num, const Base<eT,T1>& X);
   
   
@@ -167,7 +171,7 @@ class Col : public Mat<eT>
   
   public:
   
-  #ifdef ARMA_EXTRA_COL_PROTO
+  #if defined(ARMA_EXTRA_COL_PROTO)
     #include ARMA_INCFILE_WRAP(ARMA_EXTRA_COL_PROTO)
   #endif
   };
@@ -233,9 +237,9 @@ class Col<eT>::fixed : public Col<eT>
     template<typename T1, typename T2, typename eglue_type> inline Col& operator=(const eGlue<T1, T2, eglue_type>& X);
   #endif
   
-  arma_inline const Op< Col_fixed_type, op_htrans >  t() const;
-  arma_inline const Op< Col_fixed_type, op_htrans > ht() const;
-  arma_inline const Op< Col_fixed_type, op_strans > st() const;
+  arma_inline arma_warn_unused const Op< Col_fixed_type, op_htrans >  t() const;
+  arma_inline arma_warn_unused const Op< Col_fixed_type, op_htrans > ht() const;
+  arma_inline arma_warn_unused const Op< Col_fixed_type, op_strans > st() const;
   
   arma_inline arma_warn_unused const eT& at_alt     (const uword i) const;
   

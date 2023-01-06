@@ -3,7 +3,8 @@
 \name{logMargPostFun.Kriging}
 \alias{logMargPostFun.Kriging}
 \alias{logMargPostFun,Kriging,Kriging-method}
-\title{Compute Log-Marginal-Posterior of Kriging Model}
+\title{Compute the log-marginal posterior of a kriging model, using the
+prior XXXY.}
 \usage{
 \method{logMargPostFun}{Kriging}(object, theta, grad = FALSE, ...)
 }

@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: Apache-2.0
+// 
 // Copyright 2008-2016 Conrad Sanderson (http://conradsanderson.id.au)
 // Copyright 2008-2016 National ICT Australia (NICTA)
 // 
@@ -114,6 +116,8 @@ op_sqrtmat::apply_direct(Mat< std::complex<typename T1::elem_type> >& out, const
   
   if(A.is_diagmat())
     {
+    arma_extra_debug_print("op_sqrtmat: detected diagonal matrix");
+    
     const uword N = A.n_rows;
     
     out.zeros(N,N);  // aliasing can't happen as op_sqrtmat is defined as cx_mat = op(mat)
@@ -135,11 +139,7 @@ op_sqrtmat::apply_direct(Mat< std::complex<typename T1::elem_type> >& out, const
     return true;
     }
   
-  #if defined(ARMA_OPTIMISE_SYMPD)
-    const bool try_sympd = sympd_helper::guess_sympd_anysize(A);
-  #else
-    const bool try_sympd = false;
-  #endif
+  const bool try_sympd = arma_config::optimise_sympd && sympd_helper::guess_sympd(A);
   
   if(try_sympd)
     {
@@ -175,7 +175,7 @@ op_sqrtmat::apply_direct(Mat< std::complex<typename T1::elem_type> >& out, const
     
     arma_extra_debug_print("op_sqrtmat: sympd optimisation failed");
     
-    // fallthrough if eigen decomposition failed or an eigenvalue is zero
+    // fallthrough if eigen decomposition failed or an eigenvalue is <= 0
     }
   
   
@@ -325,6 +325,8 @@ op_sqrtmat_cx::apply_direct(Mat<typename T1::elem_type>& out, const Base<typenam
   
   if(S.is_diagmat())
     {
+    arma_extra_debug_print("op_sqrtmat_cx: detected diagonal matrix");
+    
     const uword N = S.n_rows;
     
     out.zeros(N,N);  // aliasing can't happen as S is generated
@@ -334,11 +336,7 @@ op_sqrtmat_cx::apply_direct(Mat<typename T1::elem_type>& out, const Base<typenam
     return true;
     }
   
-  #if defined(ARMA_OPTIMISE_SYMPD)
-    const bool try_sympd = sympd_helper::guess_sympd_anysize(S);
-  #else
-    const bool try_sympd = false;
-  #endif
+  const bool try_sympd = arma_config::optimise_sympd && sympd_helper::guess_sympd(S);
   
   if(try_sympd)
     {
@@ -374,7 +372,7 @@ op_sqrtmat_cx::apply_direct(Mat<typename T1::elem_type>& out, const Base<typenam
     
     arma_extra_debug_print("op_sqrtmat_cx: sympd optimisation failed");
     
-    // fallthrough if eigen decomposition failed or an eigenvalue is zero
+    // fallthrough if eigen decomposition failed or an eigenvalue is <= 0
     }
   
   const bool schur_ok = auxlib::schur(U, S);
@@ -476,13 +474,43 @@ op_sqrtmat_sympd::apply_direct(Mat<typename T1::elem_type>& out, const Base<type
   
   #if defined(ARMA_USE_LAPACK)
     {
-    typedef typename T1::pod_type   T;
     typedef typename T1::elem_type eT;
+    typedef typename T1::pod_type   T;
     
     const unwrap<T1>   U(expr.get_ref());
     const Mat<eT>& X = U.M;
     
     arma_debug_check( (X.is_square() == false), "sqrtmat_sympd(): given matrix must be square sized" );
+    
+    if((arma_config::debug) && (is_cx<eT>::yes) && (sympd_helper::check_diag_imag(X) == false))
+      {
+      arma_debug_warn_level(1, "sqrtmat_sympd(): imaginary components on the diagonal are non-zero");
+      }
+    
+    if(is_op_diagmat<T1>::value || X.is_diagmat())
+      {
+      arma_extra_debug_print("op_sqrtmat_sympd: detected diagonal matrix");
+      
+      out = X;
+      
+      eT* colmem = out.memptr();
+      
+      const uword N = X.n_rows;
+      
+      for(uword i=0; i<N; ++i)
+        {
+        eT& out_ii      = colmem[i];
+         T  out_ii_real = access::tmp_real(out_ii);
+        
+        if(out_ii_real < T(0))  { return false; }
+        
+        out_ii = std::sqrt(out_ii);
+        
+        colmem += N;
+        }
+      
+      return true;
+      }
     
     Col< T> eigval;
     Mat<eT> eigvec;

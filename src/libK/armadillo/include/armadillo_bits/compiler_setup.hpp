@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: Apache-2.0
+// 
 // Copyright 2008-2016 Conrad Sanderson (http://conradsanderson.id.au)
 // Copyright 2008-2016 National ICT Australia (NICTA)
 // 
@@ -136,6 +138,11 @@
 #endif
 
 
+// #if defined(ARMA_HAVE_CXX17)
+//   #define arma_warn_unused  [[nodiscard]]
+// #endif
+
+
 #if !defined(ARMA_ALLOW_FAKE_GCC)
   #if (defined(__GNUG__) || defined(__GNUC__)) && (defined(__INTEL_COMPILER) || defined(__NVCC__) || defined(__CUDACC__) || defined(__PGI) || defined(__PATHSCALE__) || defined(__ARMCC_VERSION) || defined(__IBMCPP__))
     #undef  ARMA_DETECTED_FAKE_GCC
@@ -260,12 +267,12 @@
     #define arma_hot __attribute__((__hot__))
   #endif
   
-  #if __has_attribute(__minsize__)
-    #undef  arma_cold
-    #define arma_cold __attribute__((__minsize__))
-  #elif __has_attribute(__cold__)
+  #if __has_attribute(__cold__)
     #undef  arma_cold
     #define arma_cold __attribute__((__cold__))
+  #elif __has_attribute(__minsize__)
+    #undef  arma_cold
+    #define arma_cold __attribute__((__minsize__))
   #endif
   
   #if defined(__has_builtin) && __has_builtin(__builtin_assume_aligned)
@@ -326,6 +333,10 @@
   #pragma warning(disable: 4800)  // value forced to bool
   #pragma warning(disable: 4519)  // C++11: default template args are only allowed on a class template
   
+  #if defined(ARMA_HAVE_CXX17)
+  #pragma warning(disable: 26812)  // unscoped enum
+  #pragma warning(disable: 26819)  // unannotated fallthrough
+  #endif
   
   // #if (_MANAGED == 1) || (_M_CEE == 1)
   //   
@@ -408,9 +419,9 @@
 #endif
 
 
-#if ( defined(_WIN32) || defined(_WIN64) || defined(_MSC_VER) || defined(__MINGW32__) || defined(__MINGW64__) )
-  #undef  ARMA_PRINT_EXCEPTIONS
-  #define ARMA_PRINT_EXCEPTIONS
+#if ( (defined(_WIN32) || defined(_WIN64) || defined(_MSC_VER)) && (!defined(__MINGW32__) && !defined(__MINGW64__)) )
+  #undef  ARMA_PRINT_EXCEPTIONS_INTERNAL
+  #define ARMA_PRINT_EXCEPTIONS_INTERNAL
 #endif
 
 
@@ -454,3 +465,11 @@
 
 #undef minor
 #undef major
+
+
+// optionally allow disabling of compile-time deprecation messages (not recommended)
+
+#if defined(ARMA_IGNORE_DEPRECATED_MARKER) && (!defined(ARMA_DONT_IGNORE_DEPRECATED_MARKER)) && (!defined(ARMA_EXTRA_DEBUG))
+  #undef  arma_deprecated
+  #define arma_deprecated
+#endif

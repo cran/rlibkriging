@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: Apache-2.0
+// 
 // Copyright 2008-2016 Conrad Sanderson (http://conradsanderson.id.au)
 // Copyright 2008-2016 National ICT Australia (NICTA)
 // 
@@ -195,6 +197,8 @@ void
 MapMat<eT>::operator=(MapMat<eT>&& x)
   {
   arma_extra_debug_sigprint();
+  
+  if(this == &x)  { return; }
   
   reset();
   
@@ -1182,11 +1186,9 @@ SpMat_MapMat_val<eT>::operator=(const eT in_val)
     }
   #elif (!defined(ARMA_DONT_USE_STD_MUTEX))
     {
-    s_parent.cache_mutex.lock();
+    const std::lock_guard<std::mutex> lock(s_parent.cache_mutex);
     
     (*this).set(in_val);
-    
-    s_parent.cache_mutex.unlock();
     }
   #else
     {
@@ -1217,11 +1219,9 @@ SpMat_MapMat_val<eT>::operator+=(const eT in_val)
     }
   #elif (!defined(ARMA_DONT_USE_STD_MUTEX))
     {
-    s_parent.cache_mutex.lock();
+    const std::lock_guard<std::mutex> lock(s_parent.cache_mutex);
     
     (*this).add(in_val);
-    
-    s_parent.cache_mutex.unlock();
     }
   #else
     {
@@ -1252,11 +1252,9 @@ SpMat_MapMat_val<eT>::operator-=(const eT in_val)
     }
   #elif (!defined(ARMA_DONT_USE_STD_MUTEX))
     {
-    s_parent.cache_mutex.lock();
+    const std::lock_guard<std::mutex> lock(s_parent.cache_mutex);
     
     (*this).sub(in_val);
-    
-    s_parent.cache_mutex.unlock();
     }
   #else
     {
@@ -1285,11 +1283,9 @@ SpMat_MapMat_val<eT>::operator*=(const eT in_val)
     }
   #elif (!defined(ARMA_DONT_USE_STD_MUTEX))
     {
-    s_parent.cache_mutex.lock();
+    const std::lock_guard<std::mutex> lock(s_parent.cache_mutex);
     
     (*this).mul(in_val);
-    
-    s_parent.cache_mutex.unlock();
     }
   #else
     {
@@ -1318,11 +1314,9 @@ SpMat_MapMat_val<eT>::operator/=(const eT in_val)
     }
   #elif (!defined(ARMA_DONT_USE_STD_MUTEX))
     {
-    s_parent.cache_mutex.lock();
+    const std::lock_guard<std::mutex> lock(s_parent.cache_mutex);
     
     (*this).div(in_val);
-    
-    s_parent.cache_mutex.unlock();
     }
   #else
     {

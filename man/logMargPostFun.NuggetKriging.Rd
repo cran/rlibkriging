@@ -3,7 +3,8 @@
 \name{logMargPostFun.NuggetKriging}
 \alias{logMargPostFun.NuggetKriging}
 \alias{logMargPostFun,NuggetKriging,NuggetKriging-method}
-\title{Compute Log-Marginal-Posterior of NuggetKriging Model}
+\title{Compute the log-marginal posterior of a kriging model, using the
+prior XXXY.}
 \usage{
 \method{logMargPostFun}{NuggetKriging}(object, theta_alpha, grad = FALSE, ...)
 }

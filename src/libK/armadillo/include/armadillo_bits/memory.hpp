@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: Apache-2.0
+// 
 // Copyright 2008-2016 Conrad Sanderson (http://conradsanderson.id.au)
 // Copyright 2008-2016 National ICT Australia (NICTA)
 // 
@@ -79,6 +81,8 @@ memory::acquire(const uword n_elem)
     }
   #elif defined(_MSC_VER)
     {
+    // Windoze is too primitive to handle C++17 std::aligned_alloc()
+    
     //out_memptr = (eT *) malloc(sizeof(eT)*n_elem);
     //out_memptr = (eT *) _aligned_malloc( sizeof(eT)*n_elem, 16 );  // lives in malloc.h
     

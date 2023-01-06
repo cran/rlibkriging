@@ -2,7 +2,7 @@
 % Please edit documentation in R/NoiseKrigingClass.R
 \name{simulate.NoiseKriging}
 \alias{simulate.NoiseKriging}
-\title{Simulation from a \code{NoiseKriging} Object}
+\title{Simulation from a \code{NoiseKriging} model object.}
 \usage{
 \method{simulate}{NoiseKriging}(object, nsim = 1, seed = 123, x, ...)
 }
@@ -23,9 +23,6 @@ a matrix with \code{length(x)} rows and \code{nsim}
     given in \code{x}.
 }
 \description{
-Simulation from a \code{NoiseKriging} model object.
-}
-\details{
 This method draws paths of the stochastic process at new input
 points conditional on the values at the input points used in the
 fit.

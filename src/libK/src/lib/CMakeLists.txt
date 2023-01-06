@@ -5,8 +5,8 @@ add_library(Kriging
         demo/DemoClass.cpp include/libKriging/demo/DemoClass.hpp
         demo/DemoFunction.cpp include/libKriging/demo/DemoFunction.hpp
         demo/DemoArmadilloClass.cpp include/libKriging/demo/DemoArmadilloClass.hpp
-        ##LinearRegression.cpp include/libKriging/##LinearRegression.hpp
-        ##LinearRegressionOptim.cpp include/libKriging/##LinearRegressionOptim.hpp
+        ##############LinearRegression.cpp include/libKriging/##############LinearRegression.hpp
+        ##############LinearRegressionOptim.cpp include/libKriging/##############LinearRegressionOptim.hpp
         Trend.cpp include/libKriging/Trend.hpp
         Optim.cpp include/libKriging/Optim.hpp
         Random.cpp include/libKriging/Random.hpp
@@ -21,7 +21,8 @@ add_library(Kriging
         CacheFunction.cpp include/libKriging/CacheFunction.hpp include/libKriging/utils/custom_hash_function.hpp include/libKriging/utils/cache_details.hpp
         include/libKriging/utils/LinearHashStorage.hpp
         include/libKriging/utils/data_from_arma_vec.hpp
-        include/libKriging/version.hpp ${VERSION_FILE})
+        include/libKriging/utils/ExplicitCopySpecifier.hpp
+        include/libKriging/version.hpp ${VERSION_FILE} )
 
 if (CXX_CLANG_TIDY)
     set_target_properties(Kriging

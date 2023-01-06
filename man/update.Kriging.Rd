@@ -2,7 +2,7 @@
 % Please edit documentation in R/KrigingClass.R
 \name{update.Kriging}
 \alias{update.Kriging}
-\title{Update a \code{Kriging} Object with New Points}
+\title{Update a \code{Kriging} model object with new points}
 \usage{
 \method{update}{Kriging}(object, newy, newX, ...)
 }

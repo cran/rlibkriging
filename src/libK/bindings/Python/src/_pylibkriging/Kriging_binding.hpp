@@ -13,12 +13,15 @@
 namespace py = pybind11;
 
 class PyKriging {
+ private:
+  PyKriging(std::unique_ptr<Kriging>&& internal) : m_internal(std::move(internal)) {}
+
  public:
   PyKriging(const std::string& kernel);
   PyKriging(const py::array_t<double>& y,
             const py::array_t<double>& X,
             const std::string& covType,
-            const Trend::RegressionModel& regmodel,
+            const std::string& regmodel,
             bool normalize,
             const std::string& optim,
             const std::string& objective,
@@ -26,16 +29,20 @@ class PyKriging {
   PyKriging(const py::array_t<double>& y,
             const py::array_t<double>& X,
             const std::string& covType,
-            const Trend::RegressionModel& regmodel,
+            const std::string& regmodel,
             bool normalize,
             const std::string& optim,
             const std::string& objective,
             const py::dict& dict);
   ~PyKriging();
 
+  PyKriging(const PyKriging& other);
+
+  [[nodiscard]] PyKriging copy() const;
+
   void fit(const py::array_t<double>& y,
            const py::array_t<double>& X,
-           const Trend::RegressionModel& regmodel,
+           const std::string& regmodel,
            bool normalize,
            const std::string& optim,
            const std::string& objective,

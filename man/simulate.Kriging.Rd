@@ -2,7 +2,7 @@
 % Please edit documentation in R/KrigingClass.R
 \name{simulate.Kriging}
 \alias{simulate.Kriging}
-\title{Simulation from a \code{Kriging} Object}
+\title{Simulation from a \code{Kriging} model object.}
 \usage{
 \method{simulate}{Kriging}(object, nsim = 1, seed = 123, x, ...)
 }
@@ -23,9 +23,6 @@ a matrix with \code{length(x)} rows and \code{nsim}
     given in \code{x}.
 }
 \description{
-Simulation from a \code{Kriging} model object.
-}
-\details{
 This method draws paths of the stochastic process at new input
 points conditional on the values at the input points used in the
 fit.

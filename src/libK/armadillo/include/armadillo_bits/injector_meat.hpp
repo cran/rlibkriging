@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: Apache-2.0
+// 
 // Copyright 2008-2016 Conrad Sanderson (http://conradsanderson.id.au)
 // Copyright 2008-2016 National ICT Australia (NICTA)
 // 
@@ -272,6 +274,7 @@ mat_injector<T1>::end_of_row() const
 
 template<typename T1>
 arma_cold
+inline
 const mat_injector<T1>&
 operator<<(const mat_injector<T1>& ref, const typename mat_injector<T1>::elem_type val)
   {
@@ -286,6 +289,7 @@ operator<<(const mat_injector<T1>& ref, const typename mat_injector<T1>::elem_ty
 
 template<typename T1>
 arma_cold
+inline
 const mat_injector<T1>&
 operator<<(const mat_injector<T1>& ref, const injector_end_of_row<>& x)
   {
@@ -300,7 +304,7 @@ operator<<(const mat_injector<T1>& ref, const injector_end_of_row<>& x)
 
 
 //// using a mixture of operator << and , doesn't work yet
-//// e.g. A << 1, 2, 3 << endr
+//// eg. A << 1, 2, 3 << endr
 //// in the above "3 << endr" requires special handling.
 //// similarly, special handling is necessary for "endr << 3"
 //// 
@@ -577,6 +581,7 @@ field_injector<T1>::end_of_row() const
 
 template<typename T1>
 arma_cold
+inline
 const field_injector<T1>&
 operator<<(const field_injector<T1>& ref, const typename field_injector<T1>::object_type& val)
   {
@@ -591,6 +596,7 @@ operator<<(const field_injector<T1>& ref, const typename field_injector<T1>::obj
 
 template<typename T1>
 arma_cold
+inline
 const field_injector<T1>&
 operator<<(const field_injector<T1>& ref, const injector_end_of_row<>& x)
   {

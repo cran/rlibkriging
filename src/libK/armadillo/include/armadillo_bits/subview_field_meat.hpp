@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: Apache-2.0
+// 
 // Copyright 2008-2016 Conrad Sanderson (http://conradsanderson.id.au)
 // Copyright 2008-2016 National ICT Australia (NICTA)
 // 
@@ -512,7 +514,7 @@ subview_field<oT>::extract(field<oT>& actual_out, const subview_field<oT>& in)
   //
   const bool alias = (&actual_out == &in.f);
   
-  field<oT>* tmp = (alias) ? new field<oT> : 0;
+  field<oT>* tmp = (alias) ? new field<oT> : nullptr;
   field<oT>& out = (alias) ? (*tmp)        : actual_out;
   
   //

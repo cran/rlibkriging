@@ -2,17 +2,18 @@
 % Please edit documentation in R/NoiseKrigingClass.R
 \name{NoiseKriging}
 \alias{NoiseKriging}
-\title{Create a \code{NoiseKriging} Object using \pkg{libKriging}}
+\title{Create an object with S3 class \code{"NoiseKriging"} using
+the \pkg{libKriging} library.}
 \usage{
 NoiseKriging(
-  y,
-  noise,
-  X,
-  kernel,
+  y = NULL,
+  noise = NULL,
+  X = NULL,
+  kernel = NULL,
   regmodel = c("constant", "linear", "interactive"),
   normalize = FALSE,
   optim = c("BFGS", "none"),
-  objective = c("LL", "LMP"),
+  objective = c("LL"),
   parameters = NULL
 )
 }
@@ -33,7 +34,7 @@ NoiseKriging(
 values in the interval \eqn{[0, 1]}.}
 
 \item{optim}{Character giving the Optimization method used to fit
-hyper-parameters. Possible values are: \code{"BFGS"} and \code{"none"}, 
+hyper-parameters. Possible values are: \code{"BFGS"} and \code{"none"},
 the later simply keeping
 the values given in \code{parameters}. The method
 \code{"BFGS"} uses the gradient of the objective.}
@@ -55,10 +56,6 @@ An object with S3 class \code{"NoiseKriging"}. Should be used
     methods.
 }
 \description{
-Create an object with S3 class \code{"NoiseKriging"} using
-the \pkg{libKriging} library.
-}
-\details{
 The hyper-parameters (variance and vector of correlation ranges)
 are estimated thanks to the optimization of a criterion given by
 \code{objective}, using the method given in \code{optim}.

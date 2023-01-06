@@ -2,7 +2,7 @@
 % Please edit documentation in R/NuggetKrigingClass.R
 \name{update.NuggetKriging}
 \alias{update.NuggetKriging}
-\title{Update a \code{NuggetKriging} Object with New Points}
+\title{Update a \code{NuggetKriging} model object with new points}
 \usage{
 \method{update}{NuggetKriging}(object, newy, newX, ...)
 }

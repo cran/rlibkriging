@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: Apache-2.0
+// 
 // Copyright 2008-2016 Conrad Sanderson (http://conradsanderson.id.au)
 // Copyright 2008-2016 National ICT Australia (NICTA)
 // 
@@ -16,7 +18,7 @@
 
 #if defined(ARMA_USE_HDF5)
 
-#if !defined(ARMA_USE_HDF5_ALT)
+#if !defined(ARMA_USE_HDF5_CMAKE)
   
   // macros needed if the wrapper run-time library is not being used
   

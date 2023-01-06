@@ -1,5 +1,5 @@
 Name:           armadillo
-Version:        10.1.x
+Version:        11.1.x
 Release:        1%{?dist}
 Summary:        Fast C++ matrix library with syntax similar to MATLAB and Octave
 
@@ -7,7 +7,7 @@ License:        ASL 2.0
 URL:            http://arma.sourceforge.net/
 Source:         http://sourceforge.net/projects/arma/files/%{name}-%{version}.tar.xz
 
-BuildRequires:  gcc-c++, cmake, lapack-devel, arpack-devel, hdf5-devel, zlib-devel
+BuildRequires:  gcc-c++, cmake, lapack-devel, arpack-devel, hdf5-devel
 %{!?openblas_arches:%global openblas_arches x86_64 %{ix86} armv7hl %{power64} aarch64}
 %ifarch %{openblas_arches}
 BuildRequires:  openblas-devel
@@ -36,7 +36,7 @@ computer vision, signal processing, bioinformatics, statistics, finance, etc.
 %package devel
 Summary:        Development headers and documentation for the Armadillo C++ library
 Requires:       %{name} = %{version}-%{release}
-Requires:       lapack-devel,  atlas-devel, arpack-devel, hdf5-devel, zlib-devel, libstdc++-devel
+Requires:       lapack-devel,  arpack-devel, hdf5-devel, libstdc++-devel
 %ifarch %{openblas_arches}
 Requires:       openblas-devel
 %endif

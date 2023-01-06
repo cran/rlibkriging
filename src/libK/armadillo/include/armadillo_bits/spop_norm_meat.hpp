@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: Apache-2.0
+// 
 // Copyright 2008-2016 Conrad Sanderson (http://conradsanderson.id.au)
 // Copyright 2008-2016 National ICT Australia (NICTA)
 // 
@@ -98,6 +100,28 @@ spop_norm::mat_norm_inf(const SpMat<eT>& X)
   
   // TODO: this can be sped up with a dedicated implementation
   return as_scalar( max( sum(abs(X), 1), 0) );
+  }
+
+
+
+template<typename eT>
+inline
+typename get_pod_type<eT>::result
+spop_norm::vec_norm_k(const eT* mem, const uword N, const uword k)
+  {
+  arma_extra_debug_sigprint();
+  
+  arma_debug_check( (k == 0), "norm(): k must be greater than zero" );
+  
+  // create a fake dense vector to allow reuse of code for dense vectors
+  Col<eT> fake_vector( access::rwp(mem), N, false );
+  
+  const Proxy< Col<eT> > P_fake_vector(fake_vector);
+  
+  if(k == uword(1))  { return op_norm::vec_norm_1(P_fake_vector); }
+  if(k == uword(2))  { return op_norm::vec_norm_2(P_fake_vector); }
+  
+  return op_norm::vec_norm_k(P_fake_vector, int(k));
   }
 
 

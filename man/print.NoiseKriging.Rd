@@ -2,7 +2,7 @@
 % Please edit documentation in R/NoiseKrigingClass.R
 \name{print.NoiseKriging}
 \alias{print.NoiseKriging}
-\title{Print a \code{NoiseKriging} object}
+\title{Print the content of a \code{NoiseKriging} object.}
 \usage{
 \method{print}{NoiseKriging}(x, ...)
 }

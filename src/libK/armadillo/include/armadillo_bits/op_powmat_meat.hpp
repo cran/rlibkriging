@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: Apache-2.0
+// 
 // Copyright 2008-2016 Conrad Sanderson (http://conradsanderson.id.au)
 // Copyright 2008-2016 National ICT Australia (NICTA)
 // 
@@ -53,13 +55,13 @@ op_powmat::apply_direct(Mat<typename T1::elem_type>& out, const Base<typename T1
     {
     if(y == uword(1))
       {
-      return op_inv::apply_direct(out, X.get_ref(), "powmat()");
+      return op_inv_gen_default::apply_direct(out, X.get_ref(), "powmat()");
       }
     else
       {
       Mat<eT> X_inv;
       
-      const bool inv_status = op_inv::apply_direct(X_inv, X.get_ref(), "powmat()");
+      const bool inv_status = op_inv_gen_default::apply_direct(X_inv, X.get_ref(), "powmat()");
       
       if(inv_status == false)  { return false; }
       
@@ -94,6 +96,8 @@ op_powmat::apply_direct_positive(Mat<eT>& out, const Mat<eT>& X, const uword y)
   
   if(X.is_diagmat())
     {
+    arma_extra_debug_print("op_powmat: detected diagonal matrix");
+    
     podarray<eT> tmp(N);  // use temporary array in case we have aliasing
     
     for(uword i=0; i<N; ++i)  { tmp[i] = eop_aux::pow(X.at(i,i), int(y)); }
@@ -190,6 +194,8 @@ op_powmat_cx::apply_direct(Mat< std::complex<typename T1::pod_type> >& out, cons
   
   if(A.is_diagmat())
     {
+    arma_extra_debug_print("op_powmat_cx: detected diagonal matrix");
+    
     podarray<out_eT> tmp(N);  // use temporary array in case we have aliasing
     
     for(uword i=0; i<N; ++i)  { tmp[i] = eop_aux::pow( std::complex<in_T>(A.at(i,i)), y) ; }
@@ -201,14 +207,12 @@ op_powmat_cx::apply_direct(Mat< std::complex<typename T1::pod_type> >& out, cons
     return true;
     }
   
-  #if defined(ARMA_OPTIMISE_SYMPD)
-    const bool try_sympd = sympd_helper::guess_sympd_anysize(A);
-  #else
-    const bool try_sympd = false;
-  #endif
+  const bool try_sympd = arma_config::optimise_sympd && sympd_helper::guess_sympd(A);
   
   if(try_sympd)
     {
+    arma_extra_debug_print("op_powmat_cx: attempting sympd optimisation");
+    
     Col<in_T>  eigval;
     Mat<in_eT> eigvec;
     
@@ -225,7 +229,9 @@ op_powmat_cx::apply_direct(Mat< std::complex<typename T1::pod_type> >& out, cons
       return true;
       }
     
-    // fallthrough
+    arma_extra_debug_print("op_powmat_cx: sympd optimisation failed");
+    
+    // fallthrough if optimisation failed
     }
   
   bool powmat_status = false;

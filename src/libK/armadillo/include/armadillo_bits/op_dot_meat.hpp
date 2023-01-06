@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: Apache-2.0
+// 
 // Copyright 2008-2016 Conrad Sanderson (http://conradsanderson.id.au)
 // Copyright 2008-2016 National ICT Australia (NICTA)
 // 
@@ -448,12 +450,6 @@ op_cdot::direct_cdot(const uword n_elem, const eT* const A, const eT* const B)
       blas::gemv(&trans, &m, &n, &alpha, A, &m, B, &inc, &beta, &result[0], &inc);
       
       return result[0];
-      }
-    #elif defined(ARMA_USE_ATLAS)
-      {
-      // TODO: use dedicated atlas functions cblas_cdotc_sub() and cblas_zdotc_sub() and retune threshold
-
-      return op_cdot::direct_cdot_arma(n_elem, A, B);
       }
     #else
       {

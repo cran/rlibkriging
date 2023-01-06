@@ -2,12 +2,13 @@
 % Please edit documentation in R/NuggetKrigingClass.R
 \name{NuggetKriging}
 \alias{NuggetKriging}
-\title{Create a \code{NuggetKriging} Object using \pkg{libKriging}}
+\title{Create an object with S3 class \code{"NuggetKriging"} using
+the \pkg{libKriging} library.}
 \usage{
 NuggetKriging(
-  y,
-  X,
-  kernel,
+  y = NULL,
+  X = NULL,
+  kernel = NULL,
   regmodel = c("constant", "linear", "interactive"),
   normalize = FALSE,
   optim = c("BFGS", "none"),
@@ -30,7 +31,7 @@ NuggetKriging(
 values in the interval \eqn{[0, 1]}.}
 
 \item{optim}{Character giving the Optimization method used to fit
-hyper-parameters. Possible values are: \code{"BFGS"} and \code{"none"}, 
+hyper-parameters. Possible values are: \code{"BFGS"} and \code{"none"},
 the later simply keeping
 the values given in \code{parameters}. The method
 \code{"BFGS"} uses the gradient of the objective.}
@@ -40,9 +41,9 @@ optimize. Possible values are: \code{"LL"} for the
 Log-Likelihood and \code{"LMP"} for the Log-Marginal Posterior.}
 
 \item{parameters}{Initial values for the hyper-parameters. When provided this
-must be named list with some elements \code{"sigma2"}, \code{"theta"}, \code{"nugget"} 
-containing the initial value(s) for the variance, range and nugget 
-parameters. If \code{theta} is a matrix with more than one row, 
+must be named list with some elements \code{"sigma2"}, \code{"theta"}, \code{"nugget"}
+containing the initial value(s) for the variance, range and nugget
+parameters. If \code{theta} is a matrix with more than one row,
 each row is used as a starting point for optimization.}
 }
 \value{
@@ -51,10 +52,6 @@ An object with S3 class \code{"NuggetKriging"}. Should be used
     methods.
 }
 \description{
-Create an object with S3 class \code{"NuggetKriging"} using
-the \pkg{libKriging} library.
-}
-\details{
 The hyper-parameters (variance and vector of correlation ranges)
 are estimated thanks to the optimization of a criterion given by
 \code{objective}, using the method given in \code{optim}.

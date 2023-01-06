@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: Apache-2.0
+// 
 // Copyright 2008-2016 Conrad Sanderson (http://conradsanderson.id.au)
 // Copyright 2008-2016 National ICT Australia (NICTA)
 // 
@@ -33,9 +35,10 @@ subview_cube_each_common<eT>::subview_cube_each_common(const Cube<eT>& in_p)
 
 
 template<typename eT>
+template<typename eT2>
 inline
 void
-subview_cube_each_common<eT>::check_size(const Mat<eT>& A) const
+subview_cube_each_common<eT>::check_size(const Mat<eT2>& A) const
   {
   if(arma_config::debug)
     {
@@ -49,10 +52,11 @@ subview_cube_each_common<eT>::check_size(const Mat<eT>& A) const
 
 
 template<typename eT>
+template<typename eT2>
 arma_cold
 inline
 const std::string
-subview_cube_each_common<eT>::incompat_size_string(const Mat<eT>& A) const
+subview_cube_each_common<eT>::incompat_size_string(const Mat<eT2>& A) const
   {
   std::ostringstream tmp;
   
@@ -132,7 +136,7 @@ subview_cube_each1<eT>::operator+= (const Base<eT,T1>& in)
   const uword p_n_elem_slice = p.n_elem_slice;
   
   const eT* A_mem = A.memptr();
-    
+  
   for(uword i=0; i < p_n_slices; ++i)  { arrayops::inplace_plus( p.slice_memptr(i), A_mem, p_n_elem_slice ); }
   }
 
@@ -285,7 +289,7 @@ subview_cube_each2<eT,TB>::operator= (const Base<eT,T1>& in)
   
   const uword p_n_slices     = p.n_slices;
   const uword p_n_elem_slice = p.n_elem_slice;
-    
+  
   const uword* indices_mem = U.M.memptr();
   const uword  N           = U.M.n_elem;
   
@@ -324,7 +328,7 @@ subview_cube_each2<eT,TB>::operator+= (const Base<eT,T1>& in)
   
   const uword p_n_slices     = p.n_slices;
   const uword p_n_elem_slice = p.n_elem_slice;
-    
+  
   const uword* indices_mem = U.M.memptr();
   const uword  N           = U.M.n_elem;
   
@@ -363,7 +367,7 @@ subview_cube_each2<eT,TB>::operator-= (const Base<eT,T1>& in)
   
   const uword p_n_slices     = p.n_slices;
   const uword p_n_elem_slice = p.n_elem_slice;
-    
+  
   const uword* indices_mem = U.M.memptr();
   const uword  N           = U.M.n_elem;
   
@@ -402,7 +406,7 @@ subview_cube_each2<eT,TB>::operator%= (const Base<eT,T1>& in)
   
   const uword p_n_slices     = p.n_slices;
   const uword p_n_elem_slice = p.n_elem_slice;
-    
+  
   const uword* indices_mem = U.M.memptr();
   const uword  N           = U.M.n_elem;
   
@@ -441,7 +445,7 @@ subview_cube_each2<eT,TB>::operator/= (const Base<eT,T1>& in)
   
   const uword p_n_slices     = p.n_slices;
   const uword p_n_elem_slice = p.n_elem_slice;
-    
+  
   const uword* indices_mem = U.M.memptr();
   const uword  N           = U.M.n_elem;
   

@@ -17,4 +17,5 @@ ExternalProject_Add(lbfgsb-build
                         "-DCMAKE_BUILD_TYPE=@CMAKE_BUILD_TYPE@"
                         "-DCMAKE_INSTALL_PREFIX=@lbfgsb_INSTALL_DIR@"
                         "-DEMBED_CUSTOM_BLAS=@EMBED_CUSTOM_BLAS@"
+                        "-DCMAKE_INSTALL_LIBDIR=@CMAKE_INSTALL_LIBDIR@"
 )

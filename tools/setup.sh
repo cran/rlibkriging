@@ -16,7 +16,7 @@ rm -rf $LIBKRIGING_SRC_PATH/docs
  # then remove LinearRegressionOptim example
 sed -i.bak "s/LinearRegression/##LinearRegression/g" $LIBKRIGING_SRC_PATH/src/lib/CMakeLists.txt
 rm -f $LIBKRIGING_SRC_PATH/src/lib/CMakeLists.txt.bak
- 
+
 rm -f $LIBKRIGING_SRC_PATH/bindings/R/rlibkriging/src/linear_regression*
  # & unsuitable tests
 rm -f $LIBKRIGING_SRC_PATH/bindings/R/rlibkriging/tests/testthat/test-binding-consistency.R
@@ -25,7 +25,6 @@ rm -f $LIBKRIGING_SRC_PATH/bindings/R/rlibkriging/tests/testthat/test-binding-co
 if [ -d $LIBKRIGING_SRC_PATH/dependencies/lbfgsb_cpp ]; then
   rm -fr $LIBKRIGING_SRC_PATH/lbfgsb_cpp
   mv $LIBKRIGING_SRC_PATH/dependencies/lbfgsb_cpp $LIBKRIGING_SRC_PATH/.
-  rm -fr $LIBKRIGING_SRC_PATH/lbfgsb_cpp/examples
   rm -rf $LIBKRIGING_SRC_PATH/dependencies/lbfgsb_cpp
 elif [ ! -d $LIBKRIGING_SRC_PATH/lbfgsb_cpp ]; then
   echo "Cannot migrate lbfgsb_cpp dependency"
@@ -62,11 +61,18 @@ find $LIBKRIGING_SRC_PATH -type f -name *.bak -exec rm -f {} +;
 RLIBKRIGING_PATH=$LIBKRIGING_SRC_PATH"/bindings/R/rlibkriging/"
 
 # overwrite libK/src/Makevars* with ./src/Makevars*
-cp src/Makevars* $RLIBKRIGING_PATH/src/. 
+cp src/Makevars* $RLIBKRIGING_PATH/src/.
 
 # copy resources from libK/binding/R
+rm -rf R
 cp -r $RLIBKRIGING_PATH/R .
+rm -rf src/*.cpp
 cp -r $RLIBKRIGING_PATH/src .
+rm -rf tests
 cp -r $RLIBKRIGING_PATH/tests .
-cp -r $RLIBKRIGING_PATH/man .
 cp -r $RLIBKRIGING_PATH/NAMESPACE .
+
+# sync man content
+rm -rf man
+Rscript -e "roxygen2::roxygenise(package.dir = '.')"
+rm -rf $LIBKRIGING_SRC_PATH/build

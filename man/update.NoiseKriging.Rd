@@ -2,7 +2,7 @@
 % Please edit documentation in R/NoiseKrigingClass.R
 \name{update.NoiseKriging}
 \alias{update.NoiseKriging}
-\title{Update a \code{NoiseKriging} Object with New Points}
+\title{Update a \code{NoiseKriging} model object with new points}
 \usage{
 \method{update}{NoiseKriging}(object, newy, newnoise, newX, ...)
 }

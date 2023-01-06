@@ -2,7 +2,7 @@
 % Please edit documentation in R/NuggetKrigingClass.R
 \name{predict.NuggetKriging}
 \alias{predict.NuggetKriging}
-\title{Prediction Method  for a \code{NuggetKriging} Object}
+\title{Predict from a \code{NuggetKriging} object.}
 \usage{
 \method{predict}{NuggetKriging}(object, x, stdev = TRUE, cov = FALSE, deriv = FALSE, ...)
 }
@@ -27,9 +27,6 @@ A list containing the element \code{mean} and possibly
     \code{stdev} and  \code{cov}.
 }
 \description{
-Predict from a \code{NuggetKriging} object.
-}
-\details{
 Given "new" input points, the method compute the expectation,
 variance and (optionnally) the covariance of the corresponding
 stochastic process, conditional on the values at the input points

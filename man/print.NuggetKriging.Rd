@@ -2,7 +2,7 @@
 % Please edit documentation in R/NuggetKrigingClass.R
 \name{print.NuggetKriging}
 \alias{print.NuggetKriging}
-\title{Print a \code{NuggetKriging} object}
+\title{Print the content of a \code{NuggetKriging} object.}
 \usage{
 \method{print}{NuggetKriging}(x, ...)
 }

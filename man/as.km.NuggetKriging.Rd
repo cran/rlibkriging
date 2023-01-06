@@ -2,7 +2,8 @@
 % Please edit documentation in R/NuggetKrigingClass.R
 \name{as.km.NuggetKriging}
 \alias{as.km.NuggetKriging}
-\title{Coerce a \code{NuggetKriging} Object into the Class \code{"km"}}
+\title{Coerce a \code{NuggetKriging} object into the \code{"km"} class of the
+\pkg{DiceKriging} package.}
 \usage{
 \method{as.km}{NuggetKriging}(x, .call = NULL, ...)
 }

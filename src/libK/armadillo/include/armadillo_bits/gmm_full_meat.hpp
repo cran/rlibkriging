@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: Apache-2.0
+// 
 // Copyright 2008-2016 Conrad Sanderson (http://conradsanderson.id.au)
 // Copyright 2008-2016 National ICT Australia (NICTA)
 // 
@@ -920,7 +922,7 @@ gmm_full<eT>::init_constants(const bool calc_chol)
   const uword N_dims = means.n_rows;
   const uword N_gaus = means.n_cols;
   
-  const eT tmp = (eT(N_dims)/eT(2)) * std::log(eT(2) * Datum<eT>::pi);
+  const eT tmp = (eT(N_dims)/eT(2)) * std::log(Datum<eT>::tau);
   
   //
   
@@ -2186,6 +2188,10 @@ gmm_full<eT>::km_iterate(const Mat<eT>& X, const uword max_iter, const bool verb
       }
     #else
       {
+      acc_hefts.zeros();
+      acc_means.zeros();
+      last_indx.zeros();
+      
       uword* acc_hefts_mem = acc_hefts.memptr();
       uword* last_indx_mem = last_indx.memptr();
       

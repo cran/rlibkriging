@@ -5,14 +5,40 @@
 # also defined, but not for general use are
 #  LAPACK_LIBRARY, where to find the LAPACK library.
 
-SET(LAPACK_NAMES ${LAPACK_NAMES} lapack)
+SET(LAPACK_NAMES ${LAPACK_NAMES} lapack Rlapack)
 FIND_LIBRARY(LAPACK_LIBRARY
   NAMES ${LAPACK_NAMES}
-  PATHS /usr/lib64/atlas /usr/lib/atlas /usr/lib64 /usr/lib /usr/local/lib64 /usr/local/lib
+  PATHS ${CMAKE_SYSTEM_LIBRARY_PATH} /usr/lib64/atlas /usr/lib/atlas /usr/lib64 /usr/lib /usr/local/lib64 /usr/local/lib /opt/R-devel/lib64/R/lib
   )
 
+
+IF (UNIX AND LAPACK_LIBRARY)
+    # Could be a partial version of Lapack without simple precision arithmetics
+    get_filename_component(LAPACK_LIBRARY_DIR "${LAPACK_LIBRARY}" DIRECTORY)
+    get_filename_component(LAPACK_LIBRARY_NAME "${LAPACK_LIBRARY}" NAME_WE)
+    IF (LAPACK_LIBRARY_NAME STREQUAL "libRlapack")
+        # Sounds a lapack lib embedded with R: high risk
+        include(CheckCSourceCompiles)
+        set(CMAKE_REQUIRED_LINK_OPTIONS -L${LAPACK_LIBRARY_DIR} -lRlapack -lRblas)
+        check_c_source_compiles("
+            void cgees_(); // bad signature, doesn't matter; just check existing symbol
+            void xerbla_() { } // usually provided by R
+            int main() { cgees_(); }"
+            HAS_SIMPLE_PRECISION_LAPACK)
+        IF (NOT HAS_SIMPLE_PRECISION_LAPACK)
+            message(STATUS "Requires extra slapack to get 32bits arithmetics")
+            include(${CMAKE_CURRENT_SOURCE_DIR}/cmake_aux/Tools/build_external_project.cmake)
+            build_external_project(slapack "https://github.com/libKriging/slapack.git")
+            # build_external_project(slapack "file:///local/path/for/testing")
+            find_package(slapack REQUIRED PATHS "${CMAKE_CURRENT_BINARY_DIR}/ExternalProjects/slapack" NO_DEFAULT_PATH)
+            get_target_property(SLAPACK_LIBRARY slapack::slapack IMPORTED_LOCATION_NOCONFIG)
+        ENDIF()
+    ENDIF()
+ENDIF()
+
+
 IF (LAPACK_LIBRARY)
-  SET(LAPACK_LIBRARIES ${LAPACK_LIBRARY})
+  SET(LAPACK_LIBRARIES ${LAPACK_LIBRARY} ${SLAPACK_LIBRARY})
   SET(LAPACK_FOUND "YES")
 ELSE (LAPACK_LIBRARY)
   SET(LAPACK_FOUND "NO")

@@ -1,4 +1,5 @@
-
+# SPDX-License-Identifier: Apache-2.0
+# 
 # Copyright 2008-2016 Conrad Sanderson (http://conradsanderson.id.au)
 # Copyright 2008-2016 National ICT Australia (NICTA)
 # 
@@ -15,14 +16,14 @@
 # ------------------------------------------------------------------------
 
 
-## NOTE: If you prefer to link your programs directly with BLAS and LAPACK,
+## NOTE: If you prefer to link your programs _directly_ with OpenBLAS, BLAS or LAPACK,
 ## NOTE: do not use this installer.
 ## NOTE: To use Armadillo without installation, compile your programs along these lines:
-## NOTE: g++ prog.cpp -o prog -O2 -I /home/blah/armadillo-7.200.3/include -DARMA_DONT_USE_WRAPPER -lblas -llapack
+## NOTE: g++ prog.cpp -o prog -O2 -I /home/blah/armadillo-7.200.3/include -DARMA_DONT_USE_WRAPPER -lopenblas -llapack
 ## NOTE: The above command line assumes that you have unpacked the armadillo archive into /home/blah/  
 ## NOTE: You will need to adjust this for later versions of Armadillo (ie. change the 7.200.3 part)
 ## NOTE: and/or if you have unpacked the armadillo archive into a different directory.
-## NOTE: Replace -lblas with -lopenblas if you have OpenBLAS (recommended).
+## NOTE: Replace -lopenblas with -lblas if you don't have OpenBLAS.
 ## NOTE: On macOS, replace -lblas -llapack with -framework Accelerate
 ## NOTE: More details: http://arma.sourceforge.net/faq.html
 
@@ -55,21 +56,10 @@ set(ARMA_USE_WRAPPER true)
 set(ARMA_USE_LAPACK     false)
 set(ARMA_USE_BLAS       false)
 set(ARMA_USE_ATLAS      false)
-set(ARMA_USE_HDF5_ALT   false)
+set(ARMA_USE_HDF5_CMAKE false)
 set(ARMA_USE_ARPACK     false)
 set(ARMA_USE_EXTERN_RNG false)
 set(ARMA_USE_SUPERLU    false)  # Caveat: only SuperLU version 5.x can be used!
-
-## NOTE: OpenBLAS appears to have its own LAPACK functions,
-## NOTE: but on some systems the installed version of OpenBLAS
-## NOTE: has been modified not to include LAPACK functions.
-## NOTE: As the presence of LAPACK functions in OpenBLAS can't be guaranteed,
-## NOTE: this installer script requires LAPACK to be present on the system
-## NOTE: in order to enable the use of LAPACK functions by Armadillo.
-## NOTE: This installer will link with OpenBLAS first,
-## NOTE: so if a full version of OpenBLAS is actually present on the system,
-## NOTE: the linker should make use of LAPACK functions from OpenBLAS
-## NOTE: instead of standard LAPACK.
 
 
 ## extract version from sources
@@ -208,6 +198,10 @@ option(DETECT_HDF5 "Detect HDF5 and include HDF5 support, if found" ON)
 ## you can also disable HDF5 detection directly on the command line:
 ## cmake -D DETECT_HDF5=false .
 
+option(OPENBLAS_PROVIDES_LAPACK "Assume that OpenBLAS provides LAPACK functions" OFF)
+## Example use on the command line:
+## cmake -D OPENBLAS_PROVIDES_LAPACK=true .
+
 option(ALLOW_FLEXIBLAS_LINUX "Allow detection of FlexiBLAS on Linux" ON)
 # set(ALLOW_FLEXIBLAS_LINUX false)
 ## uncomment the above line to disable the detection of FlexiBLAS;
@@ -222,9 +216,13 @@ option(ALLOW_BLAS_LAPACK_MACOS "Allow detection of BLAS and LAPACK on macOS" OFF
 ## Example use on the command line:
 ## cmake -D ALLOW_BLAS_LAPACK_MACOS=true .
 
-option(BUILD_SMOKE_TEST "Build a smoke test" OFF)
-## Example use on the command line:
-## cmake -D BUILD_SMOKE_TEST=true .
+option(BUILD_SMOKE_TEST "Build the smoke test" ON)
+# set(BUILD_SMOKE_TEST false)
+## uncomment the above line to disable building the smoke test;
+## you can also disable building the smoke test directly on the command line:
+## cmake -D BUILD_SMOKE_TEST=false .
+## 
+## to run the smoke test on the command line:
 ## make
 ## ctest
 
@@ -249,12 +247,16 @@ message(STATUS "CMAKE_SYSTEM_NAME          = ${CMAKE_SYSTEM_NAME}"         )
 message(STATUS "CMAKE_CXX_COMPILER_ID      = ${CMAKE_CXX_COMPILER_ID}"     )
 message(STATUS "CMAKE_CXX_COMPILER_VERSION = ${CMAKE_CXX_COMPILER_VERSION}")
 message(STATUS "CMAKE_COMPILER_IS_GNUCXX   = ${CMAKE_COMPILER_IS_GNUCXX}"  )
-message(STATUS "BUILD_SHARED_LIBS          = ${BUILD_SHARED_LIBS}"         )
-message(STATUS "DETECT_HDF5                = ${DETECT_HDF5}"               )
-message(STATUS "ALLOW_FLEXIBLAS_LINUX      = ${ALLOW_FLEXIBLAS_LINUX}"     )
-message(STATUS "ALLOW_OPENBLAS_MACOS       = ${ALLOW_OPENBLAS_MACOS}"      )
-message(STATUS "ALLOW_BLAS_LAPACK_MACOS    = ${ALLOW_BLAS_LAPACK_MACOS}"   )
-message(STATUS "BUILD_SMOKE_TEST           = ${BUILD_SMOKE_TEST}"          )
+
+message(STATUS "")
+message(STATUS "*** Options:"                                           )
+message(STATUS "BUILD_SHARED_LIBS         = ${BUILD_SHARED_LIBS}"       )
+message(STATUS "DETECT_HDF5               = ${DETECT_HDF5}"             )
+message(STATUS "OPENBLAS_PROVIDES_LAPACK  = ${OPENBLAS_PROVIDES_LAPACK}")
+message(STATUS "ALLOW_FLEXIBLAS_LINUX     = ${ALLOW_FLEXIBLAS_LINUX}"   )
+message(STATUS "ALLOW_OPENBLAS_MACOS      = ${ALLOW_OPENBLAS_MACOS}"    )
+message(STATUS "ALLOW_BLAS_LAPACK_MACOS   = ${ALLOW_BLAS_LAPACK_MACOS}" )
+message(STATUS "BUILD_SMOKE_TEST          = ${BUILD_SMOKE_TEST}"        )
 
 message(STATUS "")
 message(STATUS "*** Looking for external libraries")
@@ -328,16 +330,19 @@ if(APPLE)
   
 else()
   
+  if(ALLOW_FLEXIBLAS_LINUX AND (${CMAKE_SYSTEM_NAME} MATCHES "Linux"))
+    include(ARMA_FindFlexiBLAS)
+  else()
+    set(FlexiBLAS_FOUND false)
+  endif()
+  
   include(ARMA_FindMKL)
   include(ARMA_FindOpenBLAS)
-  include(ARMA_FindATLAS)
+  include(ARMA_FindATLAS)     # TODO: remove support for ATLAS in next major version
   include(ARMA_FindBLAS)
   include(ARMA_FindLAPACK)
   
-  if(ALLOW_FLEXIBLAS_LINUX AND (${CMAKE_SYSTEM_NAME} MATCHES "Linux"))
-    include(ARMA_FindFlexiBLAS)
-  endif()
-  
+  message(STATUS "FlexiBLAS_FOUND = ${FlexiBLAS_FOUND}" )
   message(STATUS "      MKL_FOUND = ${MKL_FOUND}"       )
   message(STATUS " OpenBLAS_FOUND = ${OpenBLAS_FOUND}"  )
   message(STATUS "    ATLAS_FOUND = ${ATLAS_FOUND}"     )
@@ -345,8 +350,6 @@ else()
   message(STATUS "   LAPACK_FOUND = ${LAPACK_FOUND}"    )
   
   if(FlexiBLAS_FOUND)
-    
-    message(STATUS "FlexiBLAS_FOUND = ${FlexiBLAS_FOUND}" )
     
     set(ARMA_USE_LAPACK true)
     set(ARMA_USE_BLAS   true)
@@ -385,12 +388,12 @@ else()
     
     if(OpenBLAS_FOUND AND ATLAS_FOUND)
       message(STATUS "")
-      message(STATUS "*** WARNING: found both OpenBLAS and ATLAS; ATLAS will not be used")
+      message(STATUS "*** NOTE: found both OpenBLAS and ATLAS; ATLAS will not be used")
     endif()
     
     if(OpenBLAS_FOUND AND BLAS_FOUND)
       message(STATUS "")
-      message(STATUS "*** WARNING: found both OpenBLAS and BLAS; BLAS will not be used")
+      message(STATUS "*** NOTE: found both OpenBLAS and BLAS; BLAS will not be used")
     endif()
     
     if(OpenBLAS_FOUND)
@@ -398,6 +401,15 @@ else()
       set(ARMA_USE_BLAS true)
       set(ARMA_USE_LAPACK true)
       set(ARMA_LIBS ${ARMA_LIBS} ${OpenBLAS_LIBRARIES})
+      
+      if(OPENBLAS_PROVIDES_LAPACK)
+        set(ARMA_USE_LAPACK true)
+      else()
+        message(STATUS "")
+        message(STATUS "*** NOTE: if OpenBLAS is known to provide LAPACK functions, recommend to")
+        message(STATUS "*** NOTE: rerun cmake with the OPENBLAS_PROVIDES_LAPACK option enabled:")
+        message(STATUS "*** NOTE: cmake -D OPENBLAS_PROVIDES_LAPACK=true .")
+      endif()
       
       message(STATUS "")
       message(STATUS "*** If the OpenBLAS library is installed in")
@@ -411,10 +423,12 @@ else()
       
       if(ATLAS_FOUND)
         set(ARMA_USE_ATLAS true)
-        set(ARMA_ATLAS_INCLUDE_DIR ${ATLAS_INCLUDE_DIR})
         set(ARMA_LIBS ${ARMA_LIBS} ${ATLAS_LIBRARIES})
         
-        message(STATUS "ATLAS_INCLUDE_DIR = ${ATLAS_INCLUDE_DIR}")
+        message(STATUS "")
+        message(STATUS "*** NOTE: support for ATLAS is deprecated and will be removed;")
+        message(STATUS "*** NOTE: recommend to use OpenBLAS or FlexiBLAS instead.")
+        message(STATUS "")
       endif()
       
       if(BLAS_FOUND)
@@ -425,10 +439,17 @@ else()
     endif()
     
     if(LAPACK_FOUND)
-      set(ARMA_USE_LAPACK true)
-      set(ARMA_LIBS ${ARMA_LIBS} ${LAPACK_LIBRARIES})
+      if(OpenBLAS_FOUND AND OPENBLAS_PROVIDES_LAPACK)
+        message(STATUS "*** NOTE: found both OpenBLAS and LAPACK;")
+        message(STATUS "*** NOTE: option OPENBLAS_PROVIDES_LAPACK is enabled,")
+        message(STATUS "*** NOTE: so will not link with plain LAPACK.")
+        message(STATUS "")
+      else()
+        set(ARMA_USE_LAPACK true)
+        set(ARMA_LIBS ${ARMA_LIBS} ${LAPACK_LIBRARIES})
+      endif()
     endif()
-      
+    
   endif()
   
 endif()
@@ -460,7 +481,7 @@ if(DETECT_HDF5)
  
   message(STATUS "HDF5_FOUND = ${HDF5_FOUND}")
   if(HDF5_FOUND)
-    set(ARMA_USE_HDF5_ALT true)
+    set(ARMA_USE_HDF5_CMAKE true)
     set(CMAKE_REQUIRED_INCLUDES ${CMAKE_REQUIRED_INCLUDES} ${HDF5_INCLUDE_DIRS})
     set(ARMA_LIBS ${ARMA_LIBS} ${HDF5_LIBRARIES})
     # Since we called HDF5 with no arguments, the script will find only the C
@@ -499,6 +520,34 @@ if(SuperLU_FOUND)
   set(ARMA_SUPERLU_INCLUDE_DIR ${SuperLU_INCLUDE_DIR})
 endif()
 
+
+if(NOT ARMA_USE_LAPACK)
+  message(STATUS "")
+  message(STATUS "*** WARNING: Use of LAPACK is not enabled, as no LAPACK compatible library has been found.")
+  message(STATUS "*** WARNING: This will materially degrade the available functionality in Armadillo.")
+
+  if(OpenBLAS_FOUND)
+    message(STATUS "")
+    message(STATUS "*** NOTE: OpenBLAS found but LAPACK not found.")
+    message(STATUS "*** NOTE: OpenBLAS may have been built without LAPACK functions,")
+    message(STATUS "*** NOTE: so cannot assume that LAPACK functions are available.")
+    message(STATUS "*** NOTE: To forcefully assume that OpenBLAS provides LAPACK functions,")
+    message(STATUS "*** NOTE: rerun cmake with the OPENBLAS_PROVIDES_LAPACK option enabled:")
+    message(STATUS "*** NOTE: cmake -D OPENBLAS_PROVIDES_LAPACK=true .")
+  endif()
+endif()
+
+
+message(STATUS "")
+message(STATUS "*** Result of configuration:")
+message(STATUS "*** ARMA_USE_WRAPPER    = ${ARMA_USE_WRAPPER}")
+message(STATUS "*** ARMA_USE_LAPACK     = ${ARMA_USE_LAPACK}")
+message(STATUS "*** ARMA_USE_BLAS       = ${ARMA_USE_BLAS}")
+message(STATUS "*** ARMA_USE_ATLAS      = ${ARMA_USE_ATLAS}")
+message(STATUS "*** ARMA_USE_HDF5_CMAKE = ${ARMA_USE_HDF5_CMAKE}")
+message(STATUS "*** ARMA_USE_ARPACK     = ${ARMA_USE_ARPACK}")
+message(STATUS "*** ARMA_USE_EXTERN_RNG = ${ARMA_USE_EXTERN_RNG}")
+message(STATUS "*** ARMA_USE_SUPERLU    = ${ARMA_USE_SUPERLU}")
 message(STATUS "")
 message(STATUS "*** Armadillo wrapper library will use the following libraries:")
 message(STATUS "*** ARMA_LIBS = ${ARMA_LIBS}")

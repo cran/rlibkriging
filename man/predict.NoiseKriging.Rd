@@ -2,7 +2,7 @@
 % Please edit documentation in R/NoiseKrigingClass.R
 \name{predict.NoiseKriging}
 \alias{predict.NoiseKriging}
-\title{Prediction Method  for a \code{NoiseKriging} Object}
+\title{Predict from a \code{NoiseKriging} object.}
 \usage{
 \method{predict}{NoiseKriging}(object, x, stdev = TRUE, cov = FALSE, deriv = FALSE, ...)
 }
@@ -27,9 +27,6 @@ A list containing the element \code{mean} and possibly
     \code{stdev} and  \code{cov}.
 }
 \description{
-Predict from a \code{NoiseKriging} object.
-}
-\details{
 Given "new" input points, the method compute the expectation,
 variance and (optionnally) the covariance of the corresponding
 stochastic process, conditional on the values at the input points

@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: Apache-2.0
+// 
 // Copyright 2008-2016 Conrad Sanderson (http://conradsanderson.id.au)
 // Copyright 2008-2016 National ICT Australia (NICTA)
 // 
@@ -70,12 +72,11 @@ Mat<eT>::Mat(const uword in_n_rows, const uword in_n_cols)
   
   init_cold();
   
-  #if (!defined(ARMA_DONT_ZERO_INIT))
+  if(arma_config::zero_init)
     {
     arma_extra_debug_print("Mat::constructor: zeroing memory");
     arrayops::fill_zeros(memptr(), n_elem);
     }
-  #endif
   }
 
 
@@ -95,12 +96,11 @@ Mat<eT>::Mat(const SizeMat& s)
   
   init_cold();
   
-  #if (!defined(ARMA_DONT_ZERO_INIT))
+  if(arma_config::zero_init)
     {
     arma_extra_debug_print("Mat::constructor: zeroing memory");
     arrayops::fill_zeros(memptr(), n_elem);
     }
-  #endif
   }
 
 
@@ -351,7 +351,11 @@ Mat<eT>::init_warm(uword in_n_rows, uword in_n_cols)
   const uhword t_vec_state = vec_state;
   const uhword t_mem_state = mem_state;
   
-  arma_debug_set_error( err_state, err_msg, (t_mem_state == 3), "Mat::init(): size is fixed and hence cannot be changed" );
+  const char* error_message_1 = "Mat::init(): size is fixed and hence cannot be changed";
+  const char* error_message_2 = "Mat::init(): requested size is not compatible with column vector layout";
+  const char* error_message_3 = "Mat::init(): requested size is not compatible with row vector layout";
+  
+  arma_debug_set_error( err_state, err_msg, (t_mem_state == 3), error_message_1 );
   
   if(t_vec_state > 0)
     {
@@ -362,17 +366,17 @@ Mat<eT>::init_warm(uword in_n_rows, uword in_n_cols)
       }
     else
       {
-      if(t_vec_state == 1)  { arma_debug_set_error( err_state, err_msg, (in_n_cols != 1), "Mat::init(): requested size is not compatible with column vector layout" ); }
-      if(t_vec_state == 2)  { arma_debug_set_error( err_state, err_msg, (in_n_rows != 1), "Mat::init(): requested size is not compatible with row vector layout"    ); }
+      if(t_vec_state == 1)  { arma_debug_set_error( err_state, err_msg, (in_n_cols != 1), error_message_2 ); }
+      if(t_vec_state == 2)  { arma_debug_set_error( err_state, err_msg, (in_n_rows != 1), error_message_3 ); }
       }
     }
   
   // ensure that n_elem can hold the result of (n_rows * n_cols)
   
   #if defined(ARMA_64BIT_WORD)
-    const char* error_message = "Mat::init(): requested size is too large";
+    const char* error_message_4 = "Mat::init(): requested size is too large";
   #else
-    const char* error_message = "Mat::init(): requested size is too large; suggest to enable ARMA_64BIT_WORD";
+    const char* error_message_4 = "Mat::init(): requested size is too large; suggest to enable ARMA_64BIT_WORD";
   #endif
   
   arma_debug_set_error
@@ -384,7 +388,7 @@ Mat<eT>::init_warm(uword in_n_rows, uword in_n_cols)
         ? ( (double(in_n_rows) * double(in_n_cols)) > double(ARMA_MAX_UWORD) )
         : false
       ),
-    error_message
+    error_message_4
     );
   
   arma_debug_check(err_state, err_msg);
@@ -792,15 +796,7 @@ Mat<eT>::operator=(Mat<eT>&& X)
   {
   arma_extra_debug_sigprint(arma_str::format("this = %x   X = %x") % this % &X);
   
-  (*this).steal_mem(X);
-  
-  if( (X.mem_state == 0) && (X.n_alloc <= arma_config::mat_prealloc) && (this != &X) )
-    {
-    access::rw(X.n_rows) = 0;
-    access::rw(X.n_cols) = 0;
-    access::rw(X.n_elem) = 0;
-    access::rw(X.mem)    = nullptr;
-    }
+  (*this).steal_mem(X, true);
   
   return *this;
   }
@@ -937,7 +933,7 @@ Mat<eT>::init(const std::initializer_list<eT>& list)
   
   set_size(1, N);
   
-  arrayops::copy( memptr(), list.begin(), N );
+  if(N > 0)  { arrayops::copy( memptr(), list.begin(), N ); }
   }
 
 
@@ -1197,6 +1193,18 @@ Mat<eT>::steal_mem(Mat<eT>& x)
   {
   arma_extra_debug_sigprint();
   
+  (*this).steal_mem(x, false);
+  }
+
+
+
+template<typename eT>
+inline
+void
+Mat<eT>::steal_mem(Mat<eT>& x, const bool is_move)
+  {
+  arma_extra_debug_sigprint();
+  
   if(this == &x)  { return; }
   
   const uword  x_n_rows    = x.n_rows;
@@ -1211,8 +1219,10 @@ Mat<eT>::steal_mem(Mat<eT>& x)
   
   const bool layout_ok = (t_vec_state == x_vec_state) || ((t_vec_state == 1) && (x_n_cols == 1)) || ((t_vec_state == 2) && (x_n_rows == 1));
   
-  if( layout_ok && (t_mem_state <= 1) && ((x_n_alloc > arma_config::mat_prealloc) || (x_mem_state == 1)) )
+  if( layout_ok && (t_mem_state <= 1) && ( (x_n_alloc > arma_config::mat_prealloc) || (x_mem_state == 1) || (is_move && (x_mem_state == 2)) ) )
     {
+    arma_extra_debug_print("Mat::steal_mem(): stealing memory");
+    
     reset();
     
     access::rw(n_rows)    = x_n_rows;
@@ -1222,8 +1232,8 @@ Mat<eT>::steal_mem(Mat<eT>& x)
     access::rw(mem_state) = x_mem_state;
     access::rw(mem)       = x.mem;
     
-    access::rw(x.n_rows)    = 0;
-    access::rw(x.n_cols)    = 0;
+    access::rw(x.n_rows)    = (x_vec_state == 2) ? 1 : 0;
+    access::rw(x.n_cols)    = (x_vec_state == 1) ? 1 : 0;
     access::rw(x.n_elem)    = 0;
     access::rw(x.n_alloc)   = 0;
     access::rw(x.mem_state) = 0;
@@ -1231,7 +1241,17 @@ Mat<eT>::steal_mem(Mat<eT>& x)
     }
   else
     {
+    arma_extra_debug_print("Mat::steal_mem(): copying memory");
+    
     (*this).operator=(x);
+    
+    if( (is_move) && (x_mem_state == 0) && (x_n_alloc <= arma_config::mat_prealloc) )
+      {
+      access::rw(x.n_rows) = (x_vec_state == 2) ? 1 : 0;
+      access::rw(x.n_cols) = (x_vec_state == 1) ? 1 : 0;
+      access::rw(x.n_elem) = 0;
+      access::rw(x.mem)    = nullptr;
+      }
     }
   }
 
@@ -1952,7 +1972,7 @@ Mat<eT>::Mat(const subview<eT>& X, const bool use_colmem)
 
 
 
-//! construct a matrix from subview (e.g. construct a matrix from a delayed submatrix operation)
+//! construct a matrix from subview (eg. construct a matrix from a delayed submatrix operation)
 template<typename eT>
 inline
 Mat<eT>::Mat(const subview<eT>& X)
@@ -1973,7 +1993,7 @@ Mat<eT>::Mat(const subview<eT>& X)
 
 
 
-//! construct a matrix from subview (e.g. construct a matrix from a delayed submatrix operation)
+//! construct a matrix from subview (eg. construct a matrix from a delayed submatrix operation)
 template<typename eT>
 inline
 Mat<eT>&
@@ -2266,7 +2286,7 @@ Mat<eT>::operator/=(const subview_cube<eT>& X)
 
 
 
-//! construct a matrix from diagview (e.g. construct a matrix from a delayed diag operation)
+//! construct a matrix from diagview (eg. construct a matrix from a delayed diag operation)
 template<typename eT>
 inline
 Mat<eT>::Mat(const diagview<eT>& X)
@@ -2287,7 +2307,7 @@ Mat<eT>::Mat(const diagview<eT>& X)
 
 
 
-//! construct a matrix from diagview (e.g. construct a matrix from a delayed diag operation)
+//! construct a matrix from diagview (eg. construct a matrix from a delayed diag operation)
 template<typename eT>
 inline
 Mat<eT>&
@@ -2742,7 +2762,7 @@ Mat<eT>::operator%=(const SpBase<eT, T1>& m)
   typename SpProxy<T1>::const_iterator_type it_end = p.end();
   
   // We have to zero everything that isn't being used.
-  arrayops::inplace_set(memptr(), eT(0), (it.col() * n_rows) + it.row());
+  arrayops::fill_zeros(memptr(), (it.col() * n_rows) + it.row());
   
   while(it != it_end)
     {
@@ -2756,7 +2776,7 @@ Mat<eT>::operator%=(const SpBase<eT, T1>& m)
       ? (p.get_n_cols() * n_rows)
       : (it.col() * n_rows) + it.row();
     
-    arrayops::inplace_set(memptr() + cur_loc + 1, eT(0), (next_loc - cur_loc - 1));
+    arrayops::fill_zeros(memptr() + cur_loc + 1, (next_loc - cur_loc - 1));
     }
   
   return *this;
@@ -2816,8 +2836,12 @@ Mat<eT>::operator=(const SpSubview<eT>& X)
   
   (*this).zeros(X.n_rows, X.n_cols);
   
+  if(X.n_nonzero == 0)  { return *this; }
+  
   if(X.n_rows == X.m.n_rows)
     {
+    X.m.sync();
+    
     const uword sv_col_start = X.aux_col1;
     const uword sv_col_end   = X.aux_col1 + X.n_cols - 1;
     
@@ -2971,7 +2995,7 @@ Mat<eT>::operator/=(const spdiagview<eT>& X)
 
 
 template<typename eT>
-arma_cold
+arma_deprecated
 inline
 mat_injector< Mat<eT> >
 Mat<eT>::operator<<(const eT val)
@@ -2982,7 +3006,7 @@ Mat<eT>::operator<<(const eT val)
 
 
 template<typename eT>
-arma_cold
+arma_deprecated
 inline
 mat_injector< Mat<eT> >
 Mat<eT>::operator<<(const injector_end_of_row<>& x)
@@ -3253,7 +3277,7 @@ Mat<eT>::rows(const uword in_row1, const uword in_row2) const
 //! creation of subview (submatrix comprised of specified column vectors)
 template<typename eT>
 arma_inline
-subview<eT>
+subview_cols<eT>
 Mat<eT>::cols(const uword in_col1, const uword in_col2)
   {
   arma_extra_debug_sigprint();
@@ -3266,7 +3290,7 @@ Mat<eT>::cols(const uword in_col1, const uword in_col2)
   
   const uword subview_n_cols = in_col2 - in_col1 + 1;
   
-  return subview<eT>(*this, 0, in_col1, n_rows, subview_n_cols);
+  return subview_cols<eT>(*this, in_col1, subview_n_cols);
   }
 
 
@@ -3274,7 +3298,7 @@ Mat<eT>::cols(const uword in_col1, const uword in_col2)
 //! creation of subview (submatrix comprised of specified column vectors)
 template<typename eT>
 arma_inline
-const subview<eT>
+const subview_cols<eT>
 Mat<eT>::cols(const uword in_col1, const uword in_col2) const
   {
   arma_extra_debug_sigprint();
@@ -3287,7 +3311,7 @@ Mat<eT>::cols(const uword in_col1, const uword in_col2) const
   
   const uword subview_n_cols = in_col2 - in_col1 + 1;
   
-  return subview<eT>(*this, 0, in_col1, n_rows, subview_n_cols);
+  return subview_cols<eT>(*this, in_col1, subview_n_cols);
   }
 
 
@@ -3351,7 +3375,7 @@ Mat<eT>::rows(const span& row_span) const
 //! creation of subview (submatrix comprised of specified column vectors)
 template<typename eT>
 arma_inline
-subview<eT>
+subview_cols<eT>
 Mat<eT>::cols(const span& col_span)
   {
   arma_extra_debug_sigprint();
@@ -3371,7 +3395,7 @@ Mat<eT>::cols(const span& col_span)
     "Mat::cols(): indices out of bounds or incorrectly used"
     );
   
-  return subview<eT>(*this, 0, in_col1, n_rows, submat_n_cols);
+  return subview_cols<eT>(*this, in_col1, submat_n_cols);
   }
 
 
@@ -3379,7 +3403,7 @@ Mat<eT>::cols(const span& col_span)
 //! creation of subview (submatrix comprised of specified column vectors)
 template<typename eT>
 arma_inline
-const subview<eT>
+const subview_cols<eT>
 Mat<eT>::cols(const span& col_span) const
   {
   arma_extra_debug_sigprint();
@@ -3399,7 +3423,7 @@ Mat<eT>::cols(const span& col_span) const
     "Mat::cols(): indices out of bounds or incorrectly used"
     );
   
-  return subview<eT>(*this, 0, in_col1, n_rows, submat_n_cols);
+  return subview_cols<eT>(*this, in_col1, submat_n_cols);
   }
 
 
@@ -3680,35 +3704,35 @@ Mat<eT>::tail_rows(const uword N) const
 
 template<typename eT>
 inline
-subview<eT>
+subview_cols<eT>
 Mat<eT>::head_cols(const uword N)
   {
   arma_extra_debug_sigprint();
   
   arma_debug_check_bounds( (N > n_cols), "Mat::head_cols(): size out of bounds" );
   
-  return subview<eT>(*this, 0, 0, n_rows, N);
+  return subview_cols<eT>(*this, 0, N);
   }
 
 
 
 template<typename eT>
 inline
-const subview<eT>
+const subview_cols<eT>
 Mat<eT>::head_cols(const uword N) const
   {
   arma_extra_debug_sigprint();
   
   arma_debug_check_bounds( (N > n_cols), "Mat::head_cols(): size out of bounds" );
   
-  return subview<eT>(*this, 0, 0, n_rows, N);
+  return subview_cols<eT>(*this, 0, N);
   }
 
 
 
 template<typename eT>
 inline
-subview<eT>
+subview_cols<eT>
 Mat<eT>::tail_cols(const uword N)
   {
   arma_extra_debug_sigprint();
@@ -3717,14 +3741,14 @@ Mat<eT>::tail_cols(const uword N)
   
   const uword start_col = n_cols - N;
   
-  return subview<eT>(*this, 0, start_col, n_rows, N);
+  return subview_cols<eT>(*this, start_col, N);
   }
 
 
 
 template<typename eT>
 inline
-const subview<eT>
+const subview_cols<eT>
 Mat<eT>::tail_cols(const uword N) const
   {
   arma_extra_debug_sigprint();
@@ -3733,7 +3757,7 @@ Mat<eT>::tail_cols(const uword N) const
   
   const uword start_col = n_cols - N;
   
-  return subview<eT>(*this, 0, start_col, n_rows, N);
+  return subview_cols<eT>(*this, start_col, N);
   }
 
 
@@ -4519,12 +4543,25 @@ Mat<eT>::shed_cols(const Base<uword, T1>& indices)
 
 
 
-//! insert N rows at the specified row position,
-//! optionally setting the elements of the inserted rows to zero
 template<typename eT>
+arma_deprecated
 inline
 void
 Mat<eT>::insert_rows(const uword row_num, const uword N, const bool set_to_zero)
+  {
+  arma_extra_debug_sigprint();
+  
+  arma_ignore(set_to_zero);
+  
+  (*this).insert_rows(row_num, N);
+  }
+
+
+
+template<typename eT>
+inline
+void
+Mat<eT>::insert_rows(const uword row_num, const uword N)
   {
   arma_extra_debug_sigprint();
   
@@ -4537,37 +4574,46 @@ Mat<eT>::insert_rows(const uword row_num, const uword N, const bool set_to_zero)
   // insertion at row_num == n_rows is in effect an append operation
   arma_debug_check_bounds( (row_num > t_n_rows), "Mat::insert_rows(): index out of bounds" );
   
-  if(N > 0)
+  if(N == 0)  { return; }
+  
+  Mat<eT> out(t_n_rows + N, t_n_cols, arma_nozeros_indicator());
+  
+  if(A_n_rows > 0)
     {
-    Mat<eT> out(t_n_rows + N, t_n_cols, arma_nozeros_indicator());
-    
-    if(A_n_rows > 0)
-      {
-      out.rows(0, A_n_rows-1) = rows(0, A_n_rows-1);
-      }
-    
-    if(B_n_rows > 0)
-      {
-      out.rows(row_num + N, t_n_rows + N - 1) = rows(row_num, t_n_rows-1);
-      }
-    
-    if(set_to_zero)
-      {
-      out.rows(row_num, row_num + N - 1).zeros();
-      }
-    
-    steal_mem(out);
+    out.rows(0, A_n_rows-1) = rows(0, A_n_rows-1);
     }
+  
+  if(B_n_rows > 0)
+    {
+    out.rows(row_num + N, t_n_rows + N - 1) = rows(row_num, t_n_rows-1);
+    }
+  
+  out.rows(row_num, row_num + N - 1).zeros();
+  
+  steal_mem(out);
   }
 
 
 
-//! insert N columns at the specified column position,
-//! optionally setting the elements of the inserted columns to zero
 template<typename eT>
+arma_deprecated
 inline
 void
 Mat<eT>::insert_cols(const uword col_num, const uword N, const bool set_to_zero)
+  {
+  arma_extra_debug_sigprint();
+  
+  arma_ignore(set_to_zero);
+  
+  (*this).insert_cols(col_num, N);
+  }
+
+
+
+template<typename eT>
+inline
+void
+Mat<eT>::insert_cols(const uword col_num, const uword N)
   {
   arma_extra_debug_sigprint();
   
@@ -4580,27 +4626,23 @@ Mat<eT>::insert_cols(const uword col_num, const uword N, const bool set_to_zero)
   // insertion at col_num == n_cols is in effect an append operation
   arma_debug_check_bounds( (col_num > t_n_cols), "Mat::insert_cols(): index out of bounds" );
   
-  if(N > 0)
+  if(N == 0)  { return; }
+  
+  Mat<eT> out(t_n_rows, t_n_cols + N, arma_nozeros_indicator());
+  
+  if(A_n_cols > 0)
     {
-    Mat<eT> out(t_n_rows, t_n_cols + N, arma_nozeros_indicator());
-    
-    if(A_n_cols > 0)
-      {
-      out.cols(0, A_n_cols-1) = cols(0, A_n_cols-1);
-      }
-    
-    if(B_n_cols > 0)
-      {
-      out.cols(col_num + N, t_n_cols + N - 1) = cols(col_num, t_n_cols-1);
-      }
-    
-    if(set_to_zero)
-      {
-      out.cols(col_num, col_num + N - 1).zeros();
-      }
-    
-    steal_mem(out);
+    out.cols(0, A_n_cols-1) = cols(0, A_n_cols-1);
     }
+  
+  if(B_n_cols > 0)
+    {
+    out.cols(col_num + N, t_n_cols + N - 1) = cols(col_num, t_n_cols-1);
+    }
+  
+  out.cols(col_num, col_num + N - 1).zeros();
+  
+  steal_mem(out);
   }
 
 
@@ -4630,6 +4672,9 @@ Mat<eT>::insert_rows(const uword row_num, const Base<eT,T1>& X)
   bool  err_state = false;
   char* err_msg   = nullptr;
   
+  const char* error_message_1 = "Mat::insert_rows(): index out of bounds";
+  const char* error_message_2 = "Mat::insert_rows(): given object has an incompatible number of columns";
+  
   // insertion at row_num == n_rows is in effect an append operation
   
   arma_debug_set_error
@@ -4637,7 +4682,7 @@ Mat<eT>::insert_rows(const uword row_num, const Base<eT,T1>& X)
     err_state,
     err_msg,
     (row_num > t_n_rows),
-    "Mat::insert_rows(): index out of bounds"
+    error_message_1
     );
   
   arma_debug_set_error
@@ -4645,7 +4690,7 @@ Mat<eT>::insert_rows(const uword row_num, const Base<eT,T1>& X)
     err_state,
     err_msg,
     ( (C_n_cols != t_n_cols) && ( (t_n_rows > 0) || (t_n_cols > 0) ) && ( (C_n_rows > 0) || (C_n_cols > 0) ) ),
-    "Mat::insert_rows(): given object has an incompatible number of columns"
+    error_message_2
     );
   
   arma_debug_check_bounds(err_state, err_msg);
@@ -4703,6 +4748,9 @@ Mat<eT>::insert_cols(const uword col_num, const Base<eT,T1>& X)
   bool  err_state = false;
   char* err_msg   = nullptr;
   
+  const char* error_message_1 = "Mat::insert_cols(): index out of bounds";
+  const char* error_message_2 = "Mat::insert_cols(): given object has an incompatible number of rows";
+  
   // insertion at col_num == n_cols is in effect an append operation
   
   arma_debug_set_error
@@ -4710,7 +4758,7 @@ Mat<eT>::insert_cols(const uword col_num, const Base<eT,T1>& X)
     err_state,
     err_msg,
     (col_num > t_n_cols),
-    "Mat::insert_cols(): index out of bounds"
+    error_message_1
     );
   
   arma_debug_set_error
@@ -4718,7 +4766,7 @@ Mat<eT>::insert_cols(const uword col_num, const Base<eT,T1>& X)
     err_state,
     err_msg,
     ( (C_n_rows != t_n_rows) && ( (t_n_rows > 0) || (t_n_cols > 0) ) && ( (C_n_rows > 0) || (C_n_cols > 0) ) ),
-    "Mat::insert_cols(): given object has an incompatible number of rows"
+    error_message_2
     );
   
   arma_debug_check_bounds(err_state, err_msg);
@@ -4878,7 +4926,7 @@ Mat<eT>::operator/=(const Gen<T1, gen_type>& X)
 
 
 
-//! create a matrix from Op, i.e. run the previously delayed unary operations
+//! create a matrix from Op, ie. run the previously delayed unary operations
 template<typename eT>
 template<typename T1, typename op_type>
 inline
@@ -4900,7 +4948,7 @@ Mat<eT>::Mat(const Op<T1, op_type>& X)
 
 
 
-//! create a matrix from Op, i.e. run the previously delayed unary operations
+//! create a matrix from Op, ie. run the previously delayed unary operations
 template<typename eT>
 template<typename T1, typename op_type>
 inline
@@ -5008,7 +5056,7 @@ Mat<eT>::operator/=(const Op<T1, op_type>& X)
 
 
 
-//! create a matrix from eOp, i.e. run the previously delayed unary operations
+//! create a matrix from eOp, ie. run the previously delayed unary operations
 template<typename eT>
 template<typename T1, typename eop_type>
 inline
@@ -5032,7 +5080,7 @@ Mat<eT>::Mat(const eOp<T1, eop_type>& X)
 
 
 
-//! create a matrix from eOp, i.e. run the previously delayed unary operations
+//! create a matrix from eOp, ie. run the previously delayed unary operations
 template<typename eT>
 template<typename T1, typename eop_type>
 inline
@@ -5403,7 +5451,7 @@ Mat<eT>::Mat(const SpToDOp<T1, op_type>& X)
 
 
 
-//! create a matrix from an SpToDOp, i.e. run the previously delayed unary operations
+//! create a matrix from an SpToDOp, ie. run the previously delayed unary operations
 template<typename eT>
 template<typename T1, typename op_type>
 inline
@@ -5511,7 +5559,7 @@ Mat<eT>::operator/=(const SpToDOp<T1, op_type>& X)
 
 
 
-//! create a matrix from Glue, i.e. run the previously delayed binary operations
+//! create a matrix from Glue, ie. run the previously delayed binary operations
 template<typename eT>
 template<typename T1, typename T2, typename glue_type>
 inline
@@ -5534,7 +5582,7 @@ Mat<eT>::Mat(const Glue<T1, T2, glue_type>& X)
 
 
 
-//! create a matrix from Glue, i.e. run the previously delayed binary operations
+//! create a matrix from Glue, ie. run the previously delayed binary operations
 template<typename eT>
 template<typename T1, typename T2, typename glue_type>
 inline
@@ -5678,7 +5726,7 @@ Mat<eT>::operator-=(const Glue<T1, T2, glue_times>& X)
 
 
 
-//! create a matrix from eGlue, i.e. run the previously delayed binary operations
+//! create a matrix from eGlue, ie. run the previously delayed binary operations
 template<typename eT>
 template<typename T1, typename T2, typename eglue_type>
 inline
@@ -5703,7 +5751,7 @@ Mat<eT>::Mat(const eGlue<T1, T2, eglue_type>& X)
 
 
 
-//! create a matrix from eGlue, i.e. run the previously delayed binary operations
+//! create a matrix from eGlue, ie. run the previously delayed binary operations
 template<typename eT>
 template<typename T1, typename T2, typename eglue_type>
 inline
@@ -6088,6 +6136,34 @@ Mat<eT>::at(const uword in_row, const uword in_col) const
 
 
 
+#if defined(__cpp_multidimensional_subscript)
+  
+  //! element accessor; no bounds check
+  template<typename eT>
+  arma_inline
+  arma_warn_unused
+  eT&
+  Mat<eT>::operator[] (const uword in_row, const uword in_col)
+    {
+    return access::rw( mem[in_row + in_col*n_rows] );
+    }
+  
+  
+  
+  //! element accessor; no bounds check
+  template<typename eT>
+  arma_inline
+  arma_warn_unused
+  const eT&
+  Mat<eT>::operator[] (const uword in_row, const uword in_col) const
+    {
+    return mem[in_row + in_col*n_rows];
+    }
+  
+#endif
+
+
+
 //! prefix ++
 template<typename eT>
 arma_inline
@@ -6203,7 +6279,7 @@ arma_warn_unused
 bool
 Mat<eT>::is_finite() const
   {
-  return arrayops::is_finite( memptr(), n_elem );
+  return arrayops::is_finite(memptr(), n_elem);
   }
 
 
@@ -6230,6 +6306,19 @@ Mat<eT>::has_nan() const
   arma_extra_debug_sigprint();
   
   return arrayops::has_nan(memptr(), n_elem);
+  }
+
+
+
+template<typename eT>
+inline
+arma_warn_unused
+bool
+Mat<eT>::has_nonfinite() const
+  {
+  arma_extra_debug_sigprint();
+  
+  return (arrayops::is_finite(memptr(), n_elem) == false);
   }
 
 
@@ -6581,7 +6670,7 @@ Mat<eT>::memptr() const
 template<typename eT>
 inline
 void
-Mat<eT>::set_size(const uword in_elem)
+Mat<eT>::set_size(const uword new_n_elem)
   {
   arma_extra_debug_sigprint();
   
@@ -6590,11 +6679,11 @@ Mat<eT>::set_size(const uword in_elem)
     case 0:
       // fallthrough
     case 1:
-      init_warm(in_elem, 1);
+      init_warm(new_n_elem, 1);
       break;
     
     case 2:
-      init_warm(1, in_elem);
+      init_warm(1, new_n_elem);
       break;
       
     default:
@@ -6608,11 +6697,11 @@ Mat<eT>::set_size(const uword in_elem)
 template<typename eT>
 inline
 void
-Mat<eT>::set_size(const uword in_rows, const uword in_cols)
+Mat<eT>::set_size(const uword new_n_rows, const uword new_n_cols)
   {
   arma_extra_debug_sigprint();
   
-  init_warm(in_rows, in_cols);
+  init_warm(new_n_rows, new_n_cols);
   }
 
 
@@ -6633,7 +6722,7 @@ Mat<eT>::set_size(const SizeMat& s)
 template<typename eT>
 inline
 void
-Mat<eT>::resize(const uword in_elem)
+Mat<eT>::resize(const uword new_n_elem)
   {
   arma_extra_debug_sigprint();
   
@@ -6642,11 +6731,11 @@ Mat<eT>::resize(const uword in_elem)
     case 0:
       // fallthrough
     case 1:
-      (*this).resize(in_elem, 1);
+      (*this).resize(new_n_elem, 1);
       break;
     
     case 2:
-      (*this).resize(1, in_elem);
+      (*this).resize(1, new_n_elem);
       break;
       
     default:
@@ -6660,11 +6749,11 @@ Mat<eT>::resize(const uword in_elem)
 template<typename eT>
 inline
 void
-Mat<eT>::resize(const uword in_rows, const uword in_cols)
+Mat<eT>::resize(const uword new_n_rows, const uword new_n_cols)
   {
   arma_extra_debug_sigprint();
   
-  *this = arma::resize(*this, in_rows, in_cols);
+  op_resize::apply_mat_inplace((*this), new_n_rows, new_n_cols);
   }
 
 
@@ -6676,7 +6765,7 @@ Mat<eT>::resize(const SizeMat& s)
   {
   arma_extra_debug_sigprint();
   
-  *this = arma::resize(*this, s.n_rows, s.n_cols);
+  op_resize::apply_mat_inplace((*this), s.n_rows, s.n_cols);
   }
 
 
@@ -6685,11 +6774,11 @@ Mat<eT>::resize(const SizeMat& s)
 template<typename eT>
 inline
 void
-Mat<eT>::reshape(const uword in_rows, const uword in_cols)
+Mat<eT>::reshape(const uword new_n_rows, const uword new_n_cols)
   {
   arma_extra_debug_sigprint();
   
-  *this = arma::reshape(*this, in_rows, in_cols);
+  op_reshape::apply_mat_inplace((*this), new_n_rows, new_n_cols);
   }
 
 
@@ -6701,7 +6790,7 @@ Mat<eT>::reshape(const SizeMat& s)
   {
   arma_extra_debug_sigprint();
   
-  *this = arma::reshape(*this, s.n_rows, s.n_cols);
+  op_reshape::apply_mat_inplace((*this), s.n_rows, s.n_cols);
   }
 
 
@@ -6711,7 +6800,7 @@ template<typename eT>
 arma_deprecated
 inline
 void
-Mat<eT>::reshape(const uword in_rows, const uword in_cols, const uword dim)
+Mat<eT>::reshape(const uword new_n_rows, const uword new_n_cols, const uword dim)
   {
   arma_extra_debug_sigprint();
   
@@ -6719,15 +6808,7 @@ Mat<eT>::reshape(const uword in_rows, const uword in_cols, const uword dim)
   
   arma_debug_check( (dim > 1), "reshape(): parameter 'dim' must be 0 or 1" );
   
-  if(dim == 0)
-    {
-    *this = arma::reshape(*this, in_rows, in_cols);
-    }
-  else
-  if(dim == 1)
-    {
-    *this = arma::reshape(strans(*this), in_rows, in_cols);
-    }
+  op_reshape_old::apply_mat_inplace((*this), new_n_rows, new_n_cols, dim);
   }
 
 
@@ -6987,11 +7068,11 @@ Mat<eT>::zeros()
 template<typename eT>
 inline
 const Mat<eT>&
-Mat<eT>::zeros(const uword in_elem)
+Mat<eT>::zeros(const uword new_n_elem)
   {
   arma_extra_debug_sigprint();
   
-  set_size(in_elem);
+  set_size(new_n_elem);
   
   return (*this).zeros();
   }
@@ -7001,11 +7082,11 @@ Mat<eT>::zeros(const uword in_elem)
 template<typename eT>
 inline
 const Mat<eT>&
-Mat<eT>::zeros(const uword in_n_rows, const uword in_n_cols)
+Mat<eT>::zeros(const uword new_n_rows, const uword new_n_cols)
   {
   arma_extra_debug_sigprint();
   
-  set_size(in_n_rows, in_n_cols);
+  set_size(new_n_rows, new_n_cols);
   
   return (*this).zeros();
   }
@@ -7039,11 +7120,11 @@ Mat<eT>::ones()
 template<typename eT>
 inline
 const Mat<eT>&
-Mat<eT>::ones(const uword in_elem)
+Mat<eT>::ones(const uword new_n_elem)
   {
   arma_extra_debug_sigprint();
   
-  set_size(in_elem);
+  set_size(new_n_elem);
   
   return fill(eT(1));
   }
@@ -7053,11 +7134,11 @@ Mat<eT>::ones(const uword in_elem)
 template<typename eT>
 inline
 const Mat<eT>&
-Mat<eT>::ones(const uword in_rows, const uword in_cols)
+Mat<eT>::ones(const uword new_n_rows, const uword new_n_cols)
   {
   arma_extra_debug_sigprint();
   
-  set_size(in_rows, in_cols);
+  set_size(new_n_rows, new_n_cols);
   
   return fill(eT(1));
   }
@@ -7093,11 +7174,11 @@ Mat<eT>::randu()
 template<typename eT>
 inline
 const Mat<eT>&
-Mat<eT>::randu(const uword in_elem)
+Mat<eT>::randu(const uword new_n_elem)
   {
   arma_extra_debug_sigprint();
   
-  set_size(in_elem);
+  set_size(new_n_elem);
   
   return (*this).randu();
   }
@@ -7107,11 +7188,11 @@ Mat<eT>::randu(const uword in_elem)
 template<typename eT>
 inline
 const Mat<eT>&
-Mat<eT>::randu(const uword in_rows, const uword in_cols)
+Mat<eT>::randu(const uword new_n_rows, const uword new_n_cols)
   {
   arma_extra_debug_sigprint();
   
-  set_size(in_rows, in_cols);
+  set_size(new_n_rows, new_n_cols);
   
   return (*this).randu();
   }
@@ -7147,11 +7228,11 @@ Mat<eT>::randn()
 template<typename eT>
 inline
 const Mat<eT>&
-Mat<eT>::randn(const uword in_elem)
+Mat<eT>::randn(const uword new_n_elem)
   {
   arma_extra_debug_sigprint();
   
-  set_size(in_elem);
+  set_size(new_n_elem);
   
   return (*this).randn();
   }
@@ -7161,11 +7242,11 @@ Mat<eT>::randn(const uword in_elem)
 template<typename eT>
 inline
 const Mat<eT>&
-Mat<eT>::randn(const uword in_rows, const uword in_cols)
+Mat<eT>::randn(const uword new_n_rows, const uword new_n_cols)
   {
   arma_extra_debug_sigprint();
   
-  set_size(in_rows, in_cols);
+  set_size(new_n_rows, new_n_cols);
   
   return (*this).randn();
   }
@@ -7205,11 +7286,11 @@ Mat<eT>::eye()
 template<typename eT>
 inline
 const Mat<eT>&
-Mat<eT>::eye(const uword in_rows, const uword in_cols)
+Mat<eT>::eye(const uword new_n_rows, const uword new_n_cols)
   {
   arma_extra_debug_sigprint();
   
-  set_size(in_rows, in_cols);
+  set_size(new_n_rows, new_n_cols);
   
   return (*this).eye();
   }
@@ -9148,7 +9229,7 @@ Mat<eT>::fixed<fixed_n_rows, fixed_n_cols>::fixed()
   {
   arma_extra_debug_sigprint_this(this);
   
-  #if (!defined(ARMA_DONT_ZERO_INIT))
+  if(arma_config::zero_init)
     {
     arma_extra_debug_print("Mat::fixed::constructor: zeroing memory");
     
@@ -9156,7 +9237,6 @@ Mat<eT>::fixed<fixed_n_rows, fixed_n_cols>::fixed()
     
     arrayops::inplace_set_fixed<eT,fixed_n_elem>( mem_use, eT(0) );
     }
-  #endif
   }
 
 
@@ -9441,6 +9521,7 @@ Mat<eT>::fixed<fixed_n_rows, fixed_n_cols>::operator=(const fixed<fixed_n_rows, 
 template<typename eT>
 template<uword fixed_n_rows, uword fixed_n_cols>
 arma_inline
+arma_warn_unused
 const Op< typename Mat<eT>::template fixed<fixed_n_rows, fixed_n_cols>::Mat_fixed_type, op_htrans >
 Mat<eT>::fixed<fixed_n_rows, fixed_n_cols>::t() const
   {
@@ -9452,6 +9533,7 @@ Mat<eT>::fixed<fixed_n_rows, fixed_n_cols>::t() const
 template<typename eT>
 template<uword fixed_n_rows, uword fixed_n_cols>
 arma_inline
+arma_warn_unused
 const Op< typename Mat<eT>::template fixed<fixed_n_rows, fixed_n_cols>::Mat_fixed_type, op_htrans >
 Mat<eT>::fixed<fixed_n_rows, fixed_n_cols>::ht() const
   {
@@ -9463,6 +9545,7 @@ Mat<eT>::fixed<fixed_n_rows, fixed_n_cols>::ht() const
 template<typename eT>
 template<uword fixed_n_rows, uword fixed_n_cols>
 arma_inline
+arma_warn_unused
 const Op< typename Mat<eT>::template fixed<fixed_n_rows, fixed_n_cols>::Mat_fixed_type, op_strans >
 Mat<eT>::fixed<fixed_n_rows, fixed_n_cols>::st() const
   {
@@ -9566,6 +9649,38 @@ Mat<eT>::fixed<fixed_n_rows, fixed_n_cols>::operator() (const uword ii) const
   
   return (use_extra) ? mem_local_extra[ii] : mem_local[ii];
   }
+
+
+
+#if defined(__cpp_multidimensional_subscript)
+  
+  template<typename eT>
+  template<uword fixed_n_rows, uword fixed_n_cols>
+  arma_inline
+  arma_warn_unused
+  eT&
+  Mat<eT>::fixed<fixed_n_rows, fixed_n_cols>::operator[] (const uword in_row, const uword in_col)
+    {
+    const uword iq = in_row + in_col*fixed_n_rows;
+    
+    return (use_extra) ? mem_local_extra[iq] : mem_local[iq];
+    }
+  
+  
+  
+  template<typename eT>
+  template<uword fixed_n_rows, uword fixed_n_cols>
+  arma_inline
+  arma_warn_unused
+  const eT&
+  Mat<eT>::fixed<fixed_n_rows, fixed_n_cols>::operator[] (const uword in_row, const uword in_col) const
+    {
+    const uword iq = in_row + in_col*fixed_n_rows;
+    
+    return (use_extra) ? mem_local_extra[iq] : mem_local[iq];
+    }
+  
+#endif
 
 
 
@@ -9941,17 +10056,14 @@ Mat_aux::set_real(Mat< std::complex<T> >& out, const Base<T,T1>& X)
     
     const uword N = out.n_elem;
     
-    for(uword i=0; i<N; ++i)
-      {
-      out_mem[i] = std::complex<T>( A[i], out_mem[i].imag() );
-      }
+    for(uword i=0; i<N; ++i)  { out_mem[i].real(A[i]); }
     }
   else
     {
     for(uword col=0; col < local_n_cols; ++col)
     for(uword row=0; row < local_n_rows; ++row)
       {
-      (*out_mem) = std::complex<T>( P.at(row,col), (*out_mem).imag() );
+      (*out_mem).real(P.at(row,col));
       out_mem++;
       }
     }
@@ -9985,17 +10097,14 @@ Mat_aux::set_imag(Mat< std::complex<T> >& out, const Base<T,T1>& X)
     
     const uword N = out.n_elem;
     
-    for(uword i=0; i<N; ++i)
-      {
-      out_mem[i] = std::complex<T>( out_mem[i].real(), A[i] );
-      }
+    for(uword i=0; i<N; ++i)  { out_mem[i].imag(A[i]); }
     }
   else
     {
     for(uword col=0; col < local_n_cols; ++col)
     for(uword row=0; row < local_n_rows; ++row)
       {
-      (*out_mem) = std::complex<T>( (*out_mem).real(), P.at(row,col) );
+      (*out_mem).imag(P.at(row,col));
       out_mem++;
       }
     }
@@ -10003,7 +10112,7 @@ Mat_aux::set_imag(Mat< std::complex<T> >& out, const Base<T,T1>& X)
 
 
 
-#ifdef ARMA_EXTRA_MAT_MEAT
+#if defined(ARMA_EXTRA_MAT_MEAT)
   #include ARMA_INCFILE_WRAP(ARMA_EXTRA_MAT_MEAT)
 #endif
 

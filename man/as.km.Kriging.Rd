@@ -2,7 +2,8 @@
 % Please edit documentation in R/KrigingClass.R
 \name{as.km.Kriging}
 \alias{as.km.Kriging}
-\title{Coerce a \code{Kriging} Object into the Class \code{"km"}}
+\title{Coerce a \code{Kriging} object into the \code{"km"} class of the
+\pkg{DiceKriging} package.}
 \usage{
 \method{as.km}{Kriging}(x, .call = NULL, ...)
 }

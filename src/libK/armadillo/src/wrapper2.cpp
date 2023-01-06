@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: Apache-2.0
+// 
 // Copyright 2008-2016 Conrad Sanderson (http://conradsanderson.id.au)
 // Copyright 2008-2016 National ICT Australia (NICTA)
 // 
@@ -17,11 +19,6 @@
 #include <climits>
 #include <limits>
 #include <complex>
-
-#if (__cplusplus >= 201103L)
-  #undef  ARMA_USE_CXX11
-  #define ARMA_USE_CXX11
-#endif
 
 #include "armadillo_bits/config.hpp"
 
@@ -1113,18 +1110,6 @@ extern "C"
     void arma_fortran_with_prefix(arma_dtrevc)(const char* side, const char* howmny, blas_int* select, const blas_int* n, const double* t, const blas_int* ldt, double* vl, const blas_int* ldvl, double* vr, const blas_int* ldvr, const blas_int* mm, blas_int* m, double* work, blas_int* info, blas_len side_len, blas_len howmny_len)
       {
       arma_fortran_sans_prefix(arma_dtrevc)(side, howmny, select, n, t, ldt, vl, ldvl, vr, ldvr, mm, m, work, info, side_len, howmny_len);
-      }
-    
-    
-    
-    void arma_fortran_with_prefix(arma_slarnv)(const blas_int* idist, blas_int* iseed, const blas_int* n,  float* x)
-      {
-      arma_fortran_sans_prefix(arma_slarnv)(idist, iseed, n, x);
-      }
-    
-    void arma_fortran_with_prefix(arma_dlarnv)(const blas_int* idist, blas_int* iseed, const blas_int* n, double* x)
-      {
-      arma_fortran_sans_prefix(arma_dlarnv)(idist, iseed, n, x);
       }
     
     

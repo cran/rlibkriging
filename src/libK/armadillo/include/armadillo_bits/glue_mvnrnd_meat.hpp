@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: Apache-2.0
+// 
 // Copyright 2008-2016 Conrad Sanderson (http://conradsanderson.id.au)
 // Copyright 2008-2016 National ICT Australia (NICTA)
 // 
@@ -82,12 +84,6 @@ glue_mvnrnd::apply_direct(Mat<typename T1::elem_type>& out, const Base<typename 
     out.set_size(0,N);
     return true;
     }
-  
-  // if(auxlib::rudimentary_sym_check(UC.M) == false)
-  //   {
-  //   arma_debug_warn_level(1, "mvnrnd(): given matrix is not symmetric");
-  //   return false;
-  //   }
   
   if((arma_config::debug) && (auxlib::rudimentary_sym_check(UC.M) == false))
     {

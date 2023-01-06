@@ -3,7 +3,8 @@
 \name{leaveOneOutFun.Kriging}
 \alias{leaveOneOutFun.Kriging}
 \alias{leaveOneOutFun,Kriging,Kriging-method}
-\title{Leave-One-Out Method for the S3 class \code{"Kriging"}}
+\title{Compute Leave-One-Out (LOO) error for an object with S3 class
+\code{"Kriging"} representing a kriging model.}
 \usage{
 \method{leaveOneOutFun}{Kriging}(object, theta, grad = FALSE, ...)
 }
@@ -23,10 +24,6 @@ The leave-One-Out value computed for the given vector
     \eqn{\boldsymbol{\theta}}{\theta} of correlation ranges.
 }
 \description{
-Compute Leave-One-Out (LOO) error for an object with S3 class
-\code{"Kriging"} representing a kriging model.
-}
-\details{
 The returned value is the sum of squares \eqn{\sum_{i=1}^n [y_i -
 \hat{y}_{i,(-i)}]^2} where \eqn{\hat{y}_{i,(-i)}} is the
 prediction of \eqn{y_i}{y[i]} based on the the observations \eqn{y_j}{y[j]}

@@ -76,6 +76,9 @@ LIBKRIGING_EXPORT NuggetKriging::NuggetKriging(const arma::colvec& y,
   fit(y, X, regmodel, normalize, optim, objective, parameters);
 }
 
+LIBKRIGING_EXPORT NuggetKriging::NuggetKriging(const NuggetKriging& other, ExplicitCopySpecifier)
+    : NuggetKriging{other} {}
+
 // arma::mat XtX(arma::mat &X) {
 //   arma::mat XtX = arma::zeros(X.n_cols,X.n_cols);
 //   for (arma::uword i = 0; i < X.n_cols; i++) {
@@ -713,8 +716,9 @@ LIBKRIGING_EXPORT void NuggetKriging::fit(const arma::colvec& y,
       arma::vec w = dy2dX2_slope / sum(dy2dX2_slope);
       arma::mat steepest_dX_mean = arma::abs(m_dX) * w;
 
-      theta_lower = arma::max(theta_lower, Optim::theta_lower_factor / steepest_dX_mean);
-      theta_upper = arma::min(theta_upper, Optim::theta_upper_factor / steepest_dX_mean);
+      theta_lower = arma::max(theta_lower, Optim::theta_lower_factor * steepest_dX_mean);
+      // no, only relevant for inf bound: theta_upper = arma::min(theta_upper, Optim::theta_upper_factor *
+      // steepest_dX_mean);
       theta_lower = arma::min(theta_lower, theta_upper);
       theta_upper = arma::max(theta_lower, theta_upper);
     }
@@ -856,8 +860,8 @@ LIBKRIGING_EXPORT void NuggetKriging::fit(const arma::colvec& y,
         double sol_to_b_theta
             = Optim::reparametrize ? sol_to_ub_theta : sol_to_lb_theta;  // just consider theta lower bound
         double sol_to_b_alpha = Optim::reparametrize
-                                    ? abs(gamma_tmp.at(d) - gamma_upper.at(d))
-                                    : abs(gamma_tmp.at(d) - gamma_lower.at(d));  // just consider alpha lower bound
+                                    ? std::abs(gamma_tmp.at(d) - gamma_upper.at(d))
+                                    : std::abs(gamma_tmp.at(d) - gamma_lower.at(d));  // just consider alpha lower bound
         double sol_to_b = sol_to_b_theta < sol_to_b_alpha ? sol_to_b_theta : sol_to_b_alpha;
         if ((retry < Optim::max_restart)       //&& (result.num_iters <= 2 * d)
             && ((sol_to_b < arma::datum::eps)  // we fastly converged to one bound
@@ -1200,36 +1204,41 @@ LIBKRIGING_EXPORT std::string NuggetKriging::summary() const {
     });
   };
 
-  oss << "* data";
-  oss << ((m_normalize) ? " (normalized): " : ": ") << m_X.n_rows << "x";
-  arma::rowvec Xmins = arma::min(m_X, 0);
-  arma::rowvec Xmaxs = arma::max(m_X, 0);
-  for (arma::uword i = 0; i < m_X.n_cols; i++) {
-    oss << "[" << Xmins[i] << "," << Xmaxs[i] << "]";
-    if (i < m_X.n_cols - 1)
-      oss << ",";
+  if (m_X.is_empty() || m_X.n_rows == 0) {  // not yet fitted
+    oss << "* covariance:\n";
+    oss << "  * kernel: " << m_covType << "\n";
+  } else {
+    oss << "* data";
+    oss << ((m_normalize) ? " (normalized): " : ": ") << m_X.n_rows << "x";
+    arma::rowvec Xmins = arma::min(m_X, 0);
+    arma::rowvec Xmaxs = arma::max(m_X, 0);
+    for (arma::uword i = 0; i < m_X.n_cols; i++) {
+      oss << "[" << Xmins[i] << "," << Xmaxs[i] << "]";
+      if (i < m_X.n_cols - 1)
+        oss << ",";
+    }
+    oss << " -> " << m_y.n_elem << "x[" << arma::min(m_y) << "," << arma::max(m_y) << "]\n";
+    oss << "* trend " << Trend::toString(m_regmodel);
+    oss << ((m_est_beta) ? " (est.): " : ": ");
+    colvec_printer(m_beta);
+    oss << "\n";
+    oss << "* variance";
+    oss << ((m_est_sigma2) ? " (est.): " : ": ");
+    oss << m_sigma2;
+    oss << "\n";
+    oss << "* covariance:\n";
+    oss << "  * kernel: " << m_covType << "\n";
+    oss << "  * range";
+    oss << ((m_est_theta) ? " (est.): " : ": ");
+    colvec_printer(m_theta);
+    oss << "\n";
+    oss << "  * nugget";
+    oss << ((m_est_nugget) ? " (est.): " : ": ");
+    oss << m_nugget;
+    oss << "\n";
+    oss << "  * fit:\n";
+    oss << "    * objective: " << m_objective << "\n";
+    oss << "    * optim: " << m_optim << "\n";
   }
-  oss << " -> " << m_y.n_elem << "x[" << arma::min(m_y) << "," << arma::max(m_y) << "]\n";
-  oss << "* trend " << Trend::toString(m_regmodel);
-  oss << ((m_est_beta) ? " (est.): " : ": ");
-  colvec_printer(m_beta);
-  oss << "\n";
-  oss << "* variance";
-  oss << ((m_est_sigma2) ? " (est.): " : ": ");
-  oss << m_sigma2;
-  oss << "\n";
-  oss << "* covariance:\n";
-  oss << "  * kernel: " << m_covType << "\n";
-  oss << "  * range";
-  oss << ((m_est_theta) ? " (est.): " : ": ");
-  colvec_printer(m_theta);
-  oss << "\n";
-  oss << "  * nugget";
-  oss << ((m_est_nugget) ? " (est.): " : ": ");
-  oss << m_nugget;
-  oss << "\n";
-  oss << "  * fit:\n";
-  oss << "    * objective: " << m_objective << "\n";
-  oss << "    * optim: " << m_optim << "\n";
   return oss.str();
 }

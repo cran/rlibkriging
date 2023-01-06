@@ -2,12 +2,13 @@
 % Please edit documentation in R/KrigingClass.R
 \name{Kriging}
 \alias{Kriging}
-\title{Create a \code{Kriging} Object using \pkg{libKriging}}
+\title{Create an object with S3 class \code{"Kriging"} using
+the \pkg{libKriging} library.}
 \usage{
 Kriging(
-  y,
-  X,
-  kernel,
+  y = NULL,
+  X = NULL,
+  kernel = NULL,
   regmodel = c("constant", "linear", "interactive"),
   normalize = FALSE,
   optim = c("BFGS", "Newton", "none"),
@@ -55,10 +56,6 @@ An object with S3 class \code{"Kriging"}. Should be used
     methods.
 }
 \description{
-Create an object with S3 class \code{"Kriging"} using
-the \pkg{libKriging} library.
-}
-\details{
 The hyper-parameters (variance and vector of correlation ranges)
 are estimated thanks to the optimization of a criterion given by
 \code{objective}, using the method given in \code{optim}.

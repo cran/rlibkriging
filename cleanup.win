@@ -8,3 +8,5 @@ RLIBKRIGING_PATH="src/libK/bindings/R/rlibkriging"
 VERSION=`grep "Version:" $RLIBKRIGING_PATH/DESCRIPTION`
 sed -i.bak "s/Version:.*/$VERSION/g" DESCRIPTION
 rm -f DESCRIPTION.bak
+
+rm -rf src/libK/build

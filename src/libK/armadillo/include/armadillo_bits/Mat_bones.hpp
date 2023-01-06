@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: Apache-2.0
+// 
 // Copyright 2008-2016 Conrad Sanderson (http://conradsanderson.id.au)
 // Copyright 2008-2016 National ICT Australia (NICTA)
 // 
@@ -58,17 +60,17 @@ class Mat : public Base< eT, Mat<eT> >
   inline ~Mat();
   inline  Mat();
   
-  inline explicit Mat(const uword in_rows, const uword in_cols);
+  inline explicit Mat(const uword in_n_rows, const uword in_n_cols);
   inline explicit Mat(const SizeMat& s);
   
-  template<bool do_zeros> inline explicit Mat(const uword in_rows, const uword in_cols, const arma_initmode_indicator<do_zeros>&);
-  template<bool do_zeros> inline explicit Mat(const SizeMat& s,                         const arma_initmode_indicator<do_zeros>&);
+  template<bool do_zeros> inline explicit Mat(const uword in_n_rows, const uword in_n_cols, const arma_initmode_indicator<do_zeros>&);
+  template<bool do_zeros> inline explicit Mat(const SizeMat& s,                             const arma_initmode_indicator<do_zeros>&);
   
-  template<typename fill_type> inline Mat(const uword in_rows, const uword in_cols, const fill::fill_class<fill_type>& f);
-  template<typename fill_type> inline Mat(const SizeMat& s,                         const fill::fill_class<fill_type>& f);
+  template<typename fill_type> inline Mat(const uword in_n_rows, const uword in_n_cols, const fill::fill_class<fill_type>& f);
+  template<typename fill_type> inline Mat(const SizeMat& s,                             const fill::fill_class<fill_type>& f);
   
-  inline Mat(const uword in_rows, const uword in_cols, const fill::scalar_holder<eT> f);
-  inline Mat(const SizeMat& s,                         const fill::scalar_holder<eT> f);
+  inline Mat(const uword in_n_rows, const uword in_n_cols, const fill::scalar_holder<eT> f);
+  inline Mat(const SizeMat& s,                             const fill::scalar_holder<eT> f);
   
   inline arma_cold            Mat(const char*        text);
   inline arma_cold Mat& operator=(const char*        text);
@@ -186,8 +188,8 @@ class Mat : public Base< eT, Mat<eT> >
   inline Mat& operator/=(const spdiagview<eT>& X);
   
   
-  arma_cold inline mat_injector<Mat> operator<<(const eT val);
-  arma_cold inline mat_injector<Mat> operator<<(const injector_end_of_row<>& x);
+  arma_deprecated inline mat_injector<Mat> operator<<(const eT val);
+  arma_deprecated inline mat_injector<Mat> operator<<(const injector_end_of_row<>& x);
   
   
   arma_inline       subview_row<eT> row(const uword row_num);
@@ -207,17 +209,17 @@ class Mat : public Base< eT, Mat<eT> >
   inline      const Col<eT>  unsafe_col(const uword col_num) const;
   
   
-  arma_inline       subview<eT> rows(const uword in_row1, const uword in_row2);
-  arma_inline const subview<eT> rows(const uword in_row1, const uword in_row2) const;
+  arma_inline       subview<eT>      rows(const uword in_row1, const uword in_row2);
+  arma_inline const subview<eT>      rows(const uword in_row1, const uword in_row2) const;
   
-  arma_inline       subview<eT> cols(const uword in_col1, const uword in_col2);
-  arma_inline const subview<eT> cols(const uword in_col1, const uword in_col2) const;
+  arma_inline       subview_cols<eT> cols(const uword in_col1, const uword in_col2);
+  arma_inline const subview_cols<eT> cols(const uword in_col1, const uword in_col2) const;
   
-  inline            subview<eT> rows(const span& row_span);
-  inline      const subview<eT> rows(const span& row_span) const;
+  inline            subview<eT>      rows(const span& row_span);
+  inline      const subview<eT>      rows(const span& row_span) const;
   
-  arma_inline       subview<eT> cols(const span& col_span);
-  arma_inline const subview<eT> cols(const span& col_span) const;
+  arma_inline       subview_cols<eT> cols(const span& col_span);
+  arma_inline const subview_cols<eT> cols(const span& col_span) const;
   
   
   arma_inline       subview<eT> submat(const uword in_row1, const uword in_col1, const uword in_row2, const uword in_col2);
@@ -241,11 +243,11 @@ class Mat : public Base< eT, Mat<eT> >
   inline       subview<eT> tail_rows(const uword N);
   inline const subview<eT> tail_rows(const uword N) const;
   
-  inline       subview<eT> head_cols(const uword N);
-  inline const subview<eT> head_cols(const uword N) const;
+  inline       subview_cols<eT> head_cols(const uword N);
+  inline const subview_cols<eT> head_cols(const uword N) const;
   
-  inline       subview<eT> tail_cols(const uword N);
-  inline const subview<eT> tail_cols(const uword N) const;
+  inline       subview_cols<eT> tail_cols(const uword N);
+  inline const subview_cols<eT> tail_cols(const uword N) const;
   
   template<typename T1> arma_inline       subview_elem1<eT,T1> elem(const Base<uword,T1>& a);
   template<typename T1> arma_inline const subview_elem1<eT,T1> elem(const Base<uword,T1>& a) const;
@@ -306,8 +308,11 @@ class Mat : public Base< eT, Mat<eT> >
   template<typename T1> inline void shed_rows(const Base<uword, T1>& indices);
   template<typename T1> inline void shed_cols(const Base<uword, T1>& indices);
   
-  inline void insert_rows(const uword row_num, const uword N, const bool set_to_zero = true);
-  inline void insert_cols(const uword col_num, const uword N, const bool set_to_zero = true);
+  arma_deprecated inline void insert_rows(const uword row_num, const uword N, const bool set_to_zero);
+  arma_deprecated inline void insert_cols(const uword col_num, const uword N, const bool set_to_zero);
+  
+  inline void insert_rows(const uword row_num, const uword N);
+  inline void insert_cols(const uword col_num, const uword N);
   
   template<typename T1> inline void insert_rows(const uword row_num, const Base<eT,T1>& X);
   template<typename T1> inline void insert_cols(const uword col_num, const Base<eT,T1>& X);
@@ -398,6 +403,11 @@ class Mat : public Base< eT, Mat<eT> >
   arma_inline arma_warn_unused       eT& operator() (const uword ii);
   arma_inline arma_warn_unused const eT& operator() (const uword ii) const;
   
+  #if defined(__cpp_multidimensional_subscript)
+  arma_inline arma_warn_unused       eT& operator[] (const uword in_row, const uword in_col);
+  arma_inline arma_warn_unused const eT& operator[] (const uword in_row, const uword in_col) const;
+  #endif
+  
   arma_inline arma_warn_unused       eT& at         (const uword in_row, const uword in_col);
   arma_inline arma_warn_unused const eT& at         (const uword in_row, const uword in_col) const;
   arma_inline arma_warn_unused       eT& operator() (const uword in_row, const uword in_col);
@@ -416,8 +426,9 @@ class Mat : public Base< eT, Mat<eT> >
   arma_inline arma_warn_unused bool is_square() const;
        inline arma_warn_unused bool is_finite() const;
   
-  inline arma_warn_unused bool has_inf() const;
-  inline arma_warn_unused bool has_nan() const;
+  inline arma_warn_unused bool has_inf()       const;
+  inline arma_warn_unused bool has_nan()       const;
+  inline arma_warn_unused bool has_nonfinite() const;
   
   inline arma_warn_unused bool is_sorted(const char* direction = "ascend")       const;
   inline arma_warn_unused bool is_sorted(const char* direction, const uword dim) const;
@@ -445,18 +456,18 @@ class Mat : public Base< eT, Mat<eT> >
   template<typename eT2, typename expr>
   inline void copy_size(const Base<eT2,expr>& X);
   
-  inline void set_size(const uword in_elem);
-  inline void set_size(const uword in_rows, const uword in_cols);
+  inline void set_size(const uword new_n_elem);
+  inline void set_size(const uword new_n_rows, const uword new_n_cols);
   inline void set_size(const SizeMat& s);
   
-  inline void   resize(const uword in_elem);
-  inline void   resize(const uword in_rows, const uword in_cols);
+  inline void   resize(const uword new_n_elem);
+  inline void   resize(const uword new_n_rows, const uword new_n_cols);
   inline void   resize(const SizeMat& s);
   
-  inline void  reshape(const uword in_rows, const uword in_cols);
+  inline void  reshape(const uword new_n_rows, const uword new_n_cols);
   inline void  reshape(const SizeMat& s);
   
-  arma_deprecated inline void reshape(const uword in_rows, const uword in_cols, const uword dim);  //!< NOTE: don't use this form: it will be removed
+  arma_deprecated inline void reshape(const uword new_n_rows, const uword new_n_cols, const uword dim);  //!< NOTE: don't use this form: it will be removed
   
   
   template<typename functor> inline const Mat&  for_each(functor F);
@@ -478,27 +489,27 @@ class Mat : public Base< eT, Mat<eT> >
   inline const Mat& fill(const fill::fill_class<fill_type>& f);
   
   inline const Mat& zeros();
-  inline const Mat& zeros(const uword in_elem);
-  inline const Mat& zeros(const uword in_rows, const uword in_cols);
+  inline const Mat& zeros(const uword new_n_elem);
+  inline const Mat& zeros(const uword new_n_rows, const uword new_n_cols);
   inline const Mat& zeros(const SizeMat& s);
   
   inline const Mat& ones();
-  inline const Mat& ones(const uword in_elem);
-  inline const Mat& ones(const uword in_rows, const uword in_cols);
+  inline const Mat& ones(const uword new_n_elem);
+  inline const Mat& ones(const uword new_n_rows, const uword new_n_cols);
   inline const Mat& ones(const SizeMat& s);
   
   inline const Mat& randu();
-  inline const Mat& randu(const uword in_elem);
-  inline const Mat& randu(const uword in_rows, const uword in_cols);
+  inline const Mat& randu(const uword new_n_elem);
+  inline const Mat& randu(const uword new_n_rows, const uword new_n_cols);
   inline const Mat& randu(const SizeMat& s);
   
   inline const Mat& randn();
-  inline const Mat& randn(const uword in_elem);
-  inline const Mat& randn(const uword in_rows, const uword in_cols);
+  inline const Mat& randn(const uword new_n_elem);
+  inline const Mat& randn(const uword new_n_rows, const uword new_n_cols);
   inline const Mat& randn(const SizeMat& s);
   
   inline const Mat& eye();
-  inline const Mat& eye(const uword in_rows, const uword in_cols);
+  inline const Mat& eye(const uword new_n_rows, const uword new_n_cols);
   inline const Mat& eye(const SizeMat& s);
   
   inline arma_cold void      reset();
@@ -737,7 +748,8 @@ class Mat : public Base< eT, Mat<eT> >
   
   inline void swap(Mat& B);
   
-  inline void steal_mem(Mat& X);  //!< don't use this unless you're writing code internal to Armadillo
+  inline void steal_mem(Mat& X);                      //!< don't use this unless you're writing code internal to Armadillo
+  inline void steal_mem(Mat& X, const bool is_move);  //!< don't use this unless you're writing code internal to Armadillo
   
   inline void steal_mem_col(Mat& X, const uword max_n_rows);
   
@@ -748,7 +760,7 @@ class Mat : public Base< eT, Mat<eT> >
   protected:
   
   inline void init_cold();
-  inline void init_warm(uword in_rows, uword in_cols);
+  inline void init_warm(uword in_n_rows, uword in_n_cols);
   
   inline arma_cold void init(const std::string& text);
   
@@ -779,7 +791,7 @@ class Mat : public Base< eT, Mat<eT> >
   
   public:
   
-  #ifdef ARMA_EXTRA_MAT_PROTO
+  #if defined(ARMA_EXTRA_MAT_PROTO)
     #include ARMA_INCFILE_WRAP(ARMA_EXTRA_MAT_PROTO)
   #endif
   };
@@ -842,9 +854,9 @@ class Mat<eT>::fixed : public Mat<eT>
     template<typename T1, typename T2, typename eglue_type> inline Mat& operator=(const eGlue<T1, T2, eglue_type>& X);
   #endif
   
-  arma_inline const Op< Mat_fixed_type, op_htrans >  t() const;
-  arma_inline const Op< Mat_fixed_type, op_htrans > ht() const;
-  arma_inline const Op< Mat_fixed_type, op_strans > st() const;
+  arma_inline arma_warn_unused const Op< Mat_fixed_type, op_htrans >  t() const;
+  arma_inline arma_warn_unused const Op< Mat_fixed_type, op_htrans > ht() const;
+  arma_inline arma_warn_unused const Op< Mat_fixed_type, op_strans > st() const;
   
   arma_inline arma_warn_unused const eT& at_alt     (const uword i) const;
   
@@ -854,6 +866,11 @@ class Mat<eT>::fixed : public Mat<eT>
   arma_inline arma_warn_unused const eT& at         (const uword i) const;
   arma_inline arma_warn_unused       eT& operator() (const uword i);
   arma_inline arma_warn_unused const eT& operator() (const uword i) const;
+  
+  #if defined(__cpp_multidimensional_subscript)
+  arma_inline arma_warn_unused       eT& operator[] (const uword in_row, const uword in_col);
+  arma_inline arma_warn_unused const eT& operator[] (const uword in_row, const uword in_col) const;
+  #endif
   
   arma_inline arma_warn_unused       eT& at         (const uword in_row, const uword in_col);
   arma_inline arma_warn_unused const eT& at         (const uword in_row, const uword in_col) const;
