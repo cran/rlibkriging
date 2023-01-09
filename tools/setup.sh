@@ -49,6 +49,12 @@ rm -fr $LIBKRIGING_SRC_PATH/dependencies
 # Use custom CMakeList to hold these changes
 cp tools/libKriging_CMakeLists.txt $LIBKRIGING_SRC_PATH/CMakeLists.txt
 
+# Switch slapack dependency as a local submodule (not a git clone)
+sed -i.bak -e "s|https://github.com/libKriging/slapack.git|\${CMAKE_CURRENT_SOURCE_DIR}/../../slapack|g" \
+  $LIBKRIGING_SRC_PATH/armadillo/cmake_aux/Modules/ARMA_FindLAPACK.cmake
+sed -i.bak -e "s|GIT_REPOSITORY|SOURCE_DIR|g" \
+  $LIBKRIGING_SRC_PATH/armadillo/cmake_aux/Tools/build_external_project.cmake
+
 # .travis-ci -> travis-ci (hidden files not allowed in CRAN)
 if [ -d $LIBKRIGING_SRC_PATH/.travis-ci ]; then
   mv $LIBKRIGING_SRC_PATH/.travis-ci $LIBKRIGING_SRC_PATH/travis-ci

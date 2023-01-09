@@ -7,7 +7,7 @@ function (build_external_project target url)
         project(build_external_project)
         include(ExternalProject)
         ExternalProject_add(${target}
-            GIT_REPOSITORY \"${url}\"
+            SOURCE_DIR \"${url}\"
             CMAKE_GENERATOR \"${CMAKE_GENERATOR}\"
             CMAKE_GENERATOR_PLATFORM \"${CMAKE_GENERATOR_PLATFORM}\"
             CMAKE_GENERATOR_TOOLSET \"${CMAKE_GENERATOR_TOOLSET}\"
