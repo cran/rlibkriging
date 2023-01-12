@@ -1,12 +1,15 @@
+library(testthat)
+library(rlibkriging)
+
 #install.packages("bindings/R/rlibkriging_0.3-2_R_x86_64-pc-linux-gnu.tar.gz")
 
-library(testthat)
+#library(testthat)
 
 for (kernel in c("exp","matern3_2","matern5_2","gauss")) {
   context(paste0("Check LogLikelihood for kernel ",kernel))
   
 
-#library(rlibkriging, lib.loc="bindings/R/Rlibs")
+##library(rlibkriging, lib.loc="bindings/R/Rlibs")
 #rlibkriging:::optim_log(3)
 #kernel="exp"
 
@@ -31,7 +34,7 @@ tmax=1
     arrows(x1,x2,x1+0.1*gllx[1],x2+.01*gllx[2])
   }}
   
-  library(rlibkriging)
+  #library(rlibkriging)
   r <- NoiseKriging(y,noise=rep(0.1^2,nrow(X)), X, kernel)
   ll_r = function(theta_sigma2) logLikelihoodFun(r,theta_sigma2)$logLikelihood
   x=seq(tmin,tmax,,51)
@@ -54,4 +57,3 @@ tmax=1
   test_that(desc="logLik Grad is the same that DiceKriging one", 
             expect_equal(logLikelihoodFun(r,x,grad=T)$logLikelihoodGrad,t(DiceKriging::logLikGrad(x,k,xenv)),tolerance= precision))
 }
-

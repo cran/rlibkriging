@@ -1,4 +1,7 @@
 library(testthat)
+library(rlibkriging)
+
+#library(testthat)
 
 #kernel="matern3_2" #
 for (kernel in c("gauss","exp")){ # NOT YET WORKING: ,"matern3_2","matern5_2")) {
@@ -35,7 +38,7 @@ hll = function(theta,eps=0.0001) {
   (h+t(h))/2
 }
 
-library(rlibkriging)
+#library(rlibkriging)
 r <- Kriging(y, X, kernel)
 ll_C = function(theta) logLikelihoodFun(r,theta)$logLikelihood[1]
 gll_C = function(theta) t(logLikelihoodFun(r,theta,grad=T)$logLikelihoodGrad)

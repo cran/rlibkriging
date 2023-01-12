@@ -1,5 +1,8 @@
 library(testthat)
-#library(rlibkriging, lib.loc="bindings/R/Rlibs")
+library(rlibkriging)
+
+#library(testthat)
+##library(rlibkriging, lib.loc="bindings/R/Rlibs")
 #rlibkriging:::optim_log(2)
 #rlibkriging:::optim_use_reparametrize(FALSE)
 #rlibkriging:::optim_set_theta_lower_factor(0.02)
@@ -228,4 +231,3 @@ points(theta_ref,col='black')
 
 test_that(desc="Fit: 2D _not_ in [0,1]^2 / fit of theta 2D is _quite_ the same that DiceKriging one",
           expect_equal(ll_r(array(as.list(r)$theta)), ll_k(k@covariance@range.val), tol=1e-1))
-

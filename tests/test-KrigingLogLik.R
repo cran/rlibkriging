@@ -1,6 +1,9 @@
+library(testthat)
+library(rlibkriging)
+
 #install.packages("bindings/R/rlibkriging_0.3-2_R_x86_64-pc-linux-gnu.tar.gz")
 
-library(testthat)
+#library(testthat)
 
 for (kernel in c("exp","matern3_2","matern5_2","gauss")) {
   context(paste0("Check LogLikelihood for kernel ",kernel))
@@ -23,7 +26,7 @@ for (kernel in c("exp","matern3_2","matern5_2","gauss")) {
     arrows(x,llx,x+.1,llx+.1*gllx)
   }
   
-  library(rlibkriging)
+  #library(rlibkriging)
   r <- Kriging(y, X, kernel)
   ll2 = function(theta) logLikelihoodFun(r,theta)$logLikelihood
   # plot(Vectorize(ll2),col='red',add=T) # FIXME fails with "error: chol(): decomposition failed"
@@ -60,7 +63,7 @@ for (kernel in c("matern3_2","matern5_2","gauss","exp")) {
 
   k = DiceKriging::km(design=X,response=y,covtype = kernel,control = list(trace=F))
   
-  #library(rlibkriging)
+  ##library(rlibkriging)
   r <- Kriging(y, X, kernel)
   
   precision <- 1e-8  # the following tests should work with it, since the computations are analytical
@@ -72,5 +75,3 @@ for (kernel in c("matern3_2","matern5_2","gauss","exp")) {
   test_that(desc="logLik Grad is the same that DiceKriging one", 
             expect_equal(logLikelihoodFun(r,x,grad=T)$logLikelihoodGrad[1,],t(DiceKriging::logLikGrad(x,k,xenv))[1,],tolerance= precision))
 }
-
-

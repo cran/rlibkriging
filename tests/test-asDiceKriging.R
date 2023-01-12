@@ -1,8 +1,11 @@
 library(testthat)
-#library(rlibkriging, lib.loc="bindings/R/Rlibs")
+library(rlibkriging)
+
+#library(testthat)
+##library(rlibkriging, lib.loc="bindings/R/Rlibs")
 
 ## install.packages("../rlibkriging_0.1-10_R_x86_64-pc-linux-gnu.tar.gz",repos=NULL)
-## library(rlibkriging)
+## #library(rlibkriging)
 ##
 ## Changes by Yves remove the references to the packages as in 'rlibkriging::simulate',
 ## because simulate is not exported as such from rlibkriging
@@ -23,7 +26,7 @@ library(DiceKriging)
 km1 <- km(design = X, response = y, covtype = "gauss",
          formula = ~1, estim.method = "LOO",
          parinit = c(.15), control = list(trace = FALSE))
-library(rlibkriging)
+#library(rlibkriging)
 KM1 <- KM(design = X, response = y, covtype = "gauss",
           formula = ~1, estim.method = "LOO",
           parinit = c(.15))
@@ -39,7 +42,7 @@ test_that("m1.argmax(loo) == KM1.argmax(loo)",
 
 plot(Vectorize(function(.t) DiceKriging::leaveOneOutFun(param = as.numeric(.t), model = km1)))
 abline(v = km1@covariance@range.val)
-plot(Vectorize(function(.t) leaveOneOutFun(KM1@Kriging, as.numeric(.t))),
+plot(Vectorize(function(.t) rlibkriging::leaveOneOutFun(KM1@Kriging, as.numeric(.t))),
      add = TRUE, col = 'red')
 abline(v = KM1@covariance@range.val, col = 'red')
 
@@ -47,11 +50,11 @@ abline(v = KM1@covariance@range.val, col = 'red')
 
 ##########################################################################
 
-library(testthat)
+#library(testthat)
 
 ## install.packages("../rlibkriging_0.1-10_R_x86_64-pc-linux-gnu.tar.gz",
 ##                  repos = NULL)
-## library(rlibkriging)
+## #library(rlibkriging)
 
 context("# A 2D example - Branin-Hoo function")
 

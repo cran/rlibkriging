@@ -1,5 +1,8 @@
 library(testthat)
-#library(rlibkriging, lib.loc="bindings/R/Rlibs")
+library(rlibkriging)
+
+#library(testthat)
+##library(rlibkriging, lib.loc="bindings/R/Rlibs")
 #rlibkriging:::optim_log(3)
 
 kernel="gauss"
@@ -14,7 +17,7 @@ for (kernel in c("exp","matern3_2","matern5_2","gauss")) {
   y = f(X)
   points(X,y)
   
-  library(rlibkriging)
+  #library(rlibkriging)
   r <- NuggetKriging(y, X, kernel, objective="LMP", parameters=list(nugget=0,is_nugget_estim=TRUE))
   
 eps = 0.00001 # used for comparison bw computed grad and num grad

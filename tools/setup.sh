@@ -74,9 +74,22 @@ rm -rf R
 cp -r $RLIBKRIGING_PATH/R .
 rm -rf src/*.cpp
 cp -r $RLIBKRIGING_PATH/src .
+cp -r $RLIBKRIGING_PATH/NAMESPACE .
 rm -rf tests
 cp -r $RLIBKRIGING_PATH/tests .
-cp -r $RLIBKRIGING_PATH/NAMESPACE .
+# detailed tests
+#  remove previous loading of previous custom testthat & rlibkriging (that should not be there, anyway)
+find tests/testthat -type f -name test-*.R -exec sed -i.bak -e 's|library(testthat)|#library(testthat)|g' {} +
+find tests/testthat -type f -name test-*.R -exec sed -i.bak -e 's|library(rlibkriging|#library(rlibkriging|g' {} +
+#  prepend loading of testthat
+mv tests/testthat/test-*.R tests/.
+for f in `ls -d tests/*.R`; do
+  echo -e "library(testthat)\n Sys.setenv('OMP_THREAD_LIMIT'=2)\n library(rlibkriging)\n" > $f.new
+  echo "$(cat $f)" >> $f.new
+  mv $f.new $f
+done
+rm -rf tests/testthat/
+rm -rf tests/testthat.R
 
 # sync man content
 rm -rf man

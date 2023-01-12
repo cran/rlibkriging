@@ -1,7 +1,7 @@
 Package: rlibkriging
 Type: Package
 Title: Kriging Models using the 'libKriging' Library
-Version: 0.7-3
+Version: 0.7-3.1
 Date: 2023-01-09
 Authors@R: 
     c(person(given = "Pascal",
@@ -54,7 +54,7 @@ SystemRequirements: GNU make, cmake (>= 3.2.0), gcc, gfortran
 URL: https://github.com/libKriging
 RoxygenNote: 7.2.1
 NeedsCompilation: yes
-Packaged: 2023-01-09 19:17:28 UTC; richet
+Packaged: 2023-01-11 16:49:08 UTC; richet
 Author: Pascal Havé [aut],
   Yann Richet [aut, cre] (<https://orcid.org/0000-0002-5677-8458>),
   Yves Deville [aut],
@@ -65,4 +65,4 @@ Author: Pascal Havé [aut],
   Jorge Nocedal [ctb],
   Jose Luis Morales [ctb]
 Repository: CRAN
-Date/Publication: 2023-01-09 22:30:02 UTC
+Date/Publication: 2023-01-12 08:40:06 UTC

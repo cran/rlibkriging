@@ -1,5 +1,8 @@
 library(testthat)
-#library(rlibkriging, lib.loc="bindings/R/Rlibs")
+library(rlibkriging)
+
+#library(testthat)
+##library(rlibkriging, lib.loc="bindings/R/Rlibs")
 #rlibkriging:::optim_log(3)
 
 kernel="gauss"
@@ -25,7 +28,7 @@ for (kernel in c("exp","matern3_2","matern5_2","gauss")) {
     arrows(x,llx,x+.1,llx+.1*gllx)
   }
   
-  library(rlibkriging)
+  #library(rlibkriging)
   r <- NuggetKriging(y, X, kernel, parameters=list(nugget=0,is_nugget_estim=TRUE))
   ll2_theta = function(theta) logLikelihoodFun(r,c(theta,alpha0))$logLikelihood
   # second arg is alpha=1 for nugget=0
@@ -119,7 +122,7 @@ for (kernel in c("matern3_2","matern5_2","gauss","exp")) {
 
   k = DiceKriging::km(design=X,response=y,covtype = kernel,control = list(trace=F),nugget=0, nugget.estim=TRUE)
   
-  #library(rlibkriging)
+  ##library(rlibkriging)
   r <- NuggetKriging(y, X, kernel, parameters=list(nugget=0,is_nugget_estim=TRUE))
   
   precision <- 1e-8  # the following tests should work with it, since the computations are analytical
@@ -155,5 +158,3 @@ for (kernel in c("matern3_2","matern5_2","gauss","exp")) {
               )
               ,tolerance= 1e-2))
 }
-
-

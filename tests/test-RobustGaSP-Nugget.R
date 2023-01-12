@@ -1,4 +1,7 @@
 library(testthat)
+library(rlibkriging)
+
+#library(testthat)
 
 library(RobustGaSP)
 
@@ -12,7 +15,7 @@ X <- as.matrix(runif(n))
 y = f(X)
 #points(X,y)
 k = RobustGaSP::rgasp(design=X,response=y,nugget.est = TRUE)
-library(rlibkriging)
+#library(rlibkriging)
 r <- NuggetKriging(y, X,
   kernel="matern5_2",
   regmodel = "constant", normalize = FALSE,
@@ -62,7 +65,7 @@ model = NULL
 r = NULL
 library(RobustGaSP)
 k = rgasp(design=X,response=y, nugget.est = T)
-library(rlibkriging)
+#library(rlibkriging)
 r <- NuggetKriging(y, X,
   kernel="matern5_2",
   regmodel = "constant", normalize = FALSE,
@@ -99,4 +102,3 @@ test_that(desc=paste0("pred mean is the same that RobustGaSP one"),
           expect_equal(predict(r,c(0.7,x2))$mean[1],predict(k,matrix(c(0.7,x2),ncol=2))$mean,tol = precision))
 test_that(desc=paste0("pred sd is the same that RobustGaSP one"),
           expect_equal(predict(r,c(0.7,x2))$stdev[1],predict(k,matrix(c(0.7,x2),ncol=2))$sd,tol = precision))
-

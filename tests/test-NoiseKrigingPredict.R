@@ -1,11 +1,14 @@
 library(testthat)
-#library(rlibkriging, lib.loc="bindings/R/Rlibs")
+library(rlibkriging)
+
+#library(testthat)
+##library(rlibkriging, lib.loc="bindings/R/Rlibs")
 
 for (kernel in c("gauss","exp","matern3_2","matern5_2")) {
   context(paste0("Check predict 1D for kernel ",kernel))
 
-#library(testthat)
-#library(rlibkriging, lib.loc="bindings/R/Rlibs")
+##library(testthat)
+##library(rlibkriging, lib.loc="bindings/R/Rlibs")
 #rlibkriging:::optim_log(3)
 #kernel="exp"
 
@@ -18,7 +21,7 @@ for (kernel in c("gauss","exp","matern3_2","matern5_2")) {
   y = f(X) + 0.1*rnorm(nrow(X))
   #points(X,y)
   k = DiceKriging::km(design=X,noise.var=rep(0.1^2,nrow(X)),response=y,covtype = "gauss",control = list(trace=F), nugget.estim = F)
-  library(rlibkriging)
+  #library(rlibkriging)
   r <- NoiseKriging(y,noise=rep(0.1^2,nrow(X)),X,"gauss","constant",FALSE,"none","LL",
                parameters=list(sigma2=k@covariance@sd2,has_sigma2=TRUE, is_sigma2_estim=FALSE,
                theta=matrix(k@covariance@range.val),has_theta=TRUE, is_theta_estim=FALSE))

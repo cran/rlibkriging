@@ -1,5 +1,8 @@
 library(testthat)
-#library(rlibkriging, lib.loc="bindings/R/Rlibs")
+library(rlibkriging)
+
+#library(testthat)
+##library(rlibkriging, lib.loc="bindings/R/Rlibs")
 #rlibkriging:::optim_log(2)
 #rlibkriging:::optim_use_reparametrize(FALSE)
 #rlibkriging:::optim_set_theta_lower_factor(0.02)
@@ -14,7 +17,7 @@ X10 = 10*X
 y = f(X)
 y50 = 50*y
 
-library(rlibkriging)
+#library(rlibkriging)
 
 
 context("no normalize")
@@ -121,5 +124,3 @@ test_that(desc="update beta norm_param",
           expect_equal(r_norm_param$beta() , r1050_norm_param$beta(),tol=0.01))
 test_that(desc="update sigma2 norm_param",
           expect_equal(r_norm_param$sigma2() , r1050_norm_param$sigma2(),tol=0.01))
-
-

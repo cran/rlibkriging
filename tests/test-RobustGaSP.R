@@ -1,4 +1,7 @@
 library(testthat)
+library(rlibkriging)
+
+#library(testthat)
 
 library(RobustGaSP)
 
@@ -12,7 +15,7 @@ X <- as.matrix(runif(n))
 y = f(X)
 #points(X,y)
 k = RobustGaSP::rgasp(design=X,response=y)
-library(rlibkriging)
+#library(rlibkriging)
 r <- Kriging(y, X,
   kernel="matern5_2",
   regmodel = "constant", normalize = FALSE,
@@ -190,7 +193,7 @@ model = NULL
 r = NULL
 library(RobustGaSP)
 k = rgasp(design=X,response=y)
-library(rlibkriging)
+#library(rlibkriging)
 r <- Kriging(y, X, "matern5_2", objective="LMP", optim="BFGS10")
 
 lmp_rgasp = function(X, model=k) {if (!is.matrix(X)) X = matrix(X,ncol=2);

@@ -1,4 +1,7 @@
 library(testthat)
+library(rlibkriging)
+
+#library(testthat)
 
 kernel_type = function(kernel) {
   if (kernel=="matern3_2") return("matern_3_2")
@@ -52,7 +55,7 @@ for (kernel in c("matern5_2","matern3_2")) {
     arrows(x,lmp(x),x+.1,lmp(x)+.1*lmp_deriv(x))
   }
 
-  library(rlibkriging)
+  #library(rlibkriging)
   r <- Kriging(y, X, kernel)
   ## Should be equal:
   #lmp(1.0); lmp_deriv(1.0);

@@ -1,4 +1,7 @@
 library(testthat)
+library(rlibkriging)
+
+#library(testthat)
 
 for (kernel in c("gauss","exp")) {
 # kernel = "gauss"
@@ -26,5 +29,3 @@ test_that(desc="leaveOneOut is the same that DiceKriging one",
 test_that(desc="leaveOneOut Grad is the same that DiceKriging one",
           expect_equal(t(leaveOneOutFun(r,x,grad=T)$leaveOneOutGrad),DiceKriging::leaveOneOutGrad(x,k,xenv),tolerance= precision))
 }
-
-
