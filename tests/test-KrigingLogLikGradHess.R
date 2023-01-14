@@ -1,7 +1,6 @@
 library(testthat)
-library(rlibkriging)
-
-#library(testthat)
+ Sys.setenv('OMP_THREAD_LIMIT'=2)
+ library(rlibkriging)
 
 #kernel="matern3_2" #
 for (kernel in c("gauss","exp")){ # NOT YET WORKING: ,"matern3_2","matern5_2")) {

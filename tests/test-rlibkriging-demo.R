@@ -1,8 +1,6 @@
 library(testthat)
-library(rlibkriging)
-
-# install.packages('Rcpp', repos='http://cran.irsn.fr/')
-# install.packages('rlibkriging-version.tgz', repos=NULL)
+ Sys.setenv('OMP_THREAD_LIMIT'=2)
+ library(rlibkriging)
 
 X <- as.matrix(c(0.0, 0.2, 0.5, 0.8, 1.0))
 f <- function(x) 1 - 1 / 2 * (sin(12 * x) / (1 + x) + 2 * cos(7 * x) * x^5 + 0.7)

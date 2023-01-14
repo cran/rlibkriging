@@ -1,9 +1,6 @@
 library(testthat)
-library(rlibkriging)
-
-#library(testthat)
-##library(rlibkriging, lib.loc="bindings/R/Rlibs")
-
+ Sys.setenv('OMP_THREAD_LIMIT'=2)
+ library(rlibkriging)
 
 context("Check predict args (T,F) are consistent")
 

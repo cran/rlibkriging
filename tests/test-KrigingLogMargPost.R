@@ -1,7 +1,6 @@
 library(testthat)
-library(rlibkriging)
-
-#library(testthat)
+ Sys.setenv('OMP_THREAD_LIMIT'=2)
+ library(rlibkriging)
 
 kernel_type = function(kernel) {
   if (kernel=="matern3_2") return("matern_3_2")

@@ -1,9 +1,6 @@
 library(testthat)
-library(rlibkriging)
-
-#install.packages("bindings/R/rlibkriging_0.3-2_R_x86_64-pc-linux-gnu.tar.gz")
-
-#library(testthat)
+ Sys.setenv('OMP_THREAD_LIMIT'=2)
+ library(rlibkriging)
 
 for (kernel in c("exp","matern3_2","matern5_2","gauss")) {
   context(paste0("Check LogLikelihood for kernel ",kernel))

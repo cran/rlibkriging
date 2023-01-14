@@ -541,6 +541,16 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// linalg_set_chol_warning
+void linalg_set_chol_warning(bool warn);
+RcppExport SEXP _rlibkriging_linalg_set_chol_warning(SEXP warnSEXP) {
+BEGIN_RCPP
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< bool >::type warn(warnSEXP);
+    linalg_set_chol_warning(warn);
+    return R_NilValue;
+END_RCPP
+}
 // new_NoiseKriging
 Rcpp::List new_NoiseKriging(std::string kernel);
 RcppExport SEXP _rlibkriging_new_NoiseKriging(SEXP kernelSEXP) {
@@ -1591,6 +1601,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_rlibkriging_linalg_get_num_nugget", (DL_FUNC) &_rlibkriging_linalg_get_num_nugget, 0},
     {"_rlibkriging_linalg_set_num_nugget", (DL_FUNC) &_rlibkriging_linalg_set_num_nugget, 1},
     {"_rlibkriging_linalg_chol_safe", (DL_FUNC) &_rlibkriging_linalg_chol_safe, 1},
+    {"_rlibkriging_linalg_set_chol_warning", (DL_FUNC) &_rlibkriging_linalg_set_chol_warning, 1},
     {"_rlibkriging_new_NoiseKriging", (DL_FUNC) &_rlibkriging_new_NoiseKriging, 1},
     {"_rlibkriging_new_NoiseKrigingFit", (DL_FUNC) &_rlibkriging_new_NoiseKrigingFit, 9},
     {"_rlibkriging_noisekriging_fit", (DL_FUNC) &_rlibkriging_noisekriging_fit, 9},

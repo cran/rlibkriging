@@ -1,11 +1,6 @@
 library(testthat)
-library(rlibkriging)
-
-#library(testthat)
-
-#library(rlibkriging, lib.loc="bindings/R/Rlibs")
-# install.packages("../rlib0.1-10_R_x86_64-pc-linux-gnu.tar.gz",repos=NULL)
-##library(rlibkriging)
+ Sys.setenv('OMP_THREAD_LIMIT'=2)
+ library(rlibkriging)
 
 # f <- function(X) apply(X, 1, function(x) prod(sin((x-.5)^2)))
 f <- function(X) apply(X, 1, function(x)

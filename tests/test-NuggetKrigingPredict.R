@@ -1,8 +1,6 @@
 library(testthat)
-library(rlibkriging)
-
-#library(testthat)
-##library(rlibkriging, lib.loc="bindings/R/Rlibs")
+ Sys.setenv('OMP_THREAD_LIMIT'=2)
+ library(rlibkriging)
 
 for (kernel in c("gauss","exp","matern3_2","matern5_2")) {
   context(paste0("Check predict 1D for kernel ",kernel))

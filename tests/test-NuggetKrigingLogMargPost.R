@@ -1,9 +1,6 @@
 library(testthat)
-library(rlibkriging)
-
-#library(testthat)
-##library(rlibkriging, lib.loc="bindings/R/Rlibs")
-#rlibkriging:::optim_log(3)
+ Sys.setenv('OMP_THREAD_LIMIT'=2)
+ library(rlibkriging)
 
 kernel="gauss"
 for (kernel in c("exp","matern3_2","matern5_2","gauss")) {

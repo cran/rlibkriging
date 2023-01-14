@@ -181,6 +181,10 @@ linalg_chol_safe <- function(X) {
     .Call(`_rlibkriging_linalg_chol_safe`, X)
 }
 
+linalg_set_chol_warning <- function(warn) {
+    invisible(.Call(`_rlibkriging_linalg_set_chol_warning`, warn))
+}
+
 new_NoiseKriging <- function(kernel) {
     .Call(`_rlibkriging_new_NoiseKriging`, kernel)
 }

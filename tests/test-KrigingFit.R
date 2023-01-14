@@ -1,11 +1,6 @@
 library(testthat)
-library(rlibkriging)
-
-#library(testthat)
-##library(rlibkriging, lib.loc="bindings/R/Rlibs")
-#rlibkriging:::optim_log(2)
-#rlibkriging:::optim_use_reparametrize(FALSE)
-#rlibkriging:::optim_set_theta_lower_factor(0.02)
+ Sys.setenv('OMP_THREAD_LIMIT'=2)
+ library(rlibkriging)
 
 context("Fit: 1D")
 
