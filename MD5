@@ -1,4 +1,4 @@
-3b0f65323f75c6000277b69fdf09f6cd *DESCRIPTION
+8d80e9a2b44802f211e9314444ae001e *DESCRIPTION
 bdf67245f50ddc1cb7363f865e927b64 *NAMESPACE
 f50539e5f6969b40002f44fd6c6990d3 *R/KMClass.R
 2d047837fb3b98fb231e8bb9560f6f49 *R/KrigingClass.R
@@ -82,7 +82,7 @@ ecc23f86b9e75947247ed55d0291dc7e *src/Makevars
 6f9c14e83aa88fedf5cbd144c2a7787a *src/RcppExports.cpp
 33023723bdfa3c91e8b017a12553c645 *src/bench.cpp
 8778dd6acc6722bd9efff98be0428f00 *src/kriging_binding.cpp
-aaef26795375eb189643ade0ffed0ad7 *src/libK/CMakeLists.txt
+e1f55af619665f89ba725b275ca6f1b3 *src/libK/CMakeLists.txt
 105067fee326767af5bb48e3aa83899b *src/libK/CONTRIBUTING.md
 86d3f3a95c324c9479bd8986968f4327 *src/libK/LICENSE
 686e6d1da187cc5a08757eda7d44b7ec *src/libK/README.md
@@ -898,7 +898,7 @@ a308525ff1d9ad0ba2f07444bee8db83 *src/libK/lbfgsb_cpp/include/lbfgsb_cpp/lbfgsb.
 0e850790e65630598cc41ea0f9391f7a *src/libK/setup.py
 71b9e4136439a4407f9d39f50a3b897e *src/libK/src/CMakeLists.txt
 a2a0cccd49c7c7f0e7052a7f7a2e1f02 *src/libK/src/lib/Bench.cpp
-94f7dc711f9fef6c24872bcf0f43cc44 *src/libK/src/lib/CMakeLists.txt
+2beb82b4348f323d6c9c229fb418f954 *src/libK/src/lib/CMakeLists.txt
 3a2da6ce599c225ea93040b1530b44e9 *src/libK/src/lib/CacheFunction.cpp
 1d61f0d5c1a8510c769b9433683285f3 *src/libK/src/lib/Covariance.cpp
 5a97d8eb87dc0a901ad7609184a6e614 *src/libK/src/lib/Kriging.cpp
@@ -2133,6 +2133,5 @@ d0f1498f6d239c6d51ba4d4b69742720 *tests/test-rlibkriging-demo.R
 45cf0c7d7cb6fbda5f7a5bf0d7ec6f41 *tools/build.sh
 abc2c149c1ddbdd6b325b82f381bae0c *tools/cmake_config.sh
 6f054c2a36d1d4c9f3624f373b12d9ff *tools/install_packages.R
-aaef26795375eb189643ade0ffed0ad7 *tools/libKriging_CMakeLists.txt
 be0a67a9b80eb7e01196d5345a0372b6 *tools/r_config.sh
-d66eeafeec6805d5d91dd17a72f40c07 *tools/setup.sh
+a27f3b853ebad7f5e196351acc442671 *tools/setup.sh

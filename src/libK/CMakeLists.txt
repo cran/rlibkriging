@@ -1,5 +1,7 @@
 cmake_minimum_required(VERSION 3.10)
 
+# Avoid to export package (like armadillo) into ~/.cmake
+# This behaviour is required to submit package to CRAN
 set(CMAKE_EXPORT_NO_PACKAGE_REGISTRY ON)
 set(CMAKE_FIND_PACKAGE_NO_PACKAGE_REGISTRY ON)
 
@@ -54,6 +56,8 @@ option(LIBKRIGING_BENCHMARK_TESTS "Enable benchmark tests while testing" OFF)
 option(ENABLE_COVERAGE "Enable coverage target" OFF)
 option(ENABLE_MEMCHECK "Enable memcheck on tests" OFF)
 option(SANITIZE "Enable sanitize feature" OFF) # could be THREAD, ADDRESS or LEAK
+option(LBFGSB_SHOW_BUILD OFF)
+
 set(PYBIND11_PYTHON_VERSION 3.6)
 
 #------------------------------------------------------
@@ -163,15 +167,12 @@ list(APPEND CMAKE_SYSTEM_LIBRARY_PATH ${EXTRA_SYSTEM_LIBRARY_PATH})
 # Dependencies
 set(DETECT_HDF5 false CACHE BOOL "Disable HDF5 to avoid conflict with armadillo") # prevent issue #40
 set(CMAKE_POLICY_DEFAULT_CMP0048 NEW) # disable warning about missing version in project command
-set(BUILD_SMOKE_TEST OFF CACHE BOOL "armadillo smoke test") # no smoke tests: it fails due to custom memory guard in memory.hpp
-add_subdirectory( armadillo ) ## replace dependencies/armadillo-code by just armadillo to reduce path length
+set(BUILD_SMOKE_TEST OFF CACHE BOOL "armadillo smoke test") # no smoke tests: it fails due to custom memory guard in memory.hpp 
+add_subdirectory(armadillo)
 include_directories(SYSTEM armadillo/include)
 
-add_definitions(-DOPTIM_ENABLE_ARMA_WRAPPERS)
-## include(cmake/installOptimLibHeaders.cmake)
-## include_directories(SYSTEM ${CMAKE_BINARY_DIR}/dependencies/optim/header_only_version)
-
 add_library(blas ALIAS armadillo) # to use armadillo blas inside lbfgsb_cpp
+
 if (NOT CMAKE_Fortran_COMPILER)
     set(CMAKE_Fortran_COMPILER gfortran)
 endif()
@@ -181,7 +182,7 @@ endif()
 set(ignoreUnusedVariable ${LBFGSB_SHOW_BUILD})
 message(STATUS "Compiling lbfgsb_cpp as an external library")
 
-add_subdirectory(lbfgsb_cpp) ##
+add_subdirectory(lbfgsb_cpp)
 #set(lbfgsb_INSTALL_DIR "${CMAKE_BINARY_DIR}/lbfgsb-installed")
 #set(lbfgsb_DIR "${lbfgsb_INSTALL_DIR}/lib/cmake/lbfgsb")
 #find_package(lbfgsb CONFIG REQUIRED)
@@ -205,9 +206,6 @@ endif ()
 #------------------------------------------------------
 
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
-
-##
-set(NO_CMAKE_PACKAGE_REGISTRY ON)
 
 #------------------------------------------------------
 
@@ -309,6 +307,13 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${LIBKRIGING_CXX_FLAGS}")
 
 #------------------------------------------------------
 
+# Workaround for AppleClang 10 in CRAN automated build
+if (CMAKE_CXX_COMPILER_ID STREQUAL "AppleClang" AND CMAKE_CXX_COMPILER_VERSION VERSION_LESS "11")
+    add_definitions(-DLIBKRIGING_DISABLE_CACHE)
+endif()
+
+#------------------------------------------------------
+
 # search for clang-tidy (while be used while adding library or executable)
 find_program(CLANG_TIDY clang-tidy)
 if (CLANG_TIDY)
@@ -340,7 +345,7 @@ endif ()
 #------------------------------------------------------
 
 # valgrind must be checked before adding new subdirectories
-# before include(CTest)
+# before ####include(CTest)
 if (ENABLE_MEMCHECK)
     find_program(VALGRIND_EXECUTABLE valgrind)
     if (NOT VALGRIND_EXECUTABLE)
@@ -548,18 +553,13 @@ endif()
 if (POLICY CMP0110)
     cmake_policy(SET CMP0110 NEW) # supports arbitrary characters in test names (requires in CMake 3.19)
 endif()
-## set(CATCH_MODULE_PATH "${LIBKRIGING_SOURCE_DIR}/dependencies/Catch2")
-## add_subdirectory("${CATCH_MODULE_PATH}")
-## list(APPEND CMAKE_MODULE_PATH ${CATCH_MODULE_PATH}/contrib)
-## 
-## include(CTest)
-## add_subdirectory(tests)
-## 
-## add_custom_target(run_unit_tests
-##         COMMAND ${CMAKE_CTEST_COMMAND} -j ${PROCESSOR_COUNT}
-##         COMMENT "Executing unit tests."
-##         DEPENDS all_test_binaries
-##         )
+####set(CATCH_MODULE_PATH "${LIBKRIGING_SOURCE_DIR}/dependencies/Catch2")
+####add_subdirectory("${CATCH_MODULE_PATH}")
+####list(APPEND CMAKE_MODULE_PATH ${CATCH_MODULE_PATH}/contrib)
+
+####include(CTest)
+####add_subdirectory(tests)
+
 
 #------------------------------------------------------
 
@@ -679,7 +679,7 @@ if (DOXYGEN_FOUND)
     set(DOXYGEN_OUT ${CMAKE_BINARY_DIR}/Doxyfile)
 
     # request to configure the file
-    ## configure_file(${DOXYGEN_IN} ${DOXYGEN_OUT} @ONLY)
+    ####configure_file(${DOXYGEN_IN} ${DOXYGEN_OUT} @ONLY)
 
     add_custom_target(doc # add ALL if build together with the code
             COMMAND echo "running doc generation ..."

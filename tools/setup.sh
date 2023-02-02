@@ -47,7 +47,21 @@ fi
 rm -fr $LIBKRIGING_SRC_PATH/dependencies
 
 # Use custom CMakeList to hold these changes
-cp tools/libKriging_CMakeLists.txt $LIBKRIGING_SRC_PATH/CMakeLists.txt
+sed -i.bak -e "s|dependencies/armadillo-code|armadillo|g" \
+  $LIBKRIGING_SRC_PATH/CMakeLists.txt
+sed -i.bak -e "s|dependencies/lbfgsb_cpp|lbfgsb_cpp|g" \
+  $LIBKRIGING_SRC_PATH/CMakeLists.txt
+sed -i.bak -e "s|configure_file(\${DOXYGEN_IN}|##configure_file(\${DOXYGEN_IN}|g" \
+  $LIBKRIGING_SRC_PATH/CMakeLists.txt  
+sed -i.bak -e "s|^.*CATCH_MODULE_PATH|##&|g" \
+  $LIBKRIGING_SRC_PATH/CMakeLists.txt  
+sed -i.bak -e "s|include(CTest)|##&|g" \
+  $LIBKRIGING_SRC_PATH/CMakeLists.txt  
+sed -i.bak -e "s|add_subdirectory(tests)|##&|g" \
+  $LIBKRIGING_SRC_PATH/CMakeLists.txt    
+sed -i.bak -e '/^add_custom_target(run_unit_tests$/,/^        )$/d;//d' \
+  $LIBKRIGING_SRC_PATH/CMakeLists.txt  
+rm -rf $LIBKRIGING_SRC_PATH/CMakeLists.txt.bak
 
 # Switch slapack dependency as a local submodule (not a git clone)
 sed -i.bak -e "s|https://github.com/libKriging/slapack.git|\${CMAKE_CURRENT_SOURCE_DIR}/../../slapack|g" \
