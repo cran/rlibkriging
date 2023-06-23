@@ -11,81 +11,6 @@ Rcpp::Rostream<true>&  Rcpp::Rcout = Rcpp::Rcpp_cout_get();
 Rcpp::Rostream<false>& Rcpp::Rcerr = Rcpp::Rcpp_cerr_get();
 #endif
 
-// bench_solvetri
-arma::mat bench_solvetri(int n, arma::mat X, arma::vec y);
-RcppExport SEXP _rlibkriging_bench_solvetri(SEXP nSEXP, SEXP XSEXP, SEXP ySEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< int >::type n(nSEXP);
-    Rcpp::traits::input_parameter< arma::mat >::type X(XSEXP);
-    Rcpp::traits::input_parameter< arma::vec >::type y(ySEXP);
-    rcpp_result_gen = Rcpp::wrap(bench_solvetri(n, X, y));
-    return rcpp_result_gen;
-END_RCPP
-}
-// bench_cholsym
-arma::mat bench_cholsym(int n, arma::mat X);
-RcppExport SEXP _rlibkriging_bench_cholsym(SEXP nSEXP, SEXP XSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< int >::type n(nSEXP);
-    Rcpp::traits::input_parameter< arma::mat >::type X(XSEXP);
-    rcpp_result_gen = Rcpp::wrap(bench_cholsym(n, X));
-    return rcpp_result_gen;
-END_RCPP
-}
-// bench_invsympd
-arma::mat bench_invsympd(int n, arma::mat X);
-RcppExport SEXP _rlibkriging_bench_invsympd(SEXP nSEXP, SEXP XSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< int >::type n(nSEXP);
-    Rcpp::traits::input_parameter< arma::mat >::type X(XSEXP);
-    rcpp_result_gen = Rcpp::wrap(bench_invsympd(n, X));
-    return rcpp_result_gen;
-END_RCPP
-}
-// bench_qr
-Rcpp::List bench_qr(int n, arma::mat X);
-RcppExport SEXP _rlibkriging_bench_qr(SEXP nSEXP, SEXP XSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< int >::type n(nSEXP);
-    Rcpp::traits::input_parameter< arma::mat >::type X(XSEXP);
-    rcpp_result_gen = Rcpp::wrap(bench_qr(n, X));
-    return rcpp_result_gen;
-END_RCPP
-}
-// bench_LogLik
-double bench_LogLik(int n, Rcpp::List ordinaryKriging, arma::vec theta);
-RcppExport SEXP _rlibkriging_bench_LogLik(SEXP nSEXP, SEXP ordinaryKrigingSEXP, SEXP thetaSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< int >::type n(nSEXP);
-    Rcpp::traits::input_parameter< Rcpp::List >::type ordinaryKriging(ordinaryKrigingSEXP);
-    Rcpp::traits::input_parameter< arma::vec >::type theta(thetaSEXP);
-    rcpp_result_gen = Rcpp::wrap(bench_LogLik(n, ordinaryKriging, theta));
-    return rcpp_result_gen;
-END_RCPP
-}
-// bench_LogLikGrad
-arma::vec bench_LogLikGrad(int n, Rcpp::List ordinaryKriging, arma::vec theta);
-RcppExport SEXP _rlibkriging_bench_LogLikGrad(SEXP nSEXP, SEXP ordinaryKrigingSEXP, SEXP thetaSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< int >::type n(nSEXP);
-    Rcpp::traits::input_parameter< Rcpp::List >::type ordinaryKriging(ordinaryKrigingSEXP);
-    Rcpp::traits::input_parameter< arma::vec >::type theta(thetaSEXP);
-    rcpp_result_gen = Rcpp::wrap(bench_LogLikGrad(n, ordinaryKriging, theta));
-    return rcpp_result_gen;
-END_RCPP
-}
 // new_Kriging
 Rcpp::List new_Kriging(std::string kernel);
 RcppExport SEXP _rlibkriging_new_Kriging(SEXP kernelSEXP) {
@@ -206,9 +131,20 @@ BEGIN_RCPP
     return R_NilValue;
 END_RCPP
 }
+// kriging_save
+void kriging_save(Rcpp::List k, std::string filename);
+RcppExport SEXP _rlibkriging_kriging_save(SEXP kSEXP, SEXP filenameSEXP) {
+BEGIN_RCPP
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< Rcpp::List >::type k(kSEXP);
+    Rcpp::traits::input_parameter< std::string >::type filename(filenameSEXP);
+    kriging_save(k, filename);
+    return R_NilValue;
+END_RCPP
+}
 // kriging_logLikelihoodFun
-Rcpp::List kriging_logLikelihoodFun(Rcpp::List k, arma::vec theta, bool grad, bool hess);
-RcppExport SEXP _rlibkriging_kriging_logLikelihoodFun(SEXP kSEXP, SEXP thetaSEXP, SEXP gradSEXP, SEXP hessSEXP) {
+Rcpp::List kriging_logLikelihoodFun(Rcpp::List k, arma::vec theta, bool grad, bool hess, bool bench);
+RcppExport SEXP _rlibkriging_kriging_logLikelihoodFun(SEXP kSEXP, SEXP thetaSEXP, SEXP gradSEXP, SEXP hessSEXP, SEXP benchSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -216,7 +152,8 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< arma::vec >::type theta(thetaSEXP);
     Rcpp::traits::input_parameter< bool >::type grad(gradSEXP);
     Rcpp::traits::input_parameter< bool >::type hess(hessSEXP);
-    rcpp_result_gen = Rcpp::wrap(kriging_logLikelihoodFun(k, theta, grad, hess));
+    Rcpp::traits::input_parameter< bool >::type bench(benchSEXP);
+    rcpp_result_gen = Rcpp::wrap(kriging_logLikelihoodFun(k, theta, grad, hess, bench));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -232,15 +169,28 @@ BEGIN_RCPP
 END_RCPP
 }
 // kriging_leaveOneOutFun
-Rcpp::List kriging_leaveOneOutFun(Rcpp::List k, arma::vec theta, bool grad);
-RcppExport SEXP _rlibkriging_kriging_leaveOneOutFun(SEXP kSEXP, SEXP thetaSEXP, SEXP gradSEXP) {
+Rcpp::List kriging_leaveOneOutFun(Rcpp::List k, arma::vec theta, bool grad, bool bench);
+RcppExport SEXP _rlibkriging_kriging_leaveOneOutFun(SEXP kSEXP, SEXP thetaSEXP, SEXP gradSEXP, SEXP benchSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< Rcpp::List >::type k(kSEXP);
     Rcpp::traits::input_parameter< arma::vec >::type theta(thetaSEXP);
     Rcpp::traits::input_parameter< bool >::type grad(gradSEXP);
-    rcpp_result_gen = Rcpp::wrap(kriging_leaveOneOutFun(k, theta, grad));
+    Rcpp::traits::input_parameter< bool >::type bench(benchSEXP);
+    rcpp_result_gen = Rcpp::wrap(kriging_leaveOneOutFun(k, theta, grad, bench));
+    return rcpp_result_gen;
+END_RCPP
+}
+// kriging_leaveOneOutVec
+Rcpp::List kriging_leaveOneOutVec(Rcpp::List k, arma::vec theta);
+RcppExport SEXP _rlibkriging_kriging_leaveOneOutVec(SEXP kSEXP, SEXP thetaSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< Rcpp::List >::type k(kSEXP);
+    Rcpp::traits::input_parameter< arma::vec >::type theta(thetaSEXP);
+    rcpp_result_gen = Rcpp::wrap(kriging_leaveOneOutVec(k, theta));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -256,15 +206,16 @@ BEGIN_RCPP
 END_RCPP
 }
 // kriging_logMargPostFun
-Rcpp::List kriging_logMargPostFun(Rcpp::List k, arma::vec theta, bool grad);
-RcppExport SEXP _rlibkriging_kriging_logMargPostFun(SEXP kSEXP, SEXP thetaSEXP, SEXP gradSEXP) {
+Rcpp::List kriging_logMargPostFun(Rcpp::List k, arma::vec theta, bool grad, bool bench);
+RcppExport SEXP _rlibkriging_kriging_logMargPostFun(SEXP kSEXP, SEXP thetaSEXP, SEXP gradSEXP, SEXP benchSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< Rcpp::List >::type k(kSEXP);
     Rcpp::traits::input_parameter< arma::vec >::type theta(thetaSEXP);
     Rcpp::traits::input_parameter< bool >::type grad(gradSEXP);
-    rcpp_result_gen = Rcpp::wrap(kriging_logMargPostFun(k, theta, grad));
+    Rcpp::traits::input_parameter< bool >::type bench(benchSEXP);
+    rcpp_result_gen = Rcpp::wrap(kriging_logMargPostFun(k, theta, grad, bench));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -551,6 +502,50 @@ BEGIN_RCPP
     return R_NilValue;
 END_RCPP
 }
+// kriging_load
+Rcpp::List kriging_load(std::string filename);
+RcppExport SEXP _rlibkriging_kriging_load(SEXP filenameSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< std::string >::type filename(filenameSEXP);
+    rcpp_result_gen = Rcpp::wrap(kriging_load(filename));
+    return rcpp_result_gen;
+END_RCPP
+}
+// noisekriging_load
+Rcpp::List noisekriging_load(std::string filename);
+RcppExport SEXP _rlibkriging_noisekriging_load(SEXP filenameSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< std::string >::type filename(filenameSEXP);
+    rcpp_result_gen = Rcpp::wrap(noisekriging_load(filename));
+    return rcpp_result_gen;
+END_RCPP
+}
+// nuggetkriging_load
+Rcpp::List nuggetkriging_load(std::string filename);
+RcppExport SEXP _rlibkriging_nuggetkriging_load(SEXP filenameSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< std::string >::type filename(filenameSEXP);
+    rcpp_result_gen = Rcpp::wrap(nuggetkriging_load(filename));
+    return rcpp_result_gen;
+END_RCPP
+}
+// anykriging_load
+Rcpp::List anykriging_load(std::string filename);
+RcppExport SEXP _rlibkriging_anykriging_load(SEXP filenameSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< std::string >::type filename(filenameSEXP);
+    rcpp_result_gen = Rcpp::wrap(anykriging_load(filename));
+    return rcpp_result_gen;
+END_RCPP
+}
 // new_NoiseKriging
 Rcpp::List new_NoiseKriging(std::string kernel);
 RcppExport SEXP _rlibkriging_new_NoiseKriging(SEXP kernelSEXP) {
@@ -674,16 +669,28 @@ BEGIN_RCPP
     return R_NilValue;
 END_RCPP
 }
+// noisekriging_save
+void noisekriging_save(Rcpp::List k, std::string filename);
+RcppExport SEXP _rlibkriging_noisekriging_save(SEXP kSEXP, SEXP filenameSEXP) {
+BEGIN_RCPP
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< Rcpp::List >::type k(kSEXP);
+    Rcpp::traits::input_parameter< std::string >::type filename(filenameSEXP);
+    noisekriging_save(k, filename);
+    return R_NilValue;
+END_RCPP
+}
 // noisekriging_logLikelihoodFun
-Rcpp::List noisekriging_logLikelihoodFun(Rcpp::List k, arma::vec theta_sigma2, bool grad);
-RcppExport SEXP _rlibkriging_noisekriging_logLikelihoodFun(SEXP kSEXP, SEXP theta_sigma2SEXP, SEXP gradSEXP) {
+Rcpp::List noisekriging_logLikelihoodFun(Rcpp::List k, arma::vec theta_sigma2, bool grad, bool bench);
+RcppExport SEXP _rlibkriging_noisekriging_logLikelihoodFun(SEXP kSEXP, SEXP theta_sigma2SEXP, SEXP gradSEXP, SEXP benchSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< Rcpp::List >::type k(kSEXP);
     Rcpp::traits::input_parameter< arma::vec >::type theta_sigma2(theta_sigma2SEXP);
     Rcpp::traits::input_parameter< bool >::type grad(gradSEXP);
-    rcpp_result_gen = Rcpp::wrap(noisekriging_logLikelihoodFun(k, theta_sigma2, grad));
+    Rcpp::traits::input_parameter< bool >::type bench(benchSEXP);
+    rcpp_result_gen = Rcpp::wrap(noisekriging_logLikelihoodFun(k, theta_sigma2, grad, bench));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -1060,16 +1067,28 @@ BEGIN_RCPP
     return R_NilValue;
 END_RCPP
 }
+// nuggetkriging_save
+void nuggetkriging_save(Rcpp::List k, std::string filename);
+RcppExport SEXP _rlibkriging_nuggetkriging_save(SEXP kSEXP, SEXP filenameSEXP) {
+BEGIN_RCPP
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< Rcpp::List >::type k(kSEXP);
+    Rcpp::traits::input_parameter< std::string >::type filename(filenameSEXP);
+    nuggetkriging_save(k, filename);
+    return R_NilValue;
+END_RCPP
+}
 // nuggetkriging_logLikelihoodFun
-Rcpp::List nuggetkriging_logLikelihoodFun(Rcpp::List k, arma::vec theta_alpha, bool grad);
-RcppExport SEXP _rlibkriging_nuggetkriging_logLikelihoodFun(SEXP kSEXP, SEXP theta_alphaSEXP, SEXP gradSEXP) {
+Rcpp::List nuggetkriging_logLikelihoodFun(Rcpp::List k, arma::vec theta_alpha, bool grad, bool bench);
+RcppExport SEXP _rlibkriging_nuggetkriging_logLikelihoodFun(SEXP kSEXP, SEXP theta_alphaSEXP, SEXP gradSEXP, SEXP benchSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< Rcpp::List >::type k(kSEXP);
     Rcpp::traits::input_parameter< arma::vec >::type theta_alpha(theta_alphaSEXP);
     Rcpp::traits::input_parameter< bool >::type grad(gradSEXP);
-    rcpp_result_gen = Rcpp::wrap(nuggetkriging_logLikelihoodFun(k, theta_alpha, grad));
+    Rcpp::traits::input_parameter< bool >::type bench(benchSEXP);
+    rcpp_result_gen = Rcpp::wrap(nuggetkriging_logLikelihoodFun(k, theta_alpha, grad, bench));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -1085,15 +1104,16 @@ BEGIN_RCPP
 END_RCPP
 }
 // nuggetkriging_logMargPostFun
-Rcpp::List nuggetkriging_logMargPostFun(Rcpp::List k, arma::vec theta, bool grad);
-RcppExport SEXP _rlibkriging_nuggetkriging_logMargPostFun(SEXP kSEXP, SEXP thetaSEXP, SEXP gradSEXP) {
+Rcpp::List nuggetkriging_logMargPostFun(Rcpp::List k, arma::vec theta, bool grad, bool bench);
+RcppExport SEXP _rlibkriging_nuggetkriging_logMargPostFun(SEXP kSEXP, SEXP thetaSEXP, SEXP gradSEXP, SEXP benchSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< Rcpp::List >::type k(kSEXP);
     Rcpp::traits::input_parameter< arma::vec >::type theta(thetaSEXP);
     Rcpp::traits::input_parameter< bool >::type grad(gradSEXP);
-    rcpp_result_gen = Rcpp::wrap(nuggetkriging_logMargPostFun(k, theta, grad));
+    Rcpp::traits::input_parameter< bool >::type bench(benchSEXP);
+    rcpp_result_gen = Rcpp::wrap(nuggetkriging_logMargPostFun(k, theta, grad, bench));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -1556,12 +1576,6 @@ END_RCPP
 }
 
 static const R_CallMethodDef CallEntries[] = {
-    {"_rlibkriging_bench_solvetri", (DL_FUNC) &_rlibkriging_bench_solvetri, 3},
-    {"_rlibkriging_bench_cholsym", (DL_FUNC) &_rlibkriging_bench_cholsym, 2},
-    {"_rlibkriging_bench_invsympd", (DL_FUNC) &_rlibkriging_bench_invsympd, 2},
-    {"_rlibkriging_bench_qr", (DL_FUNC) &_rlibkriging_bench_qr, 2},
-    {"_rlibkriging_bench_LogLik", (DL_FUNC) &_rlibkriging_bench_LogLik, 3},
-    {"_rlibkriging_bench_LogLikGrad", (DL_FUNC) &_rlibkriging_bench_LogLikGrad, 3},
     {"_rlibkriging_new_Kriging", (DL_FUNC) &_rlibkriging_new_Kriging, 1},
     {"_rlibkriging_new_KrigingFit", (DL_FUNC) &_rlibkriging_new_KrigingFit, 8},
     {"_rlibkriging_kriging_fit", (DL_FUNC) &_rlibkriging_kriging_fit, 8},
@@ -1571,11 +1585,13 @@ static const R_CallMethodDef CallEntries[] = {
     {"_rlibkriging_kriging_predict", (DL_FUNC) &_rlibkriging_kriging_predict, 5},
     {"_rlibkriging_kriging_simulate", (DL_FUNC) &_rlibkriging_kriging_simulate, 4},
     {"_rlibkriging_kriging_update", (DL_FUNC) &_rlibkriging_kriging_update, 3},
-    {"_rlibkriging_kriging_logLikelihoodFun", (DL_FUNC) &_rlibkriging_kriging_logLikelihoodFun, 4},
+    {"_rlibkriging_kriging_save", (DL_FUNC) &_rlibkriging_kriging_save, 2},
+    {"_rlibkriging_kriging_logLikelihoodFun", (DL_FUNC) &_rlibkriging_kriging_logLikelihoodFun, 5},
     {"_rlibkriging_kriging_logLikelihood", (DL_FUNC) &_rlibkriging_kriging_logLikelihood, 1},
-    {"_rlibkriging_kriging_leaveOneOutFun", (DL_FUNC) &_rlibkriging_kriging_leaveOneOutFun, 3},
+    {"_rlibkriging_kriging_leaveOneOutFun", (DL_FUNC) &_rlibkriging_kriging_leaveOneOutFun, 4},
+    {"_rlibkriging_kriging_leaveOneOutVec", (DL_FUNC) &_rlibkriging_kriging_leaveOneOutVec, 2},
     {"_rlibkriging_kriging_leaveOneOut", (DL_FUNC) &_rlibkriging_kriging_leaveOneOut, 1},
-    {"_rlibkriging_kriging_logMargPostFun", (DL_FUNC) &_rlibkriging_kriging_logMargPostFun, 3},
+    {"_rlibkriging_kriging_logMargPostFun", (DL_FUNC) &_rlibkriging_kriging_logMargPostFun, 4},
     {"_rlibkriging_kriging_logMargPost", (DL_FUNC) &_rlibkriging_kriging_logMargPost, 1},
     {"_rlibkriging_kriging_kernel", (DL_FUNC) &_rlibkriging_kriging_kernel, 1},
     {"_rlibkriging_kriging_optim", (DL_FUNC) &_rlibkriging_kriging_optim, 1},
@@ -1602,6 +1618,10 @@ static const R_CallMethodDef CallEntries[] = {
     {"_rlibkriging_linalg_set_num_nugget", (DL_FUNC) &_rlibkriging_linalg_set_num_nugget, 1},
     {"_rlibkriging_linalg_chol_safe", (DL_FUNC) &_rlibkriging_linalg_chol_safe, 1},
     {"_rlibkriging_linalg_set_chol_warning", (DL_FUNC) &_rlibkriging_linalg_set_chol_warning, 1},
+    {"_rlibkriging_kriging_load", (DL_FUNC) &_rlibkriging_kriging_load, 1},
+    {"_rlibkriging_noisekriging_load", (DL_FUNC) &_rlibkriging_noisekriging_load, 1},
+    {"_rlibkriging_nuggetkriging_load", (DL_FUNC) &_rlibkriging_nuggetkriging_load, 1},
+    {"_rlibkriging_anykriging_load", (DL_FUNC) &_rlibkriging_anykriging_load, 1},
     {"_rlibkriging_new_NoiseKriging", (DL_FUNC) &_rlibkriging_new_NoiseKriging, 1},
     {"_rlibkriging_new_NoiseKrigingFit", (DL_FUNC) &_rlibkriging_new_NoiseKrigingFit, 9},
     {"_rlibkriging_noisekriging_fit", (DL_FUNC) &_rlibkriging_noisekriging_fit, 9},
@@ -1611,7 +1631,8 @@ static const R_CallMethodDef CallEntries[] = {
     {"_rlibkriging_noisekriging_predict", (DL_FUNC) &_rlibkriging_noisekriging_predict, 5},
     {"_rlibkriging_noisekriging_simulate", (DL_FUNC) &_rlibkriging_noisekriging_simulate, 4},
     {"_rlibkriging_noisekriging_update", (DL_FUNC) &_rlibkriging_noisekriging_update, 4},
-    {"_rlibkriging_noisekriging_logLikelihoodFun", (DL_FUNC) &_rlibkriging_noisekriging_logLikelihoodFun, 3},
+    {"_rlibkriging_noisekriging_save", (DL_FUNC) &_rlibkriging_noisekriging_save, 2},
+    {"_rlibkriging_noisekriging_logLikelihoodFun", (DL_FUNC) &_rlibkriging_noisekriging_logLikelihoodFun, 4},
     {"_rlibkriging_noisekriging_logLikelihood", (DL_FUNC) &_rlibkriging_noisekriging_logLikelihood, 1},
     {"_rlibkriging_noisekriging_kernel", (DL_FUNC) &_rlibkriging_noisekriging_kernel, 1},
     {"_rlibkriging_noisekriging_optim", (DL_FUNC) &_rlibkriging_noisekriging_optim, 1},
@@ -1644,9 +1665,10 @@ static const R_CallMethodDef CallEntries[] = {
     {"_rlibkriging_nuggetkriging_predict", (DL_FUNC) &_rlibkriging_nuggetkriging_predict, 5},
     {"_rlibkriging_nuggetkriging_simulate", (DL_FUNC) &_rlibkriging_nuggetkriging_simulate, 4},
     {"_rlibkriging_nuggetkriging_update", (DL_FUNC) &_rlibkriging_nuggetkriging_update, 3},
-    {"_rlibkriging_nuggetkriging_logLikelihoodFun", (DL_FUNC) &_rlibkriging_nuggetkriging_logLikelihoodFun, 3},
+    {"_rlibkriging_nuggetkriging_save", (DL_FUNC) &_rlibkriging_nuggetkriging_save, 2},
+    {"_rlibkriging_nuggetkriging_logLikelihoodFun", (DL_FUNC) &_rlibkriging_nuggetkriging_logLikelihoodFun, 4},
     {"_rlibkriging_nuggetkriging_logLikelihood", (DL_FUNC) &_rlibkriging_nuggetkriging_logLikelihood, 1},
-    {"_rlibkriging_nuggetkriging_logMargPostFun", (DL_FUNC) &_rlibkriging_nuggetkriging_logMargPostFun, 3},
+    {"_rlibkriging_nuggetkriging_logMargPostFun", (DL_FUNC) &_rlibkriging_nuggetkriging_logMargPostFun, 4},
     {"_rlibkriging_nuggetkriging_logMargPost", (DL_FUNC) &_rlibkriging_nuggetkriging_logMargPost, 1},
     {"_rlibkriging_nuggetkriging_kernel", (DL_FUNC) &_rlibkriging_nuggetkriging_kernel, 1},
     {"_rlibkriging_nuggetkriging_optim", (DL_FUNC) &_rlibkriging_nuggetkriging_optim, 1},

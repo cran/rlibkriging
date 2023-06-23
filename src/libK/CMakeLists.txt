@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.10)
+cmake_minimum_required(VERSION 3.12)
 
 # Avoid to export package (like armadillo) into ~/.cmake
 # This behaviour is required to submit package to CRAN
@@ -153,6 +153,7 @@ set(CMAKE_CXX_STANDARD 17)
 # Can be locally overridden using set_target_properties + https://cmake.org/cmake/help/latest/prop_tgt/LANG_VISIBILITY_PRESET.html
 # set(CMAKE_CXX_VISIBILITY_PRESET hidden) # global setting is incompatible with armadillo => moved to Kriging target
 set(CMAKE_POLICY_DEFAULT_CMP0063 NEW) # Honor the visibility properties for all target types
+set(CMAKE_POLICY_DEFAULT_CMP0074 NEW) # Allow to use <PackageName>_ROOT to help package finder
 
 #------------------------------------------------------
 
@@ -165,7 +166,7 @@ option(EXTRA_SYSTEM_LIBRARY_PATH "Path to add to default system library path for
 list(APPEND CMAKE_SYSTEM_LIBRARY_PATH ${EXTRA_SYSTEM_LIBRARY_PATH})
 
 # Dependencies
-set(DETECT_HDF5 false CACHE BOOL "Disable HDF5 to avoid conflict with armadillo") # prevent issue #40
+set(DETECT_HDF5 true CACHE BOOL "Disable HDF5 to avoid conflict with armadillo") # prevent issue #40
 set(CMAKE_POLICY_DEFAULT_CMP0048 NEW) # disable warning about missing version in project command
 set(BUILD_SMOKE_TEST OFF CACHE BOOL "armadillo smoke test") # no smoke tests: it fails due to custom memory guard in memory.hpp 
 add_subdirectory(armadillo)
@@ -345,7 +346,7 @@ endif ()
 #------------------------------------------------------
 
 # valgrind must be checked before adding new subdirectories
-# before ####include(CTest)
+# before ##include(CTest)
 if (ENABLE_MEMCHECK)
     find_program(VALGRIND_EXECUTABLE valgrind)
     if (NOT VALGRIND_EXECUTABLE)
@@ -553,12 +554,12 @@ endif()
 if (POLICY CMP0110)
     cmake_policy(SET CMP0110 NEW) # supports arbitrary characters in test names (requires in CMake 3.19)
 endif()
-####set(CATCH_MODULE_PATH "${LIBKRIGING_SOURCE_DIR}/dependencies/Catch2")
-####add_subdirectory("${CATCH_MODULE_PATH}")
-####list(APPEND CMAKE_MODULE_PATH ${CATCH_MODULE_PATH}/contrib)
+##set(CATCH_MODULE_PATH "${LIBKRIGING_SOURCE_DIR}/dependencies/Catch2")
+##add_subdirectory("${CATCH_MODULE_PATH}")
+##list(APPEND CMAKE_MODULE_PATH ${CATCH_MODULE_PATH}/contrib)
 
-####include(CTest)
-####add_subdirectory(tests)
+##include(CTest)
+##add_subdirectory(tests)
 
 
 #------------------------------------------------------
@@ -679,7 +680,7 @@ if (DOXYGEN_FOUND)
     set(DOXYGEN_OUT ${CMAKE_BINARY_DIR}/Doxyfile)
 
     # request to configure the file
-    ####configure_file(${DOXYGEN_IN} ${DOXYGEN_OUT} @ONLY)
+    ##configure_file(${DOXYGEN_IN} ${DOXYGEN_OUT} @ONLY)
 
     add_custom_target(doc # add ALL if build together with the code
             COMMAND echo "running doc generation ..."

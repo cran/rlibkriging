@@ -23,6 +23,7 @@ for (kernel in c("matern5_2","matern3_2")) {
   X <- as.matrix(runif(n))
   y = f(X)
   points(X,y)
+
   k = RobustGaSP::rgasp(design=X,response=y,kernel_type=kernel_type(kernel))
 
   lmp = function(theta) {
@@ -55,7 +56,7 @@ for (kernel in c("matern5_2","matern3_2")) {
   }
 
   #library(rlibkriging)
-  r <- Kriging(y, X, kernel)
+  r <- Kriging(y, X, kernel, objective="LMP")
   ## Should be equal:
   #lmp(1.0); lmp_deriv(1.0);
   #logMargPostFun(r,1.0,grad = T)

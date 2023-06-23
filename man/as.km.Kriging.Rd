@@ -2,6 +2,7 @@
 % Please edit documentation in R/KrigingClass.R
 \name{as.km.Kriging}
 \alias{as.km.Kriging}
+\alias{as.km,Kriging,Kriging-method}
 \title{Coerce a \code{Kriging} object into the \code{"km"} class of the
 \pkg{DiceKriging} package.}
 \usage{

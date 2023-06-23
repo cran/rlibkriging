@@ -2,7 +2,7 @@
 ## https://cran.r-project.org/doc/manuals/r-release/R-exts.html#Using-Makevars
 
 MAKE_SHARED_LIBS=off
-LIBKRIGING_PATH=../inst/
+export LIBKRIGING_PATH=$(shell pwd)/../inst/
 EXTRA_SYSTEM_LIBRARY_PATH="."
 
 ifneq ("${MAKE_SHARED_LIBS}","off")
@@ -11,15 +11,15 @@ else
 	LIB_SUFFIX=a
 endif
 
-# using CXX_STD should be better but, while using `R CMD INSTALL`, we get an error like
-#     make[1]: *** No rule to make target '$(CXX11STD)''.  Stop.
-# CXX_STD = CXX17
+EXTERNAL_LIBS=$(shell LIBKRIGING_PATH=${LIBKRIGING_PATH} ../src/libK/bindings/R/tools/ExternalLibsExtractor.sh | sed 's|\S*libopenblas\S*||g')
 
-#PKG_CFLAGS=
+CXX_STD = CXX17
+
 PKG_CPPFLAGS=-I"${LIBKRIGING_PATH}"/include -include "libKriging/utils/lkalloc.hpp" -DARMA_ALIEN_MEM_ALLOC_FUNCTION=lkalloc::malloc -DARMA_ALIEN_MEM_FREE_FUNCTION=lkalloc::free
-PKG_CXXFLAGS=-std=c++17 $(SHLIB_OPENMP_CXXFLAGS)
+# https://stat.ethz.ch/pipermail/r-package-devel/2018q3/003033.html
+PKG_CXXFLAGS=$(SHLIB_OPENMP_CXXFLAGS)
 # https://stackoverflow.com/questions/49154506/understanding-makevars-for-linking-to-external-c-library-in-r-package
-PKG_LIBS=-L${LIBKRIGING_PATH}/lib -lKriging -larmadillo -llbfgsb $(EXTRA_PKG_LIBS) $(SHLIB_OPENMP_CXXFLAGS) -llapack -lblas $(LAPACK_LIBS) $(BLAS_LIBS) $(FLIBS) 
+PKG_LIBS=$(SHLIB_OPENMP_CXXFLAGS) -L"${LIBKRIGING_PATH}"/lib -lKriging -larmadillo -llbfgsb $(EXTRA_PKG_LIBS) $(EXTERNAL_LIBS) -llapack -lblas $(LAPACK_LIBS) $(BLAS_LIBS) $(FLIBS)
 
 null      :=
 SPACE     := $(null) $(null)

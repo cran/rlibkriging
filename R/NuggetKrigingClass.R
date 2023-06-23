@@ -97,13 +97,10 @@ NuggetKriging <- function(y=NULL, X=NULL, kernel=NULL,
                       parameters = parameters)
     class(nk) <- "NuggetKriging"
     # This will allow to call methods (like in Python/Matlab/Octave) using `k$m(...)` as well as R-style `m(k, ...)`.
-    for (f in methods(class=class(nk))) {
-        if (regexec(paste0(".",class(nk)),f)[[1]]>0) {
-            f_anon = sub(paste0(".",class(nk)),"",fixed=TRUE,f)
-            eval(parse(text=paste0(
-                "nk$", f_anon, " <- function(...) ", f_anon, "(nk,...)"
-                )))
-        }
+    for (f in c('as.km','as.list','copy','fit','logLikelihood','logLikelihoodFun','logMargPost','logMargPostFun','predict','print','show','simulate','update')) {
+        eval(parse(text=paste0(
+            "nk$", f, " <- function(...) ", f, "(nk,...)"
+            )))
     }
     # This will allow to access kriging data/props using `k$d()`
     for (d in c('kernel','optim','objective','X','centerX','scaleX','y','centerY','scaleY','regmodel','F','T','M','z','beta','is_beta_estim','theta','is_theta_estim','sigma2','is_sigma2_estim','nugget','is_nugget_estim')) {
@@ -554,6 +551,77 @@ update.NuggetKriging <- function(object, newy, newX, ...) {
 }
 
 
+#' Save a NuggetKriging Model to a file storage
+#'
+#' @author Yann Richet \email{yann.richet@irsn.fr}
+#'
+#' @param object An S3 NuggetKriging object.
+#' @param filename File name to save in.
+#' @param ... Not used.
+#'
+#' @return The loaded NuggetKriging object.
+#'
+#' @method save NuggetKriging
+#' @export
+#' @aliases save,NuggetKriging,NuggetKriging-method
+#'
+#' @examples
+#' f <- function(x) 1- 1 / 2 * (sin(12 * x) / (1 + x) + 2 * cos(7 * x)*x^5 + 0.7)
+#' set.seed(123)
+#' X <- as.matrix(runif(10))
+#' y <- f(X) + 0.1 * rnorm(nrow(X))
+#' points(X, y, col = "blue")
+#'
+#' k <- NuggetKriging(y, X, "matern3_2")
+#' print(k)
+#'
+#' outfile = tempfile("k.h5") 
+#' save(k,outfile)
+save.NuggetKriging <- function(object, filename, ...) {
+
+    if (length(L <- list(...)) > 0) warnOnDots(L)
+    if (!is.character(filename))
+        stop("'filename' must be a string")
+
+    nuggetkriging_save(object, filename)
+
+    invisible(NULL)
+}
+
+
+#' Load a NuggetKriging Model from a file storage
+#'
+#' @author Yann Richet \email{yann.richet@irsn.fr}
+#'
+#' @param filename File name to load from.
+#' @param ... Not used.
+#'
+#' @return The loaded NuggetKriging object.
+#'
+#' @export
+#'
+#' @examples
+#' f <- function(x) 1- 1 / 2 * (sin(12 * x) / (1 + x) + 2 * cos(7 * x)*x^5 + 0.7)
+#' set.seed(123)
+#' X <- as.matrix(runif(10))
+#' y <- f(X) + 0.1 * rnorm(nrow(X))
+#' points(X, y, col = "blue")
+#'
+#' k <- NuggetKriging(y, X, "matern3_2")
+#' print(k)
+#'
+#' outfile = tempfile("k.h5")
+#' save(k,outfile)
+#'
+#' print(load.NuggetKriging(outfile)) 
+load.NuggetKriging <- function(filename, ...) {
+    if (length(L <- list(...)) > 0) warnOnDots(L)
+    if (!is.character(filename))
+        stop("'filename' must be a string")
+    return( nuggetkriging_load(filename) )
+}
+
+
 #' Compute Log-Likelihood of NuggetKriging Model
 #'
 #' @author Yann Richet \email{yann.richet@irsn.fr}
@@ -562,6 +630,7 @@ update.NuggetKriging <- function(object, newy, newX, ...) {
 #' @param theta_alpha A numeric vector of (positive) range parameters and variance over variance plus nugget at
 #'     which the log-likelihood will be evaluated.
 #' @param grad Logical. Should the function return the gradient?
+#' @param bench Logical. Should the function display benchmarking output
 #' @param ... Not used.
 #'
 #' @return The log-Likelihood computed for given
@@ -598,7 +667,7 @@ update.NuggetKriging <- function(object, newy, newX, ...) {
 #' contour(t,a,matrix(ncol=length(a),ll(expand.grid(t,a))),xlab="theta",ylab="sigma2/(sigma2+nugget)")
 #' points(k$theta(),k$sigma2()/(k$sigma2()+k$nugget()),col='blue')
 logLikelihoodFun.NuggetKriging <- function(object, theta_alpha,
-                                  grad = FALSE, ...) {
+                                  grad = FALSE, bench=FALSE, ...) {
     k <- nuggetkriging_model(object)
     if (is.data.frame(theta_alpha)) theta_alpha = data.matrix(theta_alpha)
     if (!is.matrix(theta_alpha)) theta_alpha <- matrix(theta_alpha, ncol = ncol(k$X)+1)
@@ -610,7 +679,7 @@ logLikelihoodFun.NuggetKriging <- function(object, theta_alpha,
                                            ncol = ncol(theta_alpha)))
     for (i in 1:nrow(theta_alpha)) {
         ll <- nuggetkriging_logLikelihoodFun(object, theta_alpha[i, ],
-                                    grad = isTRUE(grad))
+                                    grad = isTRUE(grad), bench = isTRUE(bench))
         out$logLikelihood[i] <- ll$logLikelihood
         if (isTRUE(grad)) out$logLikelihoodGrad[i, ] <- ll$logLikelihoodGrad
     }
@@ -659,6 +728,7 @@ logLikelihood.NuggetKriging <- function(object, ...) {
 #'     which the function is to be evaluated.
 #' @param grad Logical. Should the function return the gradient
 #'     (w.r.t theta_alpha)?
+#' @param bench Logical. Should the function display benchmarking output
 #' @param ... Not used.
 #'
 #' @return The value of the log-marginal posterior computed for the
@@ -700,7 +770,7 @@ logLikelihood.NuggetKriging <- function(object, ...) {
 #' contour(t,a,matrix(ncol=length(t),lmp(expand.grid(t,a))),
 #'  nlevels=50,xlab="theta",ylab="sigma2/(sigma2+nugget)")
 #' points(k$theta(),k$sigma2()/(k$sigma2()+k$nugget()),col='blue')
-logMargPostFun.NuggetKriging <- function(object, theta_alpha, grad = FALSE, ...) {
+logMargPostFun.NuggetKriging <- function(object, theta_alpha, grad = FALSE, bench=FALSE, ...) {
     k <- nuggetkriging_model(object)
     if (is.data.frame(theta_alpha)) theta_alpha = data.matrix(theta_alpha)
     if (!is.matrix(theta_alpha)) theta_alpha <- matrix(theta_alpha,ncol=ncol(k$X)+1)
@@ -711,7 +781,7 @@ logMargPostFun.NuggetKriging <- function(object, theta_alpha, grad = FALSE, ...)
                 logMargPostGrad = matrix(NA, nrow = nrow(theta_alpha),
                                          ncol = ncol(theta_alpha)))
     for (i in 1:nrow(theta_alpha)) {
-        lmp <- nuggetkriging_logMargPostFun(object, theta_alpha[i, ], grad = isTRUE(grad))
+        lmp <- nuggetkriging_logMargPostFun(object, theta_alpha[i, ], grad = isTRUE(grad), bench = isTRUE(bench))
         out$logMargPost[i] <- lmp$logMargPost
         if (isTRUE(grad)) out$logMargPostGrad[i, ] <- lmp$logMargPostGrad
     }

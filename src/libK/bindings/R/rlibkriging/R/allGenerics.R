@@ -53,6 +53,21 @@ leaveOneOutFun <- function(object, ...) {
 }
 
 ## *****************************************************************************
+##' Compute the leave-One-Out vector error of a model given in \code{object},
+##' at a different value of the parameters.
+##'
+##' @title Leave-One-Out vector
+##' 
+##' @param object An object representing a fitted model.
+##' @param ... Further arguments of function (eg. range).
+##'
+##' @return The Leave-One-Out errors (mean and stdev) for each conditional point.
+##' @export
+leaveOneOutVec <- function(object, ...) {
+    UseMethod("leaveOneOutVec")
+}
+
+## *****************************************************************************
 ##' Compute the log-Likelihood of a model given in \code{object},
 ##' at a different value of the parameters.
 ##'
@@ -164,4 +179,65 @@ copy <- function(object, ...) {
 ##' @export
 fit <- function(object, ...) {
     UseMethod("fit")
+}
+
+## *****************************************************************************
+##' Save a model given in
+##' \code{object}.
+##'
+##' @title Save object.
+##'
+##' @param object An object representing a fitted model.
+##' @param ... Ignored.
+##'
+##' @return The saved object.
+##' @export
+save <- function(object, ...) {
+    UseMethod("save")
+}
+
+## *****************************************************************************
+##' Load any Kriging Model from a file storage.
+##'
+##' @author Yann Richet \email{yann.richet@irsn.fr}
+##'
+##' @param filename A file holding any Kriging object.
+##' @param ... Not used.
+##'
+##' @return The loaded "*"Kriging object.
+##'
+##' @export
+##' 
+##' @examples
+##' f <- function(x) 1 - 1 / 2 * (sin(12 * x) / (1 + x) + 2 * cos(7 * x) * x^5 + 0.7)
+##' set.seed(123)
+##' X <- as.matrix(runif(10))
+##' y <- f(X)
+##'
+##' k <- Kriging(y, X, kernel = "matern3_2", objective="LMP")
+##' print(k)
+##' 
+##' outfile = tempfile("k.h5") 
+##' save(k,outfile)
+##'
+##' print(load(outfile))
+load <- function(filename, ...) {
+    if (!is.character(filename) ||
+        endsWith(filename,"Rdata") ||
+        endsWith(filename,"RData") ||
+        endsWith(filename,"rdata") ||
+        endsWith(filename,"Rds") ||
+        endsWith(filename,"rds")
+        ) # back to base::load
+        base::load(file=filename,...)
+        #stop("'filename' must be a string")
+    else {
+        if (length(L <- list(...)) > 0) warnOnDots(L)
+        k = NULL
+        base::try(k <- anykriging_load(filename))
+        if (is.null(k))
+            return(base::load(file=filename,...))
+        else
+            return(k)
+    }
 }

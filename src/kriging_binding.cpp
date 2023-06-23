@@ -42,8 +42,9 @@ Rcpp::List new_KrigingFit(arma::vec y,
     if (params.containsElementNamed("sigma2")) {
       _parameters.push_back(params["sigma2"], "sigma2");
       _parameters.push_back(true, "has_sigma2");
-      _parameters.push_back(!(params.containsElementNamed("is_sigma2_estim") && !params["is_sigma2_estim"]),
-                            "is_sigma2_estim");
+      _parameters.push_back(
+          !(params.containsElementNamed("is_sigma2_estim") && !params["is_sigma2_estim"]) && optim != "none",
+          "is_sigma2_estim");
     } else {
       //_parameters.push_back(Rcpp::runif(1), "sigma2"); // turnaround mingw bug:
       // https://github.com/msys2/MINGW-packages/issues/5019 _parameters.push_back(true, "has_sigma2");
@@ -54,8 +55,9 @@ Rcpp::List new_KrigingFit(arma::vec y,
     if (params.containsElementNamed("theta")) {
       _parameters.push_back(Rcpp::as<Rcpp::NumericMatrix>(params["theta"]), "theta");
       _parameters.push_back(true, "has_theta");
-      _parameters.push_back(!(params.containsElementNamed("is_theta_estim") && !params["is_theta_estim"]),
-                            "is_theta_estim");
+      _parameters.push_back(
+          !(params.containsElementNamed("is_theta_estim") && !params["is_theta_estim"]) && optim != "none",
+          "is_theta_estim");
     } else {
       // Rcpp::NumericVector r = Rcpp::runif(X.n_cols); // turnaround mingw bug:
       // https://github.com/msys2/MINGW-packages/issues/5019 _parameters.push_back(Rcpp::NumericMatrix(1, X.n_cols,
@@ -67,8 +69,9 @@ Rcpp::List new_KrigingFit(arma::vec y,
     if (params.containsElementNamed("beta")) {
       _parameters.push_back(Rcpp::as<Rcpp::NumericMatrix>(params["beta"]), "beta");
       _parameters.push_back(true, "has_beta");
-      _parameters.push_back(!(params.containsElementNamed("is_beta_estim") && !params["is_beta_estim"]),
-                            "is_beta_estim");
+      _parameters.push_back(
+          !(params.containsElementNamed("is_beta_estim") && !params["is_beta_estim"]) && optim != "none",
+          "is_beta_estim");
     } else {
       _parameters.push_back(Rcpp::NumericVector(0), "beta");
       _parameters.push_back(false, "has_beta");
@@ -137,8 +140,9 @@ void kriging_fit(Rcpp::List k,
     if (params.containsElementNamed("sigma2")) {
       _parameters.push_back(params["sigma2"], "sigma2");
       _parameters.push_back(true, "has_sigma2");
-      _parameters.push_back(!(params.containsElementNamed("is_sigma2_estim") && !params["is_sigma2_estim"]),
-                            "is_sigma2_estim");
+      _parameters.push_back(
+          !(params.containsElementNamed("is_sigma2_estim") && !params["is_sigma2_estim"]) && optim != "none",
+          "is_sigma2_estim");
     } else {
       //_parameters.push_back(Rcpp::runif(1), "sigma2"); // turnaround mingw bug:
       // https://github.com/msys2/MINGW-packages/issues/5019 _parameters.push_back(true, "has_sigma2");
@@ -149,8 +153,9 @@ void kriging_fit(Rcpp::List k,
     if (params.containsElementNamed("theta")) {
       _parameters.push_back(Rcpp::as<Rcpp::NumericMatrix>(params["theta"]), "theta");
       _parameters.push_back(true, "has_theta");
-      _parameters.push_back(!(params.containsElementNamed("is_theta_estim") && !params["is_theta_estim"]),
-                            "is_theta_estim");
+      _parameters.push_back(
+          !(params.containsElementNamed("is_theta_estim") && !params["is_theta_estim"]) && optim != "none",
+          "is_theta_estim");
     } else {
       // Rcpp::NumericVector r = Rcpp::runif(X.n_cols); // turnaround mingw bug:
       // https://github.com/msys2/MINGW-packages/issues/5019 _parameters.push_back(Rcpp::NumericMatrix(1, X.n_cols,
@@ -162,8 +167,9 @@ void kriging_fit(Rcpp::List k,
     if (params.containsElementNamed("beta")) {
       _parameters.push_back(Rcpp::as<Rcpp::NumericMatrix>(params["beta"]), "beta");
       _parameters.push_back(true, "has_beta");
-      _parameters.push_back(!(params.containsElementNamed("is_beta_estim") && !params["is_beta_estim"]),
-                            "is_beta_estim");
+      _parameters.push_back(
+          !(params.containsElementNamed("is_beta_estim") && !params["is_beta_estim"]) && optim != "none",
+          "is_beta_estim");
     } else {
       _parameters.push_back(Rcpp::NumericVector(0), "beta");
       _parameters.push_back(false, "has_beta");
@@ -315,14 +321,29 @@ void kriging_update(Rcpp::List k, arma::vec y, arma::mat X) {
 }
 
 // [[Rcpp::export]]
-Rcpp::List kriging_logLikelihoodFun(Rcpp::List k, arma::vec theta, bool grad = false, bool hess = false) {
+void kriging_save(Rcpp::List k, std::string filename) {
   if (!k.inherits("Kriging"))
     Rcpp::stop("Input must be a Kriging object.");
   SEXP impl = k.attr("object");
 
   Rcpp::XPtr<Kriging> impl_ptr(impl);
 
-  std::tuple<double, arma::vec, arma::mat> ll = impl_ptr->logLikelihoodFun(theta, grad, hess);
+  return impl_ptr->save(filename);
+}
+
+// [[Rcpp::export]]
+Rcpp::List kriging_logLikelihoodFun(Rcpp::List k,
+                                    arma::vec theta,
+                                    bool grad = false,
+                                    bool hess = false,
+                                    bool bench = false) {
+  if (!k.inherits("Kriging"))
+    Rcpp::stop("Input must be a Kriging object.");
+  SEXP impl = k.attr("object");
+
+  Rcpp::XPtr<Kriging> impl_ptr(impl);
+
+  std::tuple<double, arma::vec, arma::mat> ll = impl_ptr->logLikelihoodFun(theta, grad, hess, bench);
 
   Rcpp::List ret = Rcpp::List::create(Rcpp::Named("logLikelihood") = std::get<0>(ll));
   if (grad) {
@@ -347,19 +368,35 @@ double kriging_logLikelihood(Rcpp::List k) {
 }
 
 // [[Rcpp::export]]
-Rcpp::List kriging_leaveOneOutFun(Rcpp::List k, arma::vec theta, bool grad = false) {
+Rcpp::List kriging_leaveOneOutFun(Rcpp::List k, arma::vec theta, bool grad = false, bool bench = false) {
   if (!k.inherits("Kriging"))
     Rcpp::stop("Input must be a Kriging object.");
   SEXP impl = k.attr("object");
 
   Rcpp::XPtr<Kriging> impl_ptr(impl);
 
-  std::tuple<double, arma::vec> loo = impl_ptr->leaveOneOutFun(theta, grad);
+  std::tuple<double, arma::vec> loo = impl_ptr->leaveOneOutFun(theta, grad, bench);
 
   Rcpp::List ret = Rcpp::List::create(Rcpp::Named("leaveOneOut") = std::get<0>(loo));
   if (grad) {
     ret.push_back(std::get<1>(loo), "leaveOneOutGrad");
   }
+
+  return ret;
+}
+
+// [[Rcpp::export]]
+Rcpp::List kriging_leaveOneOutVec(Rcpp::List k, arma::vec theta) {
+  if (!k.inherits("Kriging"))
+    Rcpp::stop("Input must be a Kriging object.");
+  SEXP impl = k.attr("object");
+
+  Rcpp::XPtr<Kriging> impl_ptr(impl);
+
+  std::tuple<arma::vec, arma::vec> yhat = impl_ptr->leaveOneOutVec(theta);
+
+  Rcpp::List ret
+      = Rcpp::List::create(Rcpp::Named("mean") = std::get<0>(yhat), Rcpp::Named("stdev") = std::get<1>(yhat));
 
   return ret;
 }
@@ -376,14 +413,14 @@ double kriging_leaveOneOut(Rcpp::List k) {
 }
 
 // [[Rcpp::export]]
-Rcpp::List kriging_logMargPostFun(Rcpp::List k, arma::vec theta, bool grad = false) {
+Rcpp::List kriging_logMargPostFun(Rcpp::List k, arma::vec theta, bool grad = false, bool bench = false) {
   if (!k.inherits("Kriging"))
     Rcpp::stop("Input must be a Kriging object.");
   SEXP impl = k.attr("object");
 
   Rcpp::XPtr<Kriging> impl_ptr(impl);
 
-  std::tuple<double, arma::vec> lmp = impl_ptr->logMargPostFun(theta, grad);
+  std::tuple<double, arma::vec> lmp = impl_ptr->logMargPostFun(theta, grad, bench);
 
   Rcpp::List ret = Rcpp::List::create(Rcpp::Named("logMargPost") = std::get<0>(lmp));
   if (grad) {

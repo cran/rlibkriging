@@ -138,6 +138,28 @@ void summary(int nlhs, mxArray** plhs, int nrhs, const mxArray** prhs) {
   output.set(0, km->summary(), "Model description");
 }
 
+void save(int nlhs, mxArray** plhs, int nrhs, const mxArray** prhs) {
+  MxMapper input{"Input",
+                 nrhs,
+                 const_cast<mxArray**>(prhs),  // NOLINT(cppcoreguidelines-pro-type-const-cast)
+                 RequiresArg::Exactly{2}};
+  MxMapper output{"Output", nlhs, plhs, RequiresArg::Exactly{0}};
+  auto* km = input.getObjectFromRef<Kriging>(0, "Kriging reference");
+  const auto filename = input.get<std::string>(1, "filename");
+  km->save(filename);
+}
+
+void load(int nlhs, mxArray** plhs, int nrhs, const mxArray** prhs) {
+  MxMapper input{"Input",
+                 nrhs,
+                 const_cast<mxArray**>(prhs),  // NOLINT(cppcoreguidelines-pro-type-const-cast)
+                 RequiresArg::Exactly{1}};
+  MxMapper output{"Output", nlhs, plhs, RequiresArg::Exactly{1}};
+  const auto filename = input.get<std::string>(0, "filename");
+  auto km = buildObject<Kriging>(Kriging::load(filename));
+  output.set(0, km, "new object reference");
+}
+
 void leaveOneOutFun(int nlhs, mxArray** plhs, int nrhs, const mxArray** prhs) {
   MxMapper input{"Input",
                  nrhs,
@@ -146,9 +168,21 @@ void leaveOneOutFun(int nlhs, mxArray** plhs, int nrhs, const mxArray** prhs) {
   MxMapper output{"Output", nlhs, plhs, RequiresArg::Range{1, 2}};
   auto* km = input.getObjectFromRef<Kriging>(0, "Kriging reference");
   const bool want_grad = flag_output_compliance(input, 2, "want_grad", output, 1);
-  auto [loo, loograd] = km->leaveOneOutFun(input.get<arma::vec>(1, "theta"), want_grad);
+  auto [loo, loograd] = km->leaveOneOutFun(input.get<arma::vec>(1, "theta"), want_grad, false);
   output.set(0, loo, "loo");                  // FIXME better name
   output.setOptional(1, loograd, "loograd");  // FIXME better name
+}
+
+void leaveOneOutVec(int nlhs, mxArray** plhs, int nrhs, const mxArray** prhs) {
+  MxMapper input{"Input",
+                 nrhs,
+                 const_cast<mxArray**>(prhs),  // NOLINT(cppcoreguidelines-pro-type-const-cast)
+                 RequiresArg::Range{1}};
+  MxMapper output{"Output", nlhs, plhs, RequiresArg::Range{2}};
+  auto* km = input.getObjectFromRef<Kriging>(0, "Kriging reference");
+  auto [yhat_mean, yhat_sd] = km->leaveOneOutVec(input.get<arma::vec>(1, "theta"));
+  output.set(0, yhat_mean, "mean");  // FIXME better name
+  output.set(1, yhat_sd, "stdev");   // FIXME better name
 }
 
 void leaveOneOut(int nlhs, mxArray** plhs, int nrhs, const mxArray** prhs) {
@@ -170,7 +204,7 @@ void logLikelihoodFun(int nlhs, mxArray** plhs, int nrhs, const mxArray** prhs) 
   auto* km = input.getObjectFromRef<Kriging>(0, "Kriging reference");
   const bool want_grad = flag_output_compliance(input, 2, "want_grad", output, 1);
   const bool want_hess = flag_output_compliance(input, 3, "want_hess", output, 2);
-  auto [ll, llgrad, llhess] = km->logLikelihoodFun(input.get<arma::vec>(1, "theta"), want_grad, want_hess);
+  auto [ll, llgrad, llhess] = km->logLikelihoodFun(input.get<arma::vec>(1, "theta"), want_grad, want_hess, false);
   output.set(0, ll, "ll");                  // FIXME better name
   output.setOptional(1, llgrad, "llgrad");  // FIXME better name
   output.setOptional(2, llhess, "llhess");  // FIXME better name
@@ -194,7 +228,7 @@ void logMargPostFun(int nlhs, mxArray** plhs, int nrhs, const mxArray** prhs) {
   MxMapper output{"Output", nlhs, plhs, RequiresArg::Range{1, 2}};
   auto* km = input.getObjectFromRef<Kriging>(0, "Kriging reference");
   const bool want_grad = flag_output_compliance(input, 2, "want_grad", output, 1);
-  auto [lmp, lmpgrad] = km->logMargPostFun(input.get<arma::vec>(1, "theta"), want_grad);
+  auto [lmp, lmpgrad] = km->logMargPostFun(input.get<arma::vec>(1, "theta"), want_grad, false);
   output.set(0, lmp, "lmp");                  // FIXME better name
   output.setOptional(1, lmpgrad, "lmpgrad");  // FIXME better name
 }

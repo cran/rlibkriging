@@ -98,10 +98,15 @@ class NoiseKriging {
     bool is_beta_estim;
   };
 
-  double _logLikelihood(const arma::vec& _theta, arma::vec* grad_out, NoiseKriging::OKModel* okm_data) const;
+  double _logLikelihood(const arma::vec& _theta,
+                        arma::vec* grad_out,
+                        NoiseKriging::OKModel* okm_data,
+                        std::map<std::string, double>* bench) const;
 
   // at least, just call make_dist(kernel)
   LIBKRIGING_EXPORT NoiseKriging(const std::string& covType);
+
+  LIBKRIGING_EXPORT NoiseKriging(NoiseKriging&&) = default;
 
   LIBKRIGING_EXPORT NoiseKriging(const arma::colvec& y,
                                  const arma::colvec& noise,
@@ -133,7 +138,7 @@ class NoiseKriging {
                              const std::string& objective = "LL",
                              const Parameters& parameters = Parameters{});
 
-  LIBKRIGING_EXPORT std::tuple<double, arma::vec> logLikelihoodFun(const arma::vec& theta, bool grad);
+  LIBKRIGING_EXPORT std::tuple<double, arma::vec> logLikelihoodFun(const arma::vec& theta, bool grad, bool bench);
 
   LIBKRIGING_EXPORT double logLikelihood();
 
@@ -164,6 +169,16 @@ class NoiseKriging {
   LIBKRIGING_EXPORT void update(const arma::vec& newy, const arma::vec& newnoise, const arma::mat& newX);
 
   LIBKRIGING_EXPORT std::string summary() const;
+
+  /** Dump current NoiseKriging object into an hdf5 file
+   * @param filename
+   */
+  LIBKRIGING_EXPORT void save(const std::string filename) const;
+
+  /** Load a new NoiseKriging object from an hdf5 file
+   * @param filename
+   */
+  LIBKRIGING_EXPORT static NoiseKriging load(const std::string filename);
 };
 
 #endif  // LIBKRIGING_NOISEKRIGING_HPP

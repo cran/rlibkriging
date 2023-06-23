@@ -108,11 +108,19 @@ class NuggetKriging {
     double var;
   };
 
-  double _logLikelihood(const arma::vec& _theta, arma::vec* grad_out, NuggetKriging::OKModel* okm_data) const;
-  double _logMargPost(const arma::vec& _theta, arma::vec* grad_out, NuggetKriging::OKModel* okm_data) const;
+  double _logLikelihood(const arma::vec& _theta,
+                        arma::vec* grad_out,
+                        NuggetKriging::OKModel* okm_data,
+                        std::map<std::string, double>* bench) const;
+  double _logMargPost(const arma::vec& _theta,
+                      arma::vec* grad_out,
+                      NuggetKriging::OKModel* okm_data,
+                      std::map<std::string, double>* bench) const;
 
   // at least, just call make_dist(kernel)
   LIBKRIGING_EXPORT NuggetKriging(const std::string& covType);
+
+  LIBKRIGING_EXPORT NuggetKriging(NuggetKriging&&) = default;
 
   LIBKRIGING_EXPORT NuggetKriging(const arma::colvec& y,
                                   const arma::mat& X,
@@ -124,6 +132,13 @@ class NuggetKriging {
                                   const Parameters& parameters = Parameters{});
 
   LIBKRIGING_EXPORT NuggetKriging(const NuggetKriging& other, ExplicitCopySpecifier);
+
+  static std::function<arma::vec(const arma::vec&)> reparam_to;
+  static std::function<arma::vec(const arma::vec&)> reparam_from;
+  static std::function<arma::vec(const arma::vec&, const arma::vec&)> reparam_from_deriv;
+
+  static double alpha_lower;
+  static double alpha_upper;
 
   /** Fit the kriging object on (X,y):
    * @param y is n length column vector of output
@@ -141,9 +156,9 @@ class NuggetKriging {
                              const std::string& objective = "LL",
                              const Parameters& parameters = Parameters{});
 
-  LIBKRIGING_EXPORT std::tuple<double, arma::vec> logLikelihoodFun(const arma::vec& theta, bool grad);
+  LIBKRIGING_EXPORT std::tuple<double, arma::vec> logLikelihoodFun(const arma::vec& theta, bool grad, bool bench);
 
-  LIBKRIGING_EXPORT std::tuple<double, arma::vec> logMargPostFun(const arma::vec& theta, bool grad);
+  LIBKRIGING_EXPORT std::tuple<double, arma::vec> logMargPostFun(const arma::vec& theta, bool grad, bool bench);
 
   LIBKRIGING_EXPORT double logLikelihood();
   LIBKRIGING_EXPORT double logMargPost();
@@ -174,6 +189,16 @@ class NuggetKriging {
   LIBKRIGING_EXPORT void update(const arma::vec& newy, const arma::mat& newX);
 
   LIBKRIGING_EXPORT std::string summary() const;
+
+  /** Dump current NuggetKriging object into an hdf5 file
+   * @param filename
+   */
+  LIBKRIGING_EXPORT void save(const std::string filename) const;
+
+  /** Load a new NuggetKriging object from an hdf5 file
+   * @param filename
+   */
+  LIBKRIGING_EXPORT static NuggetKriging load(const std::string filename);
 };
 
 #endif  // LIBKRIGING_NUGGETKRIGING_HPP

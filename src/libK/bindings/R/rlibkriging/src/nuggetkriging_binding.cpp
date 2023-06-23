@@ -42,8 +42,9 @@ Rcpp::List new_NuggetKrigingFit(arma::vec y,
     if (params.containsElementNamed("sigma2")) {
       _parameters.push_back(params["sigma2"], "sigma2");
       _parameters.push_back(true, "has_sigma2");
-      _parameters.push_back(!(params.containsElementNamed("is_sigma2_estim") && !params["is_sigma2_estim"]),
-                            "is_sigma2_estim");
+      _parameters.push_back(
+          !(params.containsElementNamed("is_sigma2_estim") && !params["is_sigma2_estim"]) && optim != "none",
+          "is_sigma2_estim");
     } else {
       //_parameters.push_back(Rcpp::runif(1), "sigma2"); // turnaround mingw bug:
       // https://github.com/msys2/MINGW-packages/issues/5019 _parameters.push_back(true, "has_sigma2");
@@ -54,8 +55,9 @@ Rcpp::List new_NuggetKrigingFit(arma::vec y,
     if (params.containsElementNamed("nugget")) {
       _parameters.push_back(params["nugget"], "nugget");
       _parameters.push_back(true, "has_nugget");
-      _parameters.push_back(!(params.containsElementNamed("is_nugget_estim") && !params["is_nugget_estim"]),
-                            "is_nugget_estim");
+      _parameters.push_back(
+          !(params.containsElementNamed("is_nugget_estim") && !params["is_nugget_estim"]) && optim != "none",
+          "is_nugget_estim");
     } else {
       //_parameters.push_back(Rcpp::runif(1), "nugget"); // turnaround mingw bug:
       // https://github.com/msys2/MINGW-packages/issues/5019 _parameters.push_back(true, "has_nugget");
@@ -66,8 +68,9 @@ Rcpp::List new_NuggetKrigingFit(arma::vec y,
     if (params.containsElementNamed("theta")) {
       _parameters.push_back(Rcpp::as<Rcpp::NumericMatrix>(params["theta"]), "theta");
       _parameters.push_back(true, "has_theta");
-      _parameters.push_back(!(params.containsElementNamed("is_theta_estim") && !params["is_theta_estim"]),
-                            "is_theta_estim");
+      _parameters.push_back(
+          !(params.containsElementNamed("is_theta_estim") && !params["is_theta_estim"]) && optim != "none",
+          "is_theta_estim");
     } else {
       // Rcpp::NumericVector r = Rcpp::runif(X.n_cols); // turnaround mingw bug:
       // https://github.com/msys2/MINGW-packages/issues/5019 _parameters.push_back(Rcpp::NumericMatrix(1, X.n_cols,
@@ -79,8 +82,9 @@ Rcpp::List new_NuggetKrigingFit(arma::vec y,
     if (params.containsElementNamed("beta")) {
       _parameters.push_back(Rcpp::as<Rcpp::NumericMatrix>(params["beta"]), "beta");
       _parameters.push_back(true, "has_beta");
-      _parameters.push_back(!(params.containsElementNamed("is_beta_estim") && !params["is_beta_estim"]),
-                            "is_beta_estim");
+      _parameters.push_back(
+          !(params.containsElementNamed("is_beta_estim") && !params["is_beta_estim"]) && optim != "none",
+          "is_beta_estim");
     } else {
       _parameters.push_back(Rcpp::NumericVector(0), "beta");
       _parameters.push_back(false, "has_beta");
@@ -157,8 +161,9 @@ void nuggetkriging_fit(Rcpp::List k,
     if (params.containsElementNamed("sigma2")) {
       _parameters.push_back(params["sigma2"], "sigma2");
       _parameters.push_back(true, "has_sigma2");
-      _parameters.push_back(!(params.containsElementNamed("is_sigma2_estim") && !params["is_sigma2_estim"]),
-                            "is_sigma2_estim");
+      _parameters.push_back(
+          !(params.containsElementNamed("is_sigma2_estim") && !params["is_sigma2_estim"]) && optim != "none",
+          "is_sigma2_estim");
     } else {
       //_parameters.push_back(Rcpp::runif(1), "sigma2"); // turnaround mingw bug:
       // https://github.com/msys2/MINGW-packages/issues/5019 _parameters.push_back(true, "has_sigma2");
@@ -169,8 +174,9 @@ void nuggetkriging_fit(Rcpp::List k,
     if (params.containsElementNamed("nugget")) {
       _parameters.push_back(params["nugget"], "nugget");
       _parameters.push_back(true, "has_nugget");
-      _parameters.push_back(!(params.containsElementNamed("is_nugget_estim") && !params["is_nugget_estim"]),
-                            "is_nugget_estim");
+      _parameters.push_back(
+          !(params.containsElementNamed("is_nugget_estim") && !params["is_nugget_estim"]) && optim != "none",
+          "is_nugget_estim");
     } else {
       //_parameters.push_back(Rcpp::runif(1), "nugget"); // turnaround mingw bug:
       // https://github.com/msys2/MINGW-packages/issues/5019 _parameters.push_back(true, "has_nugget");
@@ -181,8 +187,9 @@ void nuggetkriging_fit(Rcpp::List k,
     if (params.containsElementNamed("theta")) {
       _parameters.push_back(Rcpp::as<Rcpp::NumericMatrix>(params["theta"]), "theta");
       _parameters.push_back(true, "has_theta");
-      _parameters.push_back(!(params.containsElementNamed("is_theta_estim") && !params["is_theta_estim"]),
-                            "is_theta_estim");
+      _parameters.push_back(
+          !(params.containsElementNamed("is_theta_estim") && !params["is_theta_estim"]) && optim != "none",
+          "is_theta_estim");
     } else {
       // Rcpp::NumericVector r = Rcpp::runif(X.n_cols); // turnaround mingw bug:
       // https://github.com/msys2/MINGW-packages/issues/5019 _parameters.push_back(Rcpp::NumericMatrix(1, X.n_cols,
@@ -194,8 +201,9 @@ void nuggetkriging_fit(Rcpp::List k,
     if (params.containsElementNamed("beta")) {
       _parameters.push_back(Rcpp::as<Rcpp::NumericMatrix>(params["beta"]), "beta");
       _parameters.push_back(true, "has_beta");
-      _parameters.push_back(!(params.containsElementNamed("is_beta_estim") && !params["is_beta_estim"]),
-                            "is_beta_estim");
+      _parameters.push_back(
+          !(params.containsElementNamed("is_beta_estim") && !params["is_beta_estim"]) && optim != "none",
+          "is_beta_estim");
     } else {
       _parameters.push_back(Rcpp::NumericVector(0), "beta");
       _parameters.push_back(false, "has_beta");
@@ -244,7 +252,7 @@ void nuggetkriging_fit(Rcpp::List k,
 // [[Rcpp::export]]
 Rcpp::List nuggetkriging_copy(Rcpp::List k) {
   if (!k.inherits("NuggetKriging"))
-    Rcpp::stop("Input must be a NoiseKriging object.");
+    Rcpp::stop("Input must be a NuggetKriging object.");
   SEXP impl = k.attr("object");
   Rcpp::XPtr<NuggetKriging> impl_ptr(impl);
 
@@ -356,14 +364,25 @@ void nuggetkriging_update(Rcpp::List k, arma::vec y, arma::mat X) {
 }
 
 // [[Rcpp::export]]
-Rcpp::List nuggetkriging_logLikelihoodFun(Rcpp::List k, arma::vec theta_alpha, bool grad = false) {
+void nuggetkriging_save(Rcpp::List k, std::string filename) {
   if (!k.inherits("NuggetKriging"))
     Rcpp::stop("Input must be a NuggetKriging object.");
   SEXP impl = k.attr("object");
 
   Rcpp::XPtr<NuggetKriging> impl_ptr(impl);
 
-  std::tuple<double, arma::vec> ll = impl_ptr->logLikelihoodFun(theta_alpha, grad);
+  return impl_ptr->save(filename);
+}
+
+// [[Rcpp::export]]
+Rcpp::List nuggetkriging_logLikelihoodFun(Rcpp::List k, arma::vec theta_alpha, bool grad = false, bool bench = false) {
+  if (!k.inherits("NuggetKriging"))
+    Rcpp::stop("Input must be a NuggetKriging object.");
+  SEXP impl = k.attr("object");
+
+  Rcpp::XPtr<NuggetKriging> impl_ptr(impl);
+
+  std::tuple<double, arma::vec> ll = impl_ptr->logLikelihoodFun(theta_alpha, grad, bench);
 
   Rcpp::List ret = Rcpp::List::create(Rcpp::Named("logLikelihood") = std::get<0>(ll));
   if (grad) {
@@ -385,14 +404,14 @@ double nuggetkriging_logLikelihood(Rcpp::List k) {
 }
 
 // [[Rcpp::export]]
-Rcpp::List nuggetkriging_logMargPostFun(Rcpp::List k, arma::vec theta, bool grad = false) {
+Rcpp::List nuggetkriging_logMargPostFun(Rcpp::List k, arma::vec theta, bool grad = false, bool bench = false) {
   if (!k.inherits("NuggetKriging"))
     Rcpp::stop("Input must be a NuggetKriging object.");
   SEXP impl = k.attr("object");
 
   Rcpp::XPtr<NuggetKriging> impl_ptr(impl);
 
-  std::tuple<double, arma::vec> lmp = impl_ptr->logMargPostFun(theta, grad);
+  std::tuple<double, arma::vec> lmp = impl_ptr->logMargPostFun(theta, grad, bench);
 
   Rcpp::List ret = Rcpp::List::create(Rcpp::Named("logMargPost") = std::get<0>(lmp));
   if (grad) {

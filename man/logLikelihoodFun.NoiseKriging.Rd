@@ -72,7 +72,7 @@
 \alias{points(k$theta(),k$sigma2(),col='blue')}
 \title{Compute Log-Likelihood of NoiseKriging Model}
 \usage{
-\method{logLikelihoodFun}{NoiseKriging}(object, theta_sigma2, grad = FALSE, ...)
+\method{logLikelihoodFun}{NoiseKriging}(object, theta_sigma2, grad = FALSE, bench = FALSE, ...)
 }
 \arguments{
 \item{object}{An S3 NoiseKriging object.}
@@ -81,6 +81,8 @@
 which the log-likelihood will be evaluated.}
 
 \item{grad}{Logical. Should the function return the gradient?}
+
+\item{bench}{Logical. Should the function display benchmarking output}
 
 \item{...}{Not used.}
 }

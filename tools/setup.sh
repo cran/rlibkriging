@@ -5,6 +5,11 @@ if [[ "$DEBUG_CI" == "true" ]]; then
   set -x
 fi
 
+: ${R_HOME=$(R RHOME)}
+if test -z "${R_HOME}"; then
+   as_fn_error $? "Could not determine R_HOME." "$LINENO" 5
+fi
+
 LIBKRIGING_SRC_PATH=src/libK
 
 # Cleanup unused (for R) libKriging deps
@@ -109,5 +114,5 @@ rm -rf tests/test-KrigingCholCrash.R
 
 # sync man content
 rm -rf man
-Rscript -e "roxygen2::roxygenise(package.dir = '.')"
+"${R_HOME}"/bin/Rscript -e "roxygen2::roxygenise(package.dir = '.')"
 rm -rf $LIBKRIGING_SRC_PATH/build

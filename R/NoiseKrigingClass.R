@@ -100,13 +100,10 @@ NoiseKriging <- function(y=NULL, noise=NULL, X=NULL, kernel=NULL,
                       parameters = parameters)
     class(nk) <- "NoiseKriging"
     # This will allow to call methods (like in Python/Matlab/Octave) using `k$m(...)` as well as R-style `m(k, ...)`.
-    for (f in methods(class=class(nk))) {
-        if (regexec(paste0(".",class(nk)),f)[[1]]>0) {
-            f_anon = sub(paste0(".",class(nk)),"",fixed=TRUE,f)
-            eval(parse(text=paste0(
-                "nk$", f_anon, " <- function(...) ", f_anon, "(nk,...)"
-                )))
-        }
+    for (f in c('as.km','as.list','copy','fit','logLikelihood','logLikelihoodFun','predict','print','show','simulate','update')) {
+        eval(parse(text=paste0(
+            "nk$", f, " <- function(...) ", f, "(nk,...)"
+            )))
     }
     # This will allow to access kriging data/props using `k$d()`
     for (d in c('kernel','optim','objective','X','centerX','scaleX','y','noise','centerY','scaleY','regmodel','F','T','M','z','beta','is_beta_estim','theta','is_theta_estim','sigma2','is_sigma2_estim')) {
@@ -563,6 +560,76 @@ update.NoiseKriging <- function(object, newy, newnoise, newX, ...) {
 }
 
 
+#' Save a NoiseKriging Model to a file storage
+#'
+#' @author Yann Richet \email{yann.richet@irsn.fr}
+#'
+#' @param object An S3 NoiseKriging object.
+#' @param filename File name to save in.
+#' @param ... Not used.
+#'
+#' @return The loaded NoiseKriging object.
+#'
+#' @method save NoiseKriging
+#' @export
+#' @aliases save,NoiseKriging,NoiseKriging-method
+#'
+#' @examples
+#' f <- function(x) 1- 1 / 2 * (sin(12 * x) / (1 + x) + 2 * cos(7 * x)*x^5 + 0.7)
+#' set.seed(123)
+#' X <- as.matrix(runif(10))
+#' y <- f(X) + X/10 * rnorm(nrow(X))
+#'
+#' k <- NoiseKriging(y, (X/10)^2, X, "matern3_2")
+#' print(k)
+#'
+#' outfile = tempfile("k.h5") 
+#' save(k,outfile)
+save.NoiseKriging <- function(object, filename, ...) {
+
+    if (length(L <- list(...)) > 0) warnOnDots(L)
+    if (!is.character(filename))
+        stop("'filename' must be a string")
+
+    noisekriging_save(object, filename)
+
+    invisible(NULL)
+}
+
+
+#' Load a NoiseKriging Model from a file storage
+#'
+#' @author Yann Richet \email{yann.richet@irsn.fr}
+#'
+#' @param filename File name to load from.
+#' @param ... Not used.
+#'
+#' @return The loaded NoiseKriging object.
+#'
+#' @export
+#'
+#' @examples
+#' f <- function(x) 1- 1 / 2 * (sin(12 * x) / (1 + x) + 2 * cos(7 * x)*x^5 + 0.7)
+#' set.seed(123)
+#' X <- as.matrix(runif(10))
+#' y <- f(X) + X/10 * rnorm(nrow(X))
+#' points(X, y, col = "blue")
+#'
+#' k <- NoiseKriging(y, (X/10)^2, X, "matern3_2")
+#' print(k)
+#'
+#' outfile = tempfile("k.h5")
+#' save(k,outfile)
+#'
+#' print(load.NoiseKriging(outfile)) 
+load.NoiseKriging <- function(filename, ...) {
+    if (length(L <- list(...)) > 0) warnOnDots(L)
+    if (!is.character(filename))
+        stop("'filename' must be a string")
+    return( noisekriging_load(filename) )
+}
+
+
 #' Compute Log-Likelihood of NoiseKriging Model
 #'
 #' @author Yann Richet \email{yann.richet@irsn.fr}
@@ -571,6 +638,7 @@ update.NoiseKriging <- function(object, newy, newnoise, newX, ...) {
 #' @param theta_sigma2 A numeric vector of (positive) range parameters and variance at
 #'     which the log-likelihood will be evaluated.
 #' @param grad Logical. Should the function return the gradient?
+#' @param bench Logical. Should the function display benchmarking output
 #' @param ... Not used.
 #'
 #' @return The log-Likelihood computed for given
@@ -606,7 +674,7 @@ update.NoiseKriging <- function(object, newy, newnoise, newX, ...) {
 #' contour(t,s2,matrix(ncol=length(s2),ll(expand.grid(t,s2))),xlab="theta",ylab="sigma2")
 #' points(k$theta(),k$sigma2(),col='blue')
 logLikelihoodFun.NoiseKriging <- function(object, theta_sigma2,
-                                  grad = FALSE, ...) {
+                                  grad = FALSE, bench=FALSE, ...) {
     k <- noisekriging_model(object)
     if (is.data.frame(theta_sigma2)) theta_sigma2 = data.matrix(theta_sigma2)
     if (!is.matrix(theta_sigma2)) theta_sigma2 <- matrix(theta_sigma2, ncol = ncol(k$X)+1)
@@ -618,7 +686,7 @@ logLikelihoodFun.NoiseKriging <- function(object, theta_sigma2,
                                            ncol = ncol(theta_sigma2)))
     for (i in 1:nrow(theta_sigma2)) {
         ll <- noisekriging_logLikelihoodFun(object, theta_sigma2[i, ],
-                                    grad = isTRUE(grad))
+                                    grad = isTRUE(grad), bench = isTRUE(bench))
         out$logLikelihood[i] <- ll$logLikelihood
         if (isTRUE(grad)) out$logLikelihoodGrad[i, ] <- ll$logLikelihoodGrad
     }

@@ -10,10 +10,6 @@ BASEDIR=$(cd "$BASEDIR" && pwd -P)
 
 "${BASEDIR}"/../windows/install.sh
 
-# https://chocolatey.org/docs/commands-install
-# https://chocolatey.org/packages/make
-choco install -y --no-progress make --version 4.3
-
 if [ "${GITHUB_ACTIONS:=false}" == "false" ]; then
 
   # Allow to fail
@@ -24,7 +20,7 @@ if [ "${GITHUB_ACTIONS:=false}" == "false" ]; then
     echo "Don't know how to install it"
     echo "You can try something like:"
     # https://chocolatey.org/packages/R.Project
-    echo "\tchoco install -y --no-progress r.project --version 4.0.0"
+    echo "  choco install -y --no-progress r.project --version 4.2.1"
     exit 1
   fi
   
@@ -47,7 +43,7 @@ if [ "${GITHUB_ACTIONS:=false}" == "false" ]; then
       RTOOLSDIR=Rtools40
       ;;
     "R version 4.2")    
-      RTOOLSURL=https://cran.r-project.org/bin/windows/Rtools/rtools42/files/rtools42-5168-5107.exe
+      RTOOLSURL=https://cran.r-project.org/bin/windows/Rtools/rtools42/files/rtools42-5355-5357.exe
       RTOOLSDIR=Rtools42
       ;;
     *)
@@ -57,7 +53,7 @@ if [ "${GITHUB_ACTIONS:=false}" == "false" ]; then
   esac
   
   if [ ! -d /c/$RTOOLSDIR ]; then
-    curl -s -Lo "${HOME}"/Downloads/Rtools.exe "$RTOOLSURL" 
+    curl -s -Lo "${HOME}"/Downloads/Rtools.exe "$RTOOLSURL" --fail || echo "Cannot download Rtools; check the address; it may change"
     "${BASEDIR}"/install_rtools.bat $RTOOLSDIR
   fi
 fi

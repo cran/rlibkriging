@@ -6,7 +6,7 @@
 \title{Compute the log-marginal posterior of a kriging model, using the
 prior XXXY.}
 \usage{
-\method{logMargPostFun}{NuggetKriging}(object, theta_alpha, grad = FALSE, ...)
+\method{logMargPostFun}{NuggetKriging}(object, theta_alpha, grad = FALSE, bench = FALSE, ...)
 }
 \arguments{
 \item{object}{S3 NuggetKriging object.}
@@ -16,6 +16,8 @@ which the function is to be evaluated.}
 
 \item{grad}{Logical. Should the function return the gradient
 (w.r.t theta_alpha)?}
+
+\item{bench}{Logical. Should the function display benchmarking output}
 
 \item{...}{Not used.}
 }

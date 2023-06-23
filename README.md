@@ -7,6 +7,14 @@ install.packages('devtools')
 devtools::install_github("libKriging/rlibkriging")
 ```
 
+The stable version is available from CRAN [![Downloads
+(monthly)](https://cranlogs.r-pkg.org/badges/rlibkriging)](https://cran.r-project.org/package=rlibkriging) :
+
+```r
+install.packages('rlibkriging')
+```
+
+
 ## Requirements
 
 `c++`, `cmake` and `gfortran`, should be installed using:

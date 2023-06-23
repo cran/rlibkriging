@@ -99,13 +99,10 @@ Kriging <- function(y=NULL, X=NULL, kernel=NULL,
                       parameters = parameters)
     class(nk) <- "Kriging"
     # This will allow to call methods (like in Python/Matlab/Octave) using `k$m(...)` as well as R-style `m(k, ...)`.
-    for (f in methods(class=class(nk))) {
-        if (regexec(paste0(".",class(nk)),f)[[1]]>0) {
-            f_anon = sub(paste0(".",class(nk)),"",fixed=TRUE,f)
-            eval(parse(text=paste0(
-                "nk$", f_anon, " <- function(...) ", f_anon, "(nk,...)"
-                )))
-        }
+    for (f in c('as.km','as.list','copy','fit','leaveOneOut','leaveOneOutFun','leaveOneOutVec','logLikelihood','logLikelihoodFun','logMargPost','logMargPostFun','predict','print','show','simulate','update')) {
+        eval(parse(text=paste0(
+            "nk$", f, " <- function(...) ", f, "(nk,...)"
+            )))
     }
     # This will allow to access kriging data/props using `k$d()`
     for (d in c('kernel','optim','objective','X','centerX','scaleX','y','centerY','scaleY','regmodel','F','T','M','z','beta','is_beta_estim','theta','is_theta_estim','sigma2','is_sigma2_estim')) {
@@ -171,7 +168,8 @@ as.list.Kriging <- function(x, ...) {
 #' @importFrom stats model.matrix
 #' @export
 #' @method as.km Kriging
-#'
+#' @aliases as.km,Kriging,Kriging-method
+#' 
 #' @examples
 #' f <- function(x) 1 - 1 / 2 * (sin(12 * x) / (1 + x) + 2 * cos(7 * x) * x^5 + 0.7)
 #' set.seed(123)
@@ -485,6 +483,7 @@ simulate.Kriging <- function(object, nsim = 1, seed = 123, x,  ...) {
     return(kriging_simulate(object, nsim = nsim, seed = seed, X = x))
 }
 
+
 #' Update a \code{Kriging} model object with new points
 #'
 #' @author Yann Richet \email{yann.richet@irsn.fr}
@@ -557,6 +556,73 @@ update.Kriging <- function(object, newy, newX, ...) {
     invisible(NULL)
 }
 
+#' Save a Kriging Model to a file storage
+#'
+#' @author Yann Richet \email{yann.richet@irsn.fr}
+#'
+#' @param object An S3 Kriging object.
+#' @param filename File name to save in.
+#' @param ... Not used.
+#'
+#' @return The loaded Kriging object.
+#'
+#' @method save Kriging
+#' @export
+#' @aliases save,Kriging,Kriging-method
+#'
+#' @examples
+#' f <- function(x) 1 - 1 / 2 * (sin(12 * x) / (1 + x) + 2 * cos(7 * x) * x^5 + 0.7)
+#' set.seed(123)
+#' X <- as.matrix(runif(10))
+#' y <- f(X)
+#'
+#' k <- Kriging(y, X, kernel = "matern3_2", objective="LMP")
+#' print(k)
+#'
+#' outfile = tempfile("k.h5") 
+#' save(k,outfile)
+save.Kriging <- function(object, filename, ...) {
+
+    if (length(L <- list(...)) > 0) warnOnDots(L)
+    if (!is.character(filename))
+        stop("'filename' must be a string")
+
+    kriging_save(object, filename)
+
+    invisible(NULL)
+}
+
+#' Load a Kriging Model from a file storage
+#'
+#' @author Yann Richet \email{yann.richet@irsn.fr}
+#'
+#' @param filename File name to load from.
+#' @param ... Not used.
+#'
+#' @return The loaded Kriging object.
+#'
+#' @export
+#'
+#' @examples
+#' f <- function(x) 1 - 1 / 2 * (sin(12 * x) / (1 + x) + 2 * cos(7 * x) * x^5 + 0.7)
+#' set.seed(123)
+#' X <- as.matrix(runif(10))
+#' y <- f(X)
+#'
+#' k <- Kriging(y, X, kernel = "matern3_2", objective="LMP")
+#' print(k)
+#'
+#' outfile = tempfile("k.h5")
+#' save(k,outfile)
+#'
+#' print(load.Kriging(outfile)) 
+load.Kriging <- function(filename, ...) {
+    if (length(L <- list(...)) > 0) warnOnDots(L)
+    if (!is.character(filename))
+        stop("'filename' must be a string")
+    return( kriging_load(filename) )
+}
+
 #' Compute Log-Likelihood of Kriging Model
 #'
 #' @author Yann Richet \email{yann.richet@irsn.fr}
@@ -566,6 +632,7 @@ update.Kriging <- function(object, newy, newX, ...) {
 #'     which the log-likelihood will be evaluated.
 #' @param grad Logical. Should the function return the gradient?
 #' @param hess Logical. Should the function return Hessian?
+#' @param bench Logical. Should the function display benchmarking output?
 #' @param ... Not used.
 #'
 #' @return The log-Likelihood computed for given
@@ -590,7 +657,7 @@ update.Kriging <- function(object, newy, newX, ...) {
 #' plot(t, ll(t), type = 'l')
 #' abline(v = k$theta(), col = "blue")
 logLikelihoodFun.Kriging <- function(object, theta,
-                                  grad = FALSE, hess = FALSE, ...) {
+                                  grad = FALSE, hess = FALSE, bench=FALSE, ...) {
     k <- kriging_model(object)
     if (is.data.frame(theta)) theta = data.matrix(theta)
     if (!is.matrix(theta)) theta <- matrix(theta, ncol = ncol(k$X))
@@ -604,7 +671,7 @@ logLikelihoodFun.Kriging <- function(object, theta,
                                                       ncol(theta))))
     for (i in 1:nrow(theta)) {
         ll <- kriging_logLikelihoodFun(object, theta[i, ],
-                                    grad = isTRUE(grad), hess = isTRUE(hess))
+                                    grad = isTRUE(grad), hess = isTRUE(hess), bench = isTRUE(bench))
         out$logLikelihood[i] <- ll$logLikelihood
         if (isTRUE(grad)) out$logLikelihoodGrad[i, ] <- ll$logLikelihoodGrad
         if (isTRUE(hess)) out$logLikelihoodHess[i, , ] <- ll$logLikelihoodHess
@@ -661,7 +728,7 @@ logLikelihood.Kriging <- function(object, ...) {
 #'
 #' @param grad Logical. Should the gradient (w.r.t. \code{theta}) be
 #'     returned?
-#'
+#' @param bench Logical. Should the function display benchmarking output
 #' @param ... Not used.
 #'
 #' @return The leave-One-Out value computed for the given vector
@@ -684,7 +751,7 @@ logLikelihood.Kriging <- function(object, ...) {
 #' t <-  seq(from = 0.001, to = 2, length.out = 101)
 #' plot(t, loo(t), type = "l")
 #' abline(v = k$theta(), col = "blue")
-leaveOneOutFun.Kriging <- function(object, theta, grad = FALSE, ...) {
+leaveOneOutFun.Kriging <- function(object, theta, grad = FALSE, bench=FALSE, ...) {
     k <- kriging_model(object)
     if (is.data.frame(theta)) theta = data.matrix(theta)
     if (!is.matrix(theta)) theta <- matrix(theta,ncol=ncol(k$X))
@@ -695,12 +762,53 @@ leaveOneOutFun.Kriging <- function(object, theta, grad = FALSE, ...) {
                 leaveOneOutGrad = matrix(NA, nrow = nrow(theta),
                                          ncol = ncol(theta)))
     for (i in 1:nrow(theta)) {
-        loo <- kriging_leaveOneOutFun(object,theta[i,], isTRUE(grad))
+        loo <- kriging_leaveOneOutFun(object,theta[i,], isTRUE(grad), bench = isTRUE(bench))
         out$leaveOneOut[i] <- loo$leaveOneOut
         if (isTRUE(grad)) out$leaveOneOutGrad[i, ] <- loo$leaveOneOutGrad
     }
     if (!isTRUE(grad)) out$leaveOneOutGrad <- NULL
     return(out)
+}
+
+#' Compute Leave-One-Out (LOO) vector error for an object with S3 class
+#' \code{"Kriging"} representing a kriging model.
+#'
+#' The returned value is the mean and stdev of \eqn{\hat{y}_{i,(-i)}}, the
+#' prediction of \eqn{y_i}{y[i]} based on the the observations \eqn{y_j}{y[j]}
+#' with \eqn{j \neq i}{j != i}.
+#'
+#' @author Yann Richet \email{yann.richet@irsn.fr}
+#'
+#' @param object A \code{Kriging} object.
+#' @param theta A numeric vector of range parameters at which the LOO
+#'     will be evaluated.
+#' @param ... Not used.
+#'
+#' @return The leave-One-Out vector computed for the given vector
+#'     \eqn{\boldsymbol{\theta}}{\theta} of correlation ranges.
+#'
+#' @method leaveOneOutVec Kriging
+#' @export
+#' @aliases leaveOneOutVec,Kriging,Kriging-method
+#'
+#' @examples
+#' f <- function(x) 1 - 1 / 2 * (sin(12 * x) / (1 + x) + 2 * cos(7 * x) * x^5 + 0.7)
+#' set.seed(123)
+#' X <- as.matrix(runif(10))
+#' y <- f(X)
+#'
+#' k <- Kriging(y, X, kernel = "matern3_2", objective = "LOO", optim="BFGS")
+#' print(k)
+#'
+#' leaveOneOutVec(k, k$theta())
+leaveOneOutVec.Kriging <- function(object, theta, ...) {
+    k <- kriging_model(object)
+    if (!is.array(theta)) 
+        stop("Input theta must be 1-dimensional")
+    if (length(theta) != ncol(k$X))
+        stop("Input theta must have ", ncol(k$X), " values (instead of ",
+             length(theta),")")
+    return( kriging_leaveOneOutVec(object,theta) )
 }
 
 
@@ -742,6 +850,7 @@ leaveOneOut.Kriging <- function(object, ...) {
 #'     which the function is to be evaluated.
 #' @param grad Logical. Should the function return the gradient
 #'     (w.r.t theta)?
+#' @param bench Logical. Should the function display benchmarking output?
 #' @param ... Not used.
 #'
 #' @return The value of the log-marginal posterior computed for the
@@ -770,7 +879,7 @@ leaveOneOut.Kriging <- function(object, ...) {
 #' t <- seq(from = 0.01, to = 2, length.out = 101)
 #' plot(t, lmp(t), type = "l")
 #' abline(v = k$theta(), col = "blue")
-logMargPostFun.Kriging <- function(object, theta, grad = FALSE, ...) {
+logMargPostFun.Kriging <- function(object, theta, grad = FALSE, bench=FALSE, ...) {
     k <- kriging_model(object)
     if (is.data.frame(theta)) theta = data.matrix(theta)
     if (!is.matrix(theta)) theta <- matrix(theta,ncol=ncol(k$X))
@@ -781,7 +890,7 @@ logMargPostFun.Kriging <- function(object, theta, grad = FALSE, ...) {
                 logMargPostGrad = matrix(NA, nrow = nrow(theta),
                                          ncol = ncol(theta)))
     for (i in 1:nrow(theta)) {
-        lmp <- kriging_logMargPostFun(object, theta[i, ], grad = isTRUE(grad))
+        lmp <- kriging_logMargPostFun(object, theta[i, ], grad = isTRUE(grad), bench = isTRUE(bench))
         out$logMargPost[i] <- lmp$logMargPost
         if (isTRUE(grad)) out$logMargPostGrad[i, ] <- lmp$logMargPostGrad
     }
@@ -843,5 +952,6 @@ logMargPost.Kriging <- function(object, ...) {
 #'
 #' print(copy(k))
 copy.Kriging <- function(object, ...) {
+  if (length(L <- list(...)) > 0) warnOnDots(L)
   return(kriging_copy(object))
 }

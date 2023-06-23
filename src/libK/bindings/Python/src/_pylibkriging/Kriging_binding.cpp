@@ -101,11 +101,25 @@ std::string PyKriging::summary() const {
   return m_internal->summary();
 }
 
+void PyKriging::save(const std::string filename) const {
+  return m_internal->save(filename);
+}
+
+PyKriging PyKriging::load(const std::string filename) {
+  return PyKriging(std::make_unique<Kriging>(Kriging::load(filename)));
+}
+
 std::tuple<double, py::array_t<double>> PyKriging::leaveOneOutFun(const py::array_t<double>& theta,
                                                                   const bool want_grad) {
   arma::vec vec_theta = carma::arr_to_col<double>(theta);
-  auto [llo, grad] = m_internal->leaveOneOutFun(vec_theta, want_grad);
+  auto [llo, grad] = m_internal->leaveOneOutFun(vec_theta, want_grad, false);
   return {llo, carma::col_to_arr(grad)};
+}
+
+std::tuple<py::array_t<double>, py::array_t<double>> PyKriging::leaveOneOutVec(const py::array_t<double>& theta) {
+  arma::vec vec_theta = carma::arr_to_col<double>(theta);
+  auto [yhat_mean, yhat_sd] = m_internal->leaveOneOutVec(vec_theta);
+  return {carma::col_to_arr(yhat_mean), carma::col_to_arr(yhat_sd)};
 }
 
 double PyKriging::leaveOneOut() {
@@ -115,7 +129,7 @@ double PyKriging::leaveOneOut() {
 std::tuple<double, py::array_t<double>, py::array_t<double>>
 PyKriging::logLikelihoodFun(const py::array_t<double>& theta, const bool want_grad, const bool want_hess) {
   arma::vec vec_theta = carma::arr_to_col<double>(theta);
-  auto [llo, grad, hess] = m_internal->logLikelihoodFun(vec_theta, want_grad, want_hess);
+  auto [llo, grad, hess] = m_internal->logLikelihoodFun(vec_theta, want_grad, want_hess, false);
   return {
       llo,
       carma::col_to_arr(grad),
@@ -131,7 +145,7 @@ double PyKriging::logLikelihood() {
 std::tuple<double, py::array_t<double>> PyKriging::logMargPostFun(const py::array_t<double>& theta,
                                                                   const bool want_grad) {
   arma::vec vec_theta = carma::arr_to_col<double>(theta);
-  auto [lmp, grad] = m_internal->logMargPostFun(vec_theta, want_grad);
+  auto [lmp, grad] = m_internal->logMargPostFun(vec_theta, want_grad, false);
   return {lmp, carma::col_to_arr(grad)};
 }
 

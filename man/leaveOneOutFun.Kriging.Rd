@@ -6,7 +6,7 @@
 \title{Compute Leave-One-Out (LOO) error for an object with S3 class
 \code{"Kriging"} representing a kriging model.}
 \usage{
-\method{leaveOneOutFun}{Kriging}(object, theta, grad = FALSE, ...)
+\method{leaveOneOutFun}{Kriging}(object, theta, grad = FALSE, bench = FALSE, ...)
 }
 \arguments{
 \item{object}{A \code{Kriging} object.}
@@ -16,6 +16,8 @@ will be evaluated.}
 
 \item{grad}{Logical. Should the gradient (w.r.t. \code{theta}) be
 returned?}
+
+\item{bench}{Logical. Should the function display benchmarking output}
 
 \item{...}{Not used.}
 }

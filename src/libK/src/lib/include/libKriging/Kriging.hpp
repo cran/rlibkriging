@@ -28,7 +28,7 @@ struct KrigingParameters {
  */
 class Kriging {
   Kriging() = delete;
-  Kriging(const Kriging& other) = default;  // Should be specialized is non default copy constructor is required
+  Kriging(const Kriging& other) = default;  // Should be specialized if non default copy constructor is required
 
  public:
   using Parameters = KrigingParameters;
@@ -101,12 +101,22 @@ class Kriging {
   double _logLikelihood(const arma::vec& _theta,
                         arma::vec* grad_out,
                         arma::mat* hess_out,
-                        Kriging::OKModel* okm_data) const;
-  double _leaveOneOut(const arma::vec& _theta, arma::vec* grad_out, Kriging::OKModel* okm_data) const;
-  double _logMargPost(const arma::vec& _theta, arma::vec* grad_out, Kriging::OKModel* okm_data) const;
+                        Kriging::OKModel* okm_data,
+                        std::map<std::string, double>* bench) const;
+  double _leaveOneOut(const arma::vec& _theta,
+                      arma::vec* grad_out,
+                      arma::mat* yhat_out,
+                      Kriging::OKModel* okm_data,
+                      std::map<std::string, double>* bench) const;
+  double _logMargPost(const arma::vec& _theta,
+                      arma::vec* grad_out,
+                      Kriging::OKModel* okm_data,
+                      std::map<std::string, double>* bench) const;
 
   // at least, just call make_dist(kernel)
   LIBKRIGING_EXPORT Kriging(const std::string& covType);
+
+  LIBKRIGING_EXPORT Kriging(Kriging&&) = default;
 
   LIBKRIGING_EXPORT Kriging(const arma::colvec& y,
                             const arma::mat& X,
@@ -137,14 +147,17 @@ class Kriging {
 
   LIBKRIGING_EXPORT std::tuple<double, arma::vec, arma::mat> logLikelihoodFun(const arma::vec& theta,
                                                                               bool grad,
-                                                                              bool hess);
-  LIBKRIGING_EXPORT std::tuple<double, arma::vec> leaveOneOutFun(const arma::vec& theta, bool grad);
+                                                                              bool hess,
+                                                                              bool bench);
+  LIBKRIGING_EXPORT std::tuple<double, arma::vec> leaveOneOutFun(const arma::vec& theta, bool grad, bool bench);
 
-  LIBKRIGING_EXPORT std::tuple<double, arma::vec> logMargPostFun(const arma::vec& theta, bool grad);
+  LIBKRIGING_EXPORT std::tuple<double, arma::vec> logMargPostFun(const arma::vec& theta, bool grad, bool bench);
 
   LIBKRIGING_EXPORT double logLikelihood();
   LIBKRIGING_EXPORT double leaveOneOut();
   LIBKRIGING_EXPORT double logMargPost();
+
+  LIBKRIGING_EXPORT std::tuple<arma::vec, arma::vec> leaveOneOutVec(const arma::vec& theta);
 
   /** Compute the prediction for given points X'
    * @param Xp is m*d matrix of points where to predict output
@@ -172,6 +185,16 @@ class Kriging {
   LIBKRIGING_EXPORT void update(const arma::vec& newy, const arma::mat& newX);
 
   LIBKRIGING_EXPORT std::string summary() const;
+
+  /** Dump current Kriging object into an hdf5 file
+   * @param filename
+   */
+  LIBKRIGING_EXPORT void save(const std::string filename) const;
+
+  /** Load a new Kriging object from an hdf5 file
+   * @param filename
+   */
+  LIBKRIGING_EXPORT static Kriging load(const std::string filename);
 };
 
 #endif  // LIBKRIGING_KRIGING_HPP

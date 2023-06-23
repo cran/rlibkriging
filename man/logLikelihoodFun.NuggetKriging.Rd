@@ -5,7 +5,7 @@
 \alias{logLikelihoodFun,NuggetKriging,NuggetKriging-method}
 \title{Compute Log-Likelihood of NuggetKriging Model}
 \usage{
-\method{logLikelihoodFun}{NuggetKriging}(object, theta_alpha, grad = FALSE, ...)
+\method{logLikelihoodFun}{NuggetKriging}(object, theta_alpha, grad = FALSE, bench = FALSE, ...)
 }
 \arguments{
 \item{object}{An S3 NuggetKriging object.}
@@ -14,6 +14,8 @@
 which the log-likelihood will be evaluated.}
 
 \item{grad}{Logical. Should the function return the gradient?}
+
+\item{bench}{Logical. Should the function display benchmarking output}
 
 \item{...}{Not used.}
 }
