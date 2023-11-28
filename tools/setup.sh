@@ -114,5 +114,5 @@ rm -rf tests/test-KrigingCholCrash.R
 
 # sync man content
 rm -rf man
-"${R_HOME}"/bin/Rscript -e "roxygen2::roxygenise(package.dir = '.')"
+"${R_HOME}"/bin/R -e "roxygen2::roxygenise(package.dir = '.')"
 rm -rf $LIBKRIGING_SRC_PATH/build

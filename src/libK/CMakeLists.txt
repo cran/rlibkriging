@@ -174,12 +174,6 @@ include_directories(SYSTEM armadillo/include)
 
 add_library(blas ALIAS armadillo) # to use armadillo blas inside lbfgsb_cpp
 
-if (NOT CMAKE_Fortran_COMPILER)
-    set(CMAKE_Fortran_COMPILER gfortran)
-endif()
-if (NOT Fortran_LINK_FLAGS)
-    set(Fortran_LINK_FLAGS "-lgfortran -lquadmath -lm")
-endif()
 set(ignoreUnusedVariable ${LBFGSB_SHOW_BUILD})
 message(STATUS "Compiling lbfgsb_cpp as an external library")
 
@@ -346,7 +340,7 @@ endif ()
 #------------------------------------------------------
 
 # valgrind must be checked before adding new subdirectories
-# before ##include(CTest)
+# before ########################include(CTest)
 if (ENABLE_MEMCHECK)
     find_program(VALGRIND_EXECUTABLE valgrind)
     if (NOT VALGRIND_EXECUTABLE)
@@ -554,12 +548,12 @@ endif()
 if (POLICY CMP0110)
     cmake_policy(SET CMP0110 NEW) # supports arbitrary characters in test names (requires in CMake 3.19)
 endif()
-##set(CATCH_MODULE_PATH "${LIBKRIGING_SOURCE_DIR}/dependencies/Catch2")
-##add_subdirectory("${CATCH_MODULE_PATH}")
-##list(APPEND CMAKE_MODULE_PATH ${CATCH_MODULE_PATH}/contrib)
+########################set(CATCH_MODULE_PATH "${LIBKRIGING_SOURCE_DIR}/dependencies/Catch2")
+########################add_subdirectory("${CATCH_MODULE_PATH}")
+########################list(APPEND CMAKE_MODULE_PATH ${CATCH_MODULE_PATH}/contrib)
 
-##include(CTest)
-##add_subdirectory(tests)
+########################include(CTest)
+########################add_subdirectory(tests)
 
 
 #------------------------------------------------------
@@ -680,7 +674,7 @@ if (DOXYGEN_FOUND)
     set(DOXYGEN_OUT ${CMAKE_BINARY_DIR}/Doxyfile)
 
     # request to configure the file
-    ##configure_file(${DOXYGEN_IN} ${DOXYGEN_OUT} @ONLY)
+    ########################configure_file(${DOXYGEN_IN} ${DOXYGEN_OUT} @ONLY)
 
     add_custom_target(doc # add ALL if build together with the code
             COMMAND echo "running doc generation ..."
