@@ -5,7 +5,14 @@
 \alias{logLikelihoodFun,Kriging,Kriging-method}
 \title{Compute Log-Likelihood of Kriging Model}
 \usage{
-\method{logLikelihoodFun}{Kriging}(object, theta, grad = FALSE, hess = FALSE, bench = FALSE, ...)
+\method{logLikelihoodFun}{Kriging}(
+  object,
+  theta,
+  return_grad = FALSE,
+  return_hess = FALSE,
+  bench = FALSE,
+  ...
+)
 }
 \arguments{
 \item{object}{An S3 Kriging object.}
@@ -13,9 +20,9 @@
 \item{theta}{A numeric vector of (positive) range parameters at
 which the log-likelihood will be evaluated.}
 
-\item{grad}{Logical. Should the function return the gradient?}
+\item{return_grad}{Logical. Should the function return the gradient?}
 
-\item{hess}{Logical. Should the function return Hessian?}
+\item{return_hess}{Logical. Should the function return Hessian?}
 
 \item{bench}{Logical. Should the function display benchmarking output?}
 

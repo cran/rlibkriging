@@ -57,11 +57,10 @@ TEST_CASE("save & reload") {
     Kriging ok = Kriging("gauss");
     Kriging::Parameters parameters{std::nullopt, true, std::nullopt, true, std::nullopt, true};
     ok.fit(y, X, Trend::RegressionModel::Constant, false, "BFGS", "LL", parameters);  // FIXME no move
-    ok.save("dump.h5");
+    ok.save("dump.json");
 
-    Kriging ok_reloaded = Kriging::load("dump.h5");
-    auto e = KrigingLoader::describe("dump.h5");
-    assert(e == KrigingLoader::KrigingType::Kriging);
+    Kriging ok_reloaded = Kriging::load("dump.json");
+    assert(KrigingLoader::describe("dump.json") == KrigingLoader::KrigingType::Kriging);
 
     const double theta = 0.5;
     arma::vec theta_vec(X.n_cols);

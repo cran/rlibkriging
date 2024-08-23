@@ -3,76 +3,9 @@
 \name{logLikelihoodFun.NoiseKriging}
 \alias{logLikelihoodFun.NoiseKriging}
 \alias{logLikelihoodFun,NoiseKriging,NoiseKriging-method}
-\alias{f}
-\alias{<-}
-\alias{function(x)}
-\alias{1}
-\alias{-}
-\alias{/}
-\alias{2}
-\alias{*}
-\alias{(sin(12}
-\alias{x)}
-\alias{(1}
-\alias{+}
-\alias{cos(7}
-\alias{x^5}
-\alias{0.7)}
-\alias{set.seed(123)}
-\alias{X}
-\alias{as.matrix(runif(10))}
-\alias{y}
-\alias{f(X)}
-\alias{X/10}
-\alias{*rnorm(nrow(X))}
-\alias{k}
-\alias{NoiseKriging(y,}
-\alias{(X/10)^2,}
-\alias{X,}
-\alias{kernel}
-\alias{=}
-\alias{"matern3_2")}
-\alias{print(k)}
-\alias{theta0}
-\alias{k$theta()}
-\alias{ll_sigma2}
-\alias{function(sigma2)}
-\alias{logLikelihoodFun(k,}
-\alias{cbind(theta0,sigma2))$logLikelihood}
-\alias{s2}
-\alias{seq(from}
-\alias{0.001,}
-\alias{to}
-\alias{1,}
-\alias{length.out}
-\alias{101)}
-\alias{plot(s2,}
-\alias{Vectorize(ll_sigma2)(s2),}
-\alias{type}
-\alias{'l')}
-\alias{abline(v}
-\alias{k$sigma2(),}
-\alias{col}
-\alias{"blue")}
-\alias{sigma20}
-\alias{k$sigma2()}
-\alias{ll_theta}
-\alias{function(theta)}
-\alias{cbind(theta,sigma20))$logLikelihood}
-\alias{t}
-\alias{2,}
-\alias{plot(t,}
-\alias{Vectorize(ll_theta)(t),}
-\alias{k$theta(),}
-\alias{ll}
-\alias{function(theta_sigma2)}
-\alias{theta_sigma2)$logLikelihood}
-\alias{31)}
-\alias{contour(t,s2,matrix(ncol=length(s2),ll(expand.grid(t,s2))),xlab="theta",ylab="sigma2")}
-\alias{points(k$theta(),k$sigma2(),col='blue')}
 \title{Compute Log-Likelihood of NoiseKriging Model}
 \usage{
-\method{logLikelihoodFun}{NoiseKriging}(object, theta_sigma2, grad = FALSE, bench = FALSE, ...)
+\method{logLikelihoodFun}{NoiseKriging}(object, theta_sigma2, return_grad = FALSE, bench = FALSE, ...)
 }
 \arguments{
 \item{object}{An S3 NoiseKriging object.}
@@ -80,7 +13,7 @@
 \item{theta_sigma2}{A numeric vector of (positive) range parameters and variance at
 which the log-likelihood will be evaluated.}
 
-\item{grad}{Logical. Should the function return the gradient?}
+\item{return_grad}{Logical. Should the function return the gradient?}
 
 \item{bench}{Logical. Should the function display benchmarking output}
 
@@ -92,6 +25,33 @@ The log-Likelihood computed for given
 }
 \description{
 Compute Log-Likelihood of NoiseKriging Model
+}
+\examples{
+f <- function(x) 1 - 1 / 2 * (sin(12 * x) / (1 + x) + 2 * cos(7 * x) * x^5 + 0.7)
+set.seed(123)
+X <- as.matrix(runif(10))
+y <- f(X) + X/10  *rnorm(nrow(X))
+
+k <- NoiseKriging(y, (X/10)^2, X, kernel = "matern3_2")
+print(k)
+
+theta0 = k$theta()
+ll_sigma2 <- function(sigma2) logLikelihoodFun(k, cbind(theta0,sigma2))$logLikelihood
+s2 <- seq(from = 0.001, to = 1, length.out = 101)
+plot(s2, Vectorize(ll_sigma2)(s2), type = 'l')
+abline(v = k$sigma2(), col = "blue")
+
+sigma20 = k$sigma2()
+ll_theta <- function(theta) logLikelihoodFun(k, cbind(theta,sigma20))$logLikelihood
+t <- seq(from = 0.001, to = 2, length.out = 101)
+plot(t, Vectorize(ll_theta)(t), type = 'l')
+abline(v = k$theta(), col = "blue")
+
+ll <- function(theta_sigma2) logLikelihoodFun(k, theta_sigma2)$logLikelihood
+s2 <- seq(from = 0.001, to = 1, length.out = 31)
+t <- seq(from = 0.001, to = 2, length.out = 31)
+contour(t,s2,matrix(ncol=length(s2),ll(expand.grid(t,s2))),xlab="theta",ylab="sigma2")
+points(k$theta(),k$sigma2(),col='blue')
 }
 \author{
 Yann Richet \email{yann.richet@irsn.fr}

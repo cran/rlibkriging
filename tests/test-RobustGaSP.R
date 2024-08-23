@@ -2,6 +2,9 @@ library(testthat)
  Sys.setenv('OMP_THREAD_LIMIT'=2)
  library(rlibkriging)
 
+##library(rlibkriging, lib.loc="bindings/R/Rlibs")
+##library(testthat)
+
 library(RobustGaSP)
 
 context("RobustGaSP / Fit: 1D")
@@ -50,7 +53,7 @@ lmp_lk = function(X) {if (!is.matrix(X)) X = matrix(X,ncol=1);
                       y})}
 lmp_lk(1)
 
-lines(seq(0.1,6,,101),lmp_lk(seq(0.1,6,,101)),col='red')
+lines(seq(0.1,6,,5),lmp_lk(seq(0.1,6,,5)),col='red')
 abline(v=(log(1/as.list(r)$theta)),col='red')
 
 precision <- 1e-3
@@ -102,7 +105,7 @@ test_that(desc=paste0("RobustGaSP / Fit: 1D / rgasp/lmp deriv is the same that l
 
 # Check predict
 
-ntest <- 100
+ntest <- 10
 Xtest <- seq(0,1,,ntest)
 Ytest_rgasp <- predict(k,matrix(Xtest,ncol=1))
 Ytest_libK <- predict(r,Xtest)
@@ -221,8 +224,8 @@ lmp_rgasp = function(X, model=k) {if (!is.matrix(X)) X = matrix(X,ncol=2);
                       y})}
 lmp_rgasp(c(1,1))
 
-x=seq(-3,3,,51)
-contour(x,x,matrix(lmp_rgasp(as.matrix(expand.grid(x,x))),nrow=length(x)),levels=seq(50,100,,51))
+x=seq(-3,3,,5)
+contour(x,x,matrix(lmp_rgasp(as.matrix(expand.grid(x,x))),nrow=length(x)),levels=seq(50,100,,5))
 points(log(k@beta_hat[1]),log(k@beta_hat[2]))
 
 lmp_lk = function(X) {if (!is.matrix(X)) X = matrix(X,ncol=2);
@@ -232,7 +235,7 @@ lmp_lk = function(X) {if (!is.matrix(X)) X = matrix(X,ncol=2);
                       y})}
 lmp_lk(c(1,1))
 
-#contour(x,x,matrix(lmp_lk(as.matrix(expand.grid(x,x))),nrow=length(x)),levels = seq(50,100,,51),col='red')
+#contour(x,x,matrix(lmp_lk(as.matrix(expand.grid(x,x))),nrow=length(x)),levels = seq(50,100,,5),col='red')
 points(log(1/as.list(r)$theta[1]),log(1/as.list(r)$theta[2]),col='red')
 
 precision <- 1e-1

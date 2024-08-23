@@ -2,6 +2,9 @@ library(testthat)
  Sys.setenv('OMP_THREAD_LIMIT'=2)
  library(rlibkriging)
 
+##library(rlibkriging, lib.loc="bindings/R/Rlibs")
+##library(testthat)
+
 f = function(x) 1-1/2*(sin(12*x)/(1+x)+2*cos(7*x)*x^5+0.7)
 n <- 5
 set.seed(123)
@@ -11,13 +14,10 @@ X10 = 10*X
 y = f(X)
 y50 = 50*y
 
-#library(rlibkriging)
-
-
 context("no normalize")
 
-r_nonorm <- Kriging(y, X, "gauss", normalize=F)
-r1050_nonorm <- Kriging(y50, X10, "gauss", normalize=F)
+r_nonorm <- Kriging(y, X, "gauss", normalize=F, optim="BFGS10")
+r1050_nonorm <- Kriging(y50, X10, "gauss", normalize=F, optim="BFGS10")
 
 test_that(desc="theta nonorm",
           expect_equal( r_nonorm$theta()*10 , r1050_nonorm$theta() ,tol=0.01))
@@ -34,9 +34,8 @@ test_that(desc="simulate nonorm",
           expect_equal(50*r_nonorm$simulate(1,x=0.5), r1050_nonorm$simulate(1,x=10*0.5),tol=0.01))
 
 
-r_nonorm$update(newX=0.5,newy=f(0.5))
-r1050_nonorm$update(newX=10*0.5,newy=50*f(0.5))
-
+r_nonorm$update(f(0.5),0.5)
+r1050_nonorm$update(50*f(0.5),10*0.5)
 
 test_that(desc="update theta nonorm",
           expect_equal(r_nonorm$theta()*10 , r1050_nonorm$theta(),tol=0.01))
@@ -67,13 +66,13 @@ test_that(desc="simulate norm",
           expect_equal(50*r_norm$simulate(1,x=0.5), r1050_norm$simulate(1,x=10*0.5),tol=0.01))
 
 
-plot(seq(0,1,,101),r_norm$simulate(1,seed=123,x=seq(0,1,,101)))
+plot(seq(0,1,,5),r_norm$simulate(1,seed=123,x=seq(0,1,,5)))
 points(X,y,col='red')
-plot(seq(0,10,,101),r1050_norm$simulate(1,seed=123,x=seq(0,10,,101)))
+plot(seq(0,10,,5),r1050_norm$simulate(1,seed=123,x=seq(0,10,,5)))
 points(X10,y50,col='red')
 
-r_norm$update(newX=0.5,newy=f(0.5))
-r1050_norm$update(newX=10*0.5,newy=50*f(0.5))
+r_norm$update(f(0.5),0.5)
+r1050_norm$update(50*f(0.5),10*0.5)
 
 test_that(desc="update theta norm",
           expect_equal(r_norm$theta() , r1050_norm$theta(),tol=0.01))
@@ -104,13 +103,13 @@ test_that(desc="simulate norm_param",
           expect_equal(50*r_norm_param$simulate(1,x=0.5), r1050_norm_param$simulate(1,x=10*0.5),tol=0.01))
 
 
-plot(seq(0,1,,101),r_norm_param$simulate(1,seed=123,x=seq(0,1,,101)))
+plot(seq(0,1,,5),r_norm_param$simulate(1,seed=123,x=seq(0,1,,5)))
 points(X,y,col='red')
-plot(seq(0,10,,101),r1050_norm_param$simulate(1,seed=123,x=seq(0,10,,101)))
+plot(seq(0,10,,5),r1050_norm_param$simulate(1,seed=123,x=seq(0,10,,5)))
 points(X10,y50,col='red')
 
-r_norm_param$update(newX=0.5,newy=f(0.5))
-r1050_norm_param$update(newX=10*0.5,newy=50*f(0.5))
+r_norm_param$update(f(0.5),0.5)
+r1050_norm_param$update(50*f(0.5),10*0.5)
 
 test_that(desc="update theta norm_param",
           expect_equal(r_norm_param$theta() , r1050_norm_param$theta(),tol=0.01))

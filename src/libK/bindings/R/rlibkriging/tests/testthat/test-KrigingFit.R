@@ -15,11 +15,11 @@ plot(ll,xlim=c(0.000001,10))
   for (x in seq(0.000001,10,,11)){
     envx = new.env()
     ll2x = logLikelihoodFun(r,x)$logLikelihood
-    gll2x = logLikelihoodFun(r,x,grad = T)$logLikelihoodGrad
+    gll2x = logLikelihoodFun(r,x,return_grad = T)$logLikelihoodGrad
     arrows(x,ll2x,x+.1,ll2x+.1*gll2x,col='red')
   }
 
-theta_ref = optimize(ll,interval=c(0.001,10),maximum=T)$maximum
+theta_ref = optimize(ll,interval=c(0.001,2),maximum=T)$maximum
 abline(v=theta_ref,col='black')
 abline(v=as.list(r)$theta,col='red')
 abline(v=k@covariance@range.val,col='blue')

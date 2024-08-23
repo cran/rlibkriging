@@ -23,13 +23,6 @@ install.packages('rlibkriging')
     Note:
       * R>=4.2 & Rtools>=42 are required for this 'devtools::install_github'
       * for older R/Rtools, refer to manual install: https://github.com/libKriging/libKriging#compilation-for-linuxmacwindows-using-r-toolchain
-* `HDF5`, should be installed using:
-  * R (recommended) thanks to Rhdf5lib: `install.packages("BiocManager"); BiocManager::install("Rhdf5lib")`
-  * or directly with system install:
-    * OSX: `brew install hdf5`
-    * Linux with apt (Debian/Ubuntu/...): `apt install libhdf5-dev`
-    * Linux with yum (RedHat/CentOS/...): `yum install hdf5-devel`
-    * Windows: HDF5 pre-compiled, available at https://github.com/mannau/h5-libwin.
 
 Note: this repository mainly contains modified Makefiles, inspired by https://github.com/astamm/nloptr wrapper.
 

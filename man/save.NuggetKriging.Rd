@@ -30,7 +30,7 @@ points(X, y, col = "blue")
 k <- NuggetKriging(y, X, "matern3_2")
 print(k)
 
-outfile = tempfile("k.h5") 
+outfile = tempfile("k.json") 
 save(k,outfile)
 }
 \author{

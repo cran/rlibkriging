@@ -4,7 +4,7 @@
 \alias{simulate.Kriging}
 \title{Simulation from a \code{Kriging} model object.}
 \usage{
-\method{simulate}{Kriging}(object, nsim = 1, seed = 123, x, ...)
+\method{simulate}{Kriging}(object, nsim = 1, seed = 123, x, will_update = FALSE, ...)
 }
 \arguments{
 \item{object}{S3 Kriging object.}
@@ -15,10 +15,12 @@
 
 \item{x}{Points in model input space where to simulate.}
 
+\item{will_update}{Set to TRUE if wish to use update_simulate(...) later.}
+
 \item{...}{Ignored.}
 }
 \value{
-a matrix with \code{length(x)} rows and \code{nsim}
+a matrix with \code{nrow(x)} rows and \code{nsim}
     columns containing the simulated paths at the inputs points
     given in \code{x}.
 }

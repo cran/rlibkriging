@@ -58,7 +58,7 @@ option(ENABLE_MEMCHECK "Enable memcheck on tests" OFF)
 option(SANITIZE "Enable sanitize feature" OFF) # could be THREAD, ADDRESS or LEAK
 option(LBFGSB_SHOW_BUILD OFF)
 
-set(PYBIND11_PYTHON_VERSION 3.6)
+set(PYBIND11_PYTHON_VERSION 3.7)
 
 #------------------------------------------------------
 # Check options
@@ -166,22 +166,15 @@ option(EXTRA_SYSTEM_LIBRARY_PATH "Path to add to default system library path for
 list(APPEND CMAKE_SYSTEM_LIBRARY_PATH ${EXTRA_SYSTEM_LIBRARY_PATH})
 
 # Dependencies
-set(DETECT_HDF5 true CACHE BOOL "Disable HDF5 to avoid conflict with armadillo") # prevent issue #40
+set(DETECT_HDF5 false CACHE BOOL "Disable HDF5 to avoid conflict with armadillo") # prevent issue #40
 set(CMAKE_POLICY_DEFAULT_CMP0048 NEW) # disable warning about missing version in project command
 set(BUILD_SMOKE_TEST OFF CACHE BOOL "armadillo smoke test") # no smoke tests: it fails due to custom memory guard in memory.hpp 
 add_subdirectory(armadillo)
 include_directories(SYSTEM armadillo/include)
-
 add_library(blas ALIAS armadillo) # to use armadillo blas inside lbfgsb_cpp
 
 set(ignoreUnusedVariable ${LBFGSB_SHOW_BUILD})
-message(STATUS "Compiling lbfgsb_cpp as an external library")
-
 add_subdirectory(lbfgsb_cpp)
-#set(lbfgsb_INSTALL_DIR "${CMAKE_BINARY_DIR}/lbfgsb-installed")
-#set(lbfgsb_DIR "${lbfgsb_INSTALL_DIR}/lib/cmake/lbfgsb")
-#find_package(lbfgsb CONFIG REQUIRED)
-message(STATUS "Compilation of lbfgsb_cpp done")
 
 #------------------------------------------------------
 
@@ -340,7 +333,7 @@ endif ()
 #------------------------------------------------------
 
 # valgrind must be checked before adding new subdirectories
-# before ########################include(CTest)
+# before ##include(CTest)
 if (ENABLE_MEMCHECK)
     find_program(VALGRIND_EXECUTABLE valgrind)
     if (NOT VALGRIND_EXECUTABLE)
@@ -491,7 +484,7 @@ if (PythonInterp_FOUND)
     set(PYTHON_REQUIREMENT_INFO "\tpython3 interpreter found: ${PYTHON_EXECUTABLE}")
     set(INDENTATION "   ")
     execute_process(COMMAND ${PYTHON_EXECUTABLE} ${LIBKRIGING_SOURCE_DIR}/bindings/Python/check_requirements.py --pretty --indent=${INDENTATION} requirements.txt dev-requirements.txt
-                    RESULT_VARIABLE PYTHON_IMPORT_RETCODE)
+                RESULT_VARIABLE PYTHON_IMPORT_RETCODE)
     if (NOT PYTHON_IMPORT_RETCODE EQUAL "0")
         set(HAS_PYTHON_REQUIREMENT false)
     endif()
@@ -548,12 +541,12 @@ endif()
 if (POLICY CMP0110)
     cmake_policy(SET CMP0110 NEW) # supports arbitrary characters in test names (requires in CMake 3.19)
 endif()
-########################set(CATCH_MODULE_PATH "${LIBKRIGING_SOURCE_DIR}/dependencies/Catch2")
-########################add_subdirectory("${CATCH_MODULE_PATH}")
-########################list(APPEND CMAKE_MODULE_PATH ${CATCH_MODULE_PATH}/contrib)
+##set(CATCH_MODULE_PATH "${LIBKRIGING_SOURCE_DIR}/dependencies/Catch2")
+##add_subdirectory("${CATCH_MODULE_PATH}")
+##list(APPEND CMAKE_MODULE_PATH ${CATCH_MODULE_PATH}/contrib)
 
-########################include(CTest)
-########################add_subdirectory(tests)
+##include(CTest)
+##add_subdirectory(tests)
 
 
 #------------------------------------------------------
@@ -674,7 +667,7 @@ if (DOXYGEN_FOUND)
     set(DOXYGEN_OUT ${CMAKE_BINARY_DIR}/Doxyfile)
 
     # request to configure the file
-    ########################configure_file(${DOXYGEN_IN} ${DOXYGEN_OUT} @ONLY)
+    ##configure_file(${DOXYGEN_IN} ${DOXYGEN_OUT} @ONLY)
 
     add_custom_target(doc # add ALL if build together with the code
             COMMAND echo "running doc generation ..."

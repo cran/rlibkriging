@@ -2,6 +2,7 @@
 % Please edit documentation in R/NoiseKrigingClass.R
 \name{as.km.NoiseKriging}
 \alias{as.km.NoiseKriging}
+\alias{as.km,NoiseKriging,NoiseKriging-method}
 \title{Coerce a \code{NoiseKriging} object into the \code{"km"} class of the
 \pkg{DiceKriging} package.}
 \usage{

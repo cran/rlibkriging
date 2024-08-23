@@ -19,11 +19,11 @@ plot(ll,xlim=c(0.000001,10))
   for (x in seq(0.000001,10,,11)){
     envx = new.env()
     ll2x = logLikelihoodFun(r,x)$logLikelihood
-    gll2x = logLikelihoodFun(r,x,grad = T)$logLikelihoodGrad
+    gll2x = logLikelihoodFun(r,x,return_grad = T)$logLikelihoodGrad
     arrows(x,ll2x,x+.1,ll2x+.1*gll2x,col='red')
   }
 
-theta_ref = optimize(ll,interval=c(0.001,10),maximum=T)$maximum
+theta_ref = optimize(ll,interval=c(0.001,2),maximum=T)$maximum
 abline(v=theta_ref,col='black')
 abline(v=as.list(r)$theta,col='red')
 abline(v=k@covariance@range.val,col='blue')
@@ -58,7 +58,7 @@ ll = function(X) {if (!is.matrix(X)) X = matrix(X,ncol=2);
                       #print(y);
                       y})}
 #DiceView::contourview(ll,xlim=c(0.01,2),ylim=c(0.01,2))
-x=seq(0.01,2,,51)
+x=seq(0.01,2,,5)
 contour(x,x,matrix(ll(as.matrix(expand.grid(x,x))),nrow=length(x)),nlevels = 30)
 
 theta_ref = optim(par=matrix(c(.2,.5),ncol=2),ll,lower=c(0.01,0.01),upper=c(2,2),method="L-BFGS-B")$par
@@ -116,7 +116,7 @@ apply(X,1,
         #print(y);
         y})}
 #DiceView::contourview(ll,xlim=c(0.01,2),ylim=c(0.01,2))
-x=seq(0.01,2,,51)
+x=seq(0.01,2,,5)
 contour(x,x,matrix(ll(as.matrix(expand.grid(x,x))),nrow=length(x)),nlevels = 30)
 
 theta_ref = optim(par=matrix(c(.2,.5),ncol=2),ll,lower=c(0.01,0.01),upper=c(2,2),method="L-BFGS-B")$par
@@ -149,7 +149,7 @@ k = NULL
 r = NULL
 k = DiceKriging::km(design=X,response=y,covtype = "gauss",control = list(trace=F))
 
-x=seq(0,2,,51)
+x=seq(0,2,,5)
 mll_fun <- function(x) -apply(x,1,
                               function(theta)
                                 DiceKriging::logLikFun(theta,k)
@@ -209,8 +209,8 @@ apply(X,1,
         #print(y);
         })}
 #DiceView::contourview(ll,xlim=c(0.01,2),ylim=c(0.01,2))
-x1=seq(0.001,2,,51)
-x2=seq(0.001,30,,51)
+x1=seq(0.001,2,,5)
+x2=seq(0.001,30,,5)
 contour(x1,x2,matrix(ll_r(as.matrix(expand.grid(x1,x2))),nrow=length(x1)),nlevels = 30,col='red')
 points(as.list(r)$theta[1],as.list(r)$theta[2],col='red')
 ll_r(t(as.list(r)$theta))

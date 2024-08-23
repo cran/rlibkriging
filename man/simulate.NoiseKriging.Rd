@@ -4,7 +4,15 @@
 \alias{simulate.NoiseKriging}
 \title{Simulation from a \code{NoiseKriging} model object.}
 \usage{
-\method{simulate}{NoiseKriging}(object, nsim = 1, seed = 123, x, ...)
+\method{simulate}{NoiseKriging}(
+  object,
+  nsim = 1,
+  seed = 123,
+  x,
+  with_noise = NULL,
+  will_update = FALSE,
+  ...
+)
 }
 \arguments{
 \item{object}{S3 NoiseKriging object.}
@@ -15,10 +23,14 @@
 
 \item{x}{Points in model input space where to simulate.}
 
+\item{with_noise}{Set to array of values if wish to add the noise in the simulation.}
+
+\item{will_update}{Set to TRUE if wish to use update_simulate(...) later.}
+
 \item{...}{Ignored.}
 }
 \value{
-a matrix with \code{length(x)} rows and \code{nsim}
+a matrix with \code{nrow(x)} rows and \code{nsim}
     columns containing the simulated paths at the inputs points
     given in \code{x}.
 }

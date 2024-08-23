@@ -2,7 +2,7 @@ library(testthat)
  Sys.setenv('OMP_THREAD_LIMIT'=2)
  library(rlibkriging)
 
-#library(testthat)
+##library(testthat)
 ##library(rlibkriging, lib.loc="bindings/R/Rlibs")
 #rlibkriging:::optim_log(2)
 #rlibkriging:::optim_use_reparametrize(FALSE)

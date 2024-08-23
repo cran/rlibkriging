@@ -29,7 +29,7 @@ y <- f(X) + X/10 * rnorm(nrow(X))
 k <- NoiseKriging(y, (X/10)^2, X, "matern3_2")
 print(k)
 
-outfile = tempfile("k.h5") 
+outfile = tempfile("k.json") 
 save(k,outfile)
 }
 \author{

@@ -8,7 +8,7 @@
   object,
   y,
   X,
-  regmodel = c("constant", "linear", "interactive"),
+  regmodel = c("constant", "linear", "interactive", "none"),
   normalize = FALSE,
   optim = c("BFGS", "Newton", "none"),
   objective = c("LL", "LOO", "LMP"),
@@ -23,7 +23,8 @@
 
 \item{X}{Numeric matrix of input design.}
 
-\item{regmodel}{Universal Kriging linear trend.}
+\item{regmodel}{Universal Kriging linear trend: \code{"constant"}, 
+\code{"linear"}, \code{"interactive"}, \code{"quadratic"}.}
 
 \item{normalize}{Logical. If \code{TRUE} both the input matrix
 \code{X} and the response \code{y} in normalized to take
@@ -33,7 +34,7 @@ values in the interval \eqn{[0, 1]}.}
 hyper-parameters. Possible values are: \code{"BFGS"},
 \code{"Newton"} and \code{"none"}, the later simply keeping
 the values given in \code{parameters}. The method
-\code{"BFGS"} uses the gradient of the objective. The method
+\code{"BFGS"} uses the gradient of the objective (note that \code{"BGFS10"} means 10 multi-start of BFGS). The method
 \code{"Newton"} uses both the gradient and the Hessian of the
 objective.}
 

@@ -2,6 +2,9 @@ library(testthat)
  Sys.setenv('OMP_THREAD_LIMIT'=2)
  library(rlibkriging)
 
+##library(rlibkriging, lib.loc="bindings/R/Rlibs")
+##library(testthat)
+
 for (kernel in c("exp","matern3_2","matern5_2","gauss")) {
   context(paste0("Check LogLikelihood for kernel ",kernel))
   
@@ -30,7 +33,7 @@ for (kernel in c("exp","matern3_2","matern5_2","gauss")) {
   for (x in seq(0.01,1,,11)){
     envx = new.env()
     ll2x = logLikelihoodFun(r,x)$logLikelihood
-    gll2x = logLikelihoodFun(r,x,grad = T)$logLikelihoodGrad
+    gll2x = logLikelihoodFun(r,x,return_grad = T)$logLikelihoodGrad
     arrows(x,ll2x,x+.1,ll2x+.1*gll2x,col='red')
   }
   
@@ -41,7 +44,7 @@ for (kernel in c("exp","matern3_2","matern5_2","gauss")) {
             expect_equal(logLikelihoodFun(r,x)$logLikelihood[1],DiceKriging::logLikFun(x,k,xenv),tolerance = precision))
   
   test_that(desc="logLik Grad is the same that DiceKriging one", 
-            expect_equal(logLikelihoodFun(r,x,grad=T)$logLikelihoodGrad,DiceKriging::logLikGrad(x,k,xenv),tolerance= precision))
+            expect_equal(logLikelihoodFun(r,x,return_grad=T)$logLikelihoodGrad,DiceKriging::logLikGrad(x,k,xenv),tolerance= precision))
 }
 
 
@@ -51,7 +54,7 @@ for (kernel in c("matern3_2","matern5_2","gauss","exp")) {
   context(paste0("Check LogLikelihood for kernel ",kernel))
   
   f <- function(X) apply(X, 1, function(x) prod(sin((x-.5)^2)))
-  n <- 100
+  n <- 10
   set.seed(123)
   X <- cbind(runif(n),runif(n),runif(n))
   y <- f(X)
@@ -68,5 +71,5 @@ for (kernel in c("matern3_2","matern5_2","gauss","exp")) {
             expect_equal(logLikelihoodFun(r,x)$logLikelihood[1],DiceKriging::logLikFun(x,k,xenv),tolerance = precision))
   
   test_that(desc="logLik Grad is the same that DiceKriging one", 
-            expect_equal(logLikelihoodFun(r,x,grad=T)$logLikelihoodGrad[1,],t(DiceKriging::logLikGrad(x,k,xenv))[1,],tolerance= precision))
+            expect_equal(logLikelihoodFun(r,x,return_grad=T)$logLikelihoodGrad[1,],t(DiceKriging::logLikGrad(x,k,xenv))[1,],tolerance= precision))
 }

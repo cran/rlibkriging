@@ -7,7 +7,7 @@ if [ $# -ne 3 ]; then
   exit 1
 fi
 
-BASEDIR=$(git rev-parse --show-toplevel)
+BASEDIR=/home/richet/Sync/Open/libKriging/zzz/rlibkriging
 
 KRIGING_VERSION_MAJOR=$1
 KRIGING_VERSION_MINOR=$2

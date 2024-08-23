@@ -4,20 +4,27 @@
 \alias{predict.NoiseKriging}
 \title{Predict from a \code{NoiseKriging} object.}
 \usage{
-\method{predict}{NoiseKriging}(object, x, stdev = TRUE, cov = FALSE, deriv = FALSE, ...)
+\method{predict}{NoiseKriging}(
+  object,
+  x,
+  return_stdev = TRUE,
+  return_cov = FALSE,
+  return_deriv = FALSE,
+  ...
+)
 }
 \arguments{
 \item{object}{S3 NoiseKriging object.}
 
 \item{x}{Input points where the prediction must be computed.}
 
-\item{stdev}{\code{Logical}. If \code{TRUE} the standard deviation
+\item{return_stdev}{\code{Logical}. If \code{TRUE} the standard deviation
 is returned.}
 
-\item{cov}{\code{Logical}. If \code{TRUE} the covariance matrix of
+\item{return_cov}{\code{Logical}. If \code{TRUE} the covariance matrix of
 the predictions is returned.}
 
-\item{deriv}{\code{Logical}. If \code{TRUE} the derivatives of mean and sd
+\item{return_deriv}{\code{Logical}. If \code{TRUE} the derivatives of mean and sd
 of the predictions are returned.}
 
 \item{...}{Ignored.}

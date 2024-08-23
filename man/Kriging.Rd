@@ -9,7 +9,7 @@ Kriging(
   y = NULL,
   X = NULL,
   kernel = NULL,
-  regmodel = c("constant", "linear", "interactive"),
+  regmodel = c("constant", "linear", "interactive", "none"),
   normalize = FALSE,
   optim = c("BFGS", "Newton", "none"),
   objective = c("LL", "LOO", "LMP"),
@@ -24,7 +24,8 @@ Kriging(
 \item{kernel}{Character defining the covariance model:
 \code{"exp"}, \code{"gauss"}, \code{"matern3_2"}, \code{"matern5_2"}.}
 
-\item{regmodel}{Universal Kriging linear trend.}
+\item{regmodel}{Universal Kriging linear trend: \code{"constant"}, 
+\code{"linear"}, \code{"interactive"}, \code{"quadratic"}.}
 
 \item{normalize}{Logical. If \code{TRUE} both the input matrix
 \code{X} and the response \code{y} in normalized to take
@@ -34,7 +35,8 @@ values in the interval \eqn{[0, 1]}.}
 hyper-parameters. Possible values are: \code{"BFGS"},
 \code{"Newton"} and \code{"none"}, the later simply keeping
 the values given in \code{parameters}. The method
-\code{"BFGS"} uses the gradient of the objective. The method
+\code{"BFGS"} uses the gradient of the objective 
+(note that \code{"BGFS10"} means 10 multi-start of BFGS). The method
 \code{"Newton"} uses both the gradient and the Hessian of the
 objective.}
 
@@ -70,7 +72,7 @@ k <- Kriging(y, X, kernel = "matern3_2")
 print(k)
 
 x <- as.matrix(seq(from = 0, to = 1, length.out = 101))
-p <- predict(k, x = x, stdev = TRUE, cov = FALSE)
+p <- predict(k, x = x, return_stdev = TRUE, return_cov = FALSE)
 
 plot(f)
 points(X, y)

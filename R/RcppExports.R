@@ -25,32 +25,40 @@ kriging_summary <- function(k) {
     .Call(`_rlibkriging_kriging_summary`, k)
 }
 
-kriging_predict <- function(k, X, stdev = TRUE, cov = FALSE, deriv = FALSE) {
-    .Call(`_rlibkriging_kriging_predict`, k, X, stdev, cov, deriv)
+kriging_predict <- function(k, X_n, return_stdev = TRUE, return_cov = FALSE, return_deriv = FALSE) {
+    .Call(`_rlibkriging_kriging_predict`, k, X_n, return_stdev, return_cov, return_deriv)
 }
 
-kriging_simulate <- function(k, nsim, seed, X) {
-    .Call(`_rlibkriging_kriging_simulate`, k, nsim, seed, X)
+kriging_simulate <- function(k, nsim, seed, X_n, will_update = FALSE) {
+    .Call(`_rlibkriging_kriging_simulate`, k, nsim, seed, X_n, will_update)
 }
 
-kriging_update <- function(k, y, X) {
-    invisible(.Call(`_rlibkriging_kriging_update`, k, y, X))
+kriging_update_simulate <- function(k, y_u, X_u) {
+    .Call(`_rlibkriging_kriging_update_simulate`, k, y_u, X_u)
+}
+
+kriging_update <- function(k, y_u, X_u, refit = TRUE) {
+    invisible(.Call(`_rlibkriging_kriging_update`, k, y_u, X_u, refit))
 }
 
 kriging_save <- function(k, filename) {
     invisible(.Call(`_rlibkriging_kriging_save`, k, filename))
 }
 
-kriging_logLikelihoodFun <- function(k, theta, grad = FALSE, hess = FALSE, bench = FALSE) {
-    .Call(`_rlibkriging_kriging_logLikelihoodFun`, k, theta, grad, hess, bench)
+kriging_covMat <- function(k, X1, X2) {
+    .Call(`_rlibkriging_kriging_covMat`, k, X1, X2)
+}
+
+kriging_logLikelihoodFun <- function(k, theta, return_grad = FALSE, return_hess = FALSE, bench = FALSE) {
+    .Call(`_rlibkriging_kriging_logLikelihoodFun`, k, theta, return_grad, return_hess, bench)
 }
 
 kriging_logLikelihood <- function(k) {
     .Call(`_rlibkriging_kriging_logLikelihood`, k)
 }
 
-kriging_leaveOneOutFun <- function(k, theta, grad = FALSE, bench = FALSE) {
-    .Call(`_rlibkriging_kriging_leaveOneOutFun`, k, theta, grad, bench)
+kriging_leaveOneOutFun <- function(k, theta, return_grad = FALSE, bench = FALSE) {
+    .Call(`_rlibkriging_kriging_leaveOneOutFun`, k, theta, return_grad, bench)
 }
 
 kriging_leaveOneOutVec <- function(k, theta) {
@@ -61,8 +69,8 @@ kriging_leaveOneOut <- function(k) {
     .Call(`_rlibkriging_kriging_leaveOneOut`, k)
 }
 
-kriging_logMargPostFun <- function(k, theta, grad = FALSE, bench = FALSE) {
-    .Call(`_rlibkriging_kriging_logMargPostFun`, k, theta, grad, bench)
+kriging_logMargPostFun <- function(k, theta, return_grad = FALSE, bench = FALSE) {
+    .Call(`_rlibkriging_kriging_logMargPostFun`, k, theta, return_grad, bench)
 }
 
 kriging_logMargPost <- function(k) {
@@ -161,12 +169,32 @@ linalg_set_num_nugget <- function(nugget) {
     invisible(.Call(`_rlibkriging_linalg_set_num_nugget`, nugget))
 }
 
+linalg_check_chol_rcond <- function(cr) {
+    invisible(.Call(`_rlibkriging_linalg_check_chol_rcond`, cr))
+}
+
+linalg_chol_rcond_checked <- function() {
+    .Call(`_rlibkriging_linalg_chol_rcond_checked`)
+}
+
 linalg_chol_safe <- function(X) {
     .Call(`_rlibkriging_linalg_chol_safe`, X)
 }
 
 linalg_set_chol_warning <- function(warn) {
     invisible(.Call(`_rlibkriging_linalg_set_chol_warning`, warn))
+}
+
+linalg_rcond_approx_chol <- function(X) {
+    .Call(`_rlibkriging_linalg_rcond_approx_chol`, X)
+}
+
+linalg_rcond_chol <- function(X) {
+    .Call(`_rlibkriging_linalg_rcond_chol`, X)
+}
+
+linalg_chol_block <- function(C, Loo) {
+    .Call(`_rlibkriging_linalg_chol_block`, C, Loo)
 }
 
 kriging_load <- function(filename) {
@@ -181,8 +209,8 @@ nuggetkriging_load <- function(filename) {
     .Call(`_rlibkriging_nuggetkriging_load`, filename)
 }
 
-anykriging_load <- function(filename) {
-    .Call(`_rlibkriging_anykriging_load`, filename)
+class_saved <- function(filename) {
+    .Call(`_rlibkriging_class_saved`, filename)
 }
 
 new_NoiseKriging <- function(kernel) {
@@ -209,24 +237,32 @@ noisekriging_summary <- function(k) {
     .Call(`_rlibkriging_noisekriging_summary`, k)
 }
 
-noisekriging_predict <- function(k, X, stdev = TRUE, cov = FALSE, deriv = FALSE) {
-    .Call(`_rlibkriging_noisekriging_predict`, k, X, stdev, cov, deriv)
+noisekriging_predict <- function(k, X_n, return_stdev = TRUE, return_cov = FALSE, return_deriv = FALSE) {
+    .Call(`_rlibkriging_noisekriging_predict`, k, X_n, return_stdev, return_cov, return_deriv)
 }
 
-noisekriging_simulate <- function(k, nsim, seed, X) {
-    .Call(`_rlibkriging_noisekriging_simulate`, k, nsim, seed, X)
+noisekriging_simulate <- function(k, nsim, seed, X_n, with_noise, will_update = FALSE) {
+    .Call(`_rlibkriging_noisekriging_simulate`, k, nsim, seed, X_n, with_noise, will_update)
 }
 
-noisekriging_update <- function(k, y, noise, X) {
-    invisible(.Call(`_rlibkriging_noisekriging_update`, k, y, noise, X))
+noisekriging_update_simulate <- function(k, y_u, noise_u, X_u) {
+    .Call(`_rlibkriging_noisekriging_update_simulate`, k, y_u, noise_u, X_u)
+}
+
+noisekriging_update <- function(k, y_u, noise_u, X_u, refit = TRUE) {
+    invisible(.Call(`_rlibkriging_noisekriging_update`, k, y_u, noise_u, X_u, refit))
 }
 
 noisekriging_save <- function(k, filename) {
     invisible(.Call(`_rlibkriging_noisekriging_save`, k, filename))
 }
 
-noisekriging_logLikelihoodFun <- function(k, theta_sigma2, grad = FALSE, bench = FALSE) {
-    .Call(`_rlibkriging_noisekriging_logLikelihoodFun`, k, theta_sigma2, grad, bench)
+noisekriging_covMat <- function(k, X1, X2) {
+    .Call(`_rlibkriging_noisekriging_covMat`, k, X1, X2)
+}
+
+noisekriging_logLikelihoodFun <- function(k, theta_sigma2, return_grad = FALSE, bench = FALSE) {
+    .Call(`_rlibkriging_noisekriging_logLikelihoodFun`, k, theta_sigma2, return_grad, bench)
 }
 
 noisekriging_logLikelihood <- function(k) {
@@ -345,32 +381,40 @@ nuggetkriging_summary <- function(k) {
     .Call(`_rlibkriging_nuggetkriging_summary`, k)
 }
 
-nuggetkriging_predict <- function(k, X, stdev = TRUE, cov = FALSE, deriv = FALSE) {
-    .Call(`_rlibkriging_nuggetkriging_predict`, k, X, stdev, cov, deriv)
+nuggetkriging_predict <- function(k, X_n, return_stdev = TRUE, return_cov = FALSE, return_deriv = FALSE) {
+    .Call(`_rlibkriging_nuggetkriging_predict`, k, X_n, return_stdev, return_cov, return_deriv)
 }
 
-nuggetkriging_simulate <- function(k, nsim, seed, X) {
-    .Call(`_rlibkriging_nuggetkriging_simulate`, k, nsim, seed, X)
+nuggetkriging_simulate <- function(k, nsim, seed, X_n, with_nugget = TRUE, will_update = FALSE) {
+    .Call(`_rlibkriging_nuggetkriging_simulate`, k, nsim, seed, X_n, with_nugget, will_update)
 }
 
-nuggetkriging_update <- function(k, y, X) {
-    invisible(.Call(`_rlibkriging_nuggetkriging_update`, k, y, X))
+nuggetkriging_update_simulate <- function(k, y_u, X_u) {
+    .Call(`_rlibkriging_nuggetkriging_update_simulate`, k, y_u, X_u)
+}
+
+nuggetkriging_update <- function(k, y_u, X_u, refit = TRUE) {
+    invisible(.Call(`_rlibkriging_nuggetkriging_update`, k, y_u, X_u, refit))
 }
 
 nuggetkriging_save <- function(k, filename) {
     invisible(.Call(`_rlibkriging_nuggetkriging_save`, k, filename))
 }
 
-nuggetkriging_logLikelihoodFun <- function(k, theta_alpha, grad = FALSE, bench = FALSE) {
-    .Call(`_rlibkriging_nuggetkriging_logLikelihoodFun`, k, theta_alpha, grad, bench)
+nuggetkriging_covMat <- function(k, X1, X2) {
+    .Call(`_rlibkriging_nuggetkriging_covMat`, k, X1, X2)
+}
+
+nuggetkriging_logLikelihoodFun <- function(k, theta_alpha, return_grad = FALSE, bench = FALSE) {
+    .Call(`_rlibkriging_nuggetkriging_logLikelihoodFun`, k, theta_alpha, return_grad, bench)
 }
 
 nuggetkriging_logLikelihood <- function(k) {
     .Call(`_rlibkriging_nuggetkriging_logLikelihood`, k)
 }
 
-nuggetkriging_logMargPostFun <- function(k, theta, grad = FALSE, bench = FALSE) {
-    .Call(`_rlibkriging_nuggetkriging_logMargPostFun`, k, theta, grad, bench)
+nuggetkriging_logMargPostFun <- function(k, theta, return_grad = FALSE, bench = FALSE) {
+    .Call(`_rlibkriging_nuggetkriging_logMargPostFun`, k, theta, return_grad, bench)
 }
 
 nuggetkriging_logMargPost <- function(k) {
@@ -543,5 +587,9 @@ random_randu_vec <- function(n) {
 
 random_randu_mat <- function(n, d) {
     .Call(`_rlibkriging_random_randu_mat`, n, d)
+}
+
+random_randn_mat <- function(n, d) {
+    .Call(`_rlibkriging_random_randn_mat`, n, d)
 }
 

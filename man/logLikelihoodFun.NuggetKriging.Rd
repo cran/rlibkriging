@@ -5,7 +5,7 @@
 \alias{logLikelihoodFun,NuggetKriging,NuggetKriging-method}
 \title{Compute Log-Likelihood of NuggetKriging Model}
 \usage{
-\method{logLikelihoodFun}{NuggetKriging}(object, theta_alpha, grad = FALSE, bench = FALSE, ...)
+\method{logLikelihoodFun}{NuggetKriging}(object, theta_alpha, return_grad = FALSE, bench = FALSE, ...)
 }
 \arguments{
 \item{object}{An S3 NuggetKriging object.}
@@ -13,7 +13,7 @@
 \item{theta_alpha}{A numeric vector of (positive) range parameters and variance over variance plus nugget at
 which the log-likelihood will be evaluated.}
 
-\item{grad}{Logical. Should the function return the gradient?}
+\item{return_grad}{Logical. Should the function return the gradient?}
 
 \item{bench}{Logical. Should the function display benchmarking output}
 

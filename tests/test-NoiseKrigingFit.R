@@ -2,6 +2,9 @@ library(testthat)
  Sys.setenv('OMP_THREAD_LIMIT'=2)
  library(rlibkriging)
 
+##library(rlibkriging, lib.loc="bindings/R/Rlibs")
+##library(testthat)
+
 context("Fit: 1D")
 
 f = function(x) 1-1/2*(sin(12*x)/(1+x)+2*cos(7*x)*x^5+0.7)
@@ -20,7 +23,7 @@ plot(ll,xlim=c(0.000001,1))
   for (x in seq(0.000001,1,,11)){
     envx = new.env()
     ll2x = logLikelihoodFun(r,c(x,k@covariance@sd2))$logLikelihood
-    gll2x = logLikelihoodFun(r,c(x,k@covariance@sd2),grad = T)$logLikelihoodGrad[1]
+    gll2x = logLikelihoodFun(r,c(x,k@covariance@sd2),return_grad = T)$logLikelihoodGrad[1]
     arrows(x,ll2x,x+.1,ll2x+.1*gll2x,col='red')
   }
 
@@ -28,6 +31,18 @@ theta_ref = optimize(ll,interval=c(0.001,1),maximum=T)$maximum
 abline(v=theta_ref,col='black')
 abline(v=as.list(r)$theta,col='red')
 abline(v=k@covariance@range.val,col='blue')
+
+theta = k@covariance@range.val
+ll_s2 = Vectorize(function(s2) r$logLikelihoodFun(c(theta,s2))$logLikelihood)
+plot(ll_s2,xlim=c(0.001,.1),lwd=5)
+llk_s2 = Vectorize(function(s2) {DiceKriging::logLikFun(model=k,c(theta,s2))})
+curve(llk_s2, add=TRUE, col='blue', lwd=3)
+for (s2 in seq(0.001,.1,,5)){
+  envx = new.env()
+  ll2x = r$logLikelihoodFun(c(theta,s2))$logLikelihood
+  gll2x = r$logLikelihoodFun(c(theta,s2),return_grad = T)$logLikelihoodGrad[,2]
+  arrows(s2,ll2x,s2+.1,ll2x+.1*gll2x,col='red')
+}
 
 test_that(desc="Noise / Fit: 1D / fit of theta by DiceKriging is right",
           expect_equal(theta_ref, k@covariance@range.val, tol= 1e-3))
@@ -66,7 +81,7 @@ ll = function(X) {if (!is.matrix(X)) X = matrix(X,ncol=2);
                       #print(y);
                       y})}
 #DiceView::contourview(ll,xlim=c(0.1,2),ylim=c(0.1,2))
-x=seq(0.1,1,,51)
+x=seq(0.1,1,,5)
 contour(x,x,matrix(ll(as.matrix(expand.grid(x,x))),nrow=length(x)),nlevels = 30)
 
 theta_ref = optim(par=matrix(c(.2,.5),ncol=2),ll,lower=c(0.1,0.1),upper=c(2,2),method="L-BFGS-B")$par
@@ -129,8 +144,10 @@ apply(X,1,
         #print(y);
         y})}
 #DiceView::contourview(ll,xlim=c(0.1,2),ylim=c(0.1,2))
-x=seq(0.1,2,,51)
-contour(x,x,matrix(ll(as.matrix(expand.grid(x,x))),nrow=length(x)),nlevels = 30)
+x=seq(0.01,10,,5)
+contour(x,x,matrix(ll(as.matrix(expand.grid(x,x))),nrow=length(x)),xlim=c(0,1),ylim=c(0,10),nlevels = 30)
+points(r$theta()[1],r$theta()[2],col='red', pch=20)
+points(k@covariance@range.val[1],k@covariance@range.val[2],col='blue',pch=20)
 
 theta_ref = optim(par=matrix(c(.2,.5),ncol=2),ll,lower=c(0.1,0.1),upper=c(2,2),method="L-BFGS-B")$par
 points(theta_ref,col='black')
@@ -180,8 +197,8 @@ apply(X,1,
         #print(y);
         })}
 #DiceView::contourview(ll,xlim=c(0.1,2),ylim=c(0.1,2))
-x1=seq(0.001,2,,51)
-x2=seq(0.001,30,,51)
+x1=seq(0.001,2,,5)
+x2=seq(0.001,30,,5)
 contour(x1,x2,matrix(ll_r(as.matrix(expand.grid(x1,x2))),nrow=length(x1)),nlevels = 30,col='red')
 points(as.list(r)$theta[1],as.list(r)$theta[2],col='red')
 ll_r(t(as.list(r)$theta))

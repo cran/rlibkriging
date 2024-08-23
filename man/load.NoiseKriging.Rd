@@ -27,7 +27,7 @@ points(X, y, col = "blue")
 k <- NoiseKriging(y, (X/10)^2, X, "matern3_2")
 print(k)
 
-outfile = tempfile("k.h5")
+outfile = tempfile("k.json")
 save(k,outfile)
 
 print(load.NoiseKriging(outfile)) 

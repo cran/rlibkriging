@@ -4,16 +4,18 @@
 \alias{update.NoiseKriging}
 \title{Update a \code{NoiseKriging} model object with new points}
 \usage{
-\method{update}{NoiseKriging}(object, newy, newnoise, newX, ...)
+\method{update}{NoiseKriging}(object, y_u, noise_u, X_u, refit = TRUE, ...)
 }
 \arguments{
 \item{object}{S3 NoiseKriging object.}
 
-\item{newy}{Numeric vector of new responses (output).}
+\item{y_u}{Numeric vector of new responses (output).}
 
-\item{newnoise}{Numeric vector of new noise variances (output).}
+\item{noise_u}{Numeric vector of new noise variances (output).}
 
-\item{newX}{Numeric matrix of new input points.}
+\item{X_u}{Numeric matrix of new input points.}
+
+\item{refit}{Logical. If \code{TRUE} the model is refitted (default is FALSE).}
 
 \item{...}{Ignored.}
 }
@@ -48,14 +50,15 @@ lines(x, p$mean, col = "blue")
 polygon(c(x, rev(x)), c(p$mean - 2 * p$stdev, rev(p$mean + 2 * p$stdev)),
  border = NA, col = rgb(0, 0, 1, 0.2))
 
-newX <- as.matrix(runif(3))
-newy <- f(newX) + 0.1 * rnorm(nrow(newX))
-points(newX, newy, col = "red")
+X_u <- as.matrix(runif(3))
+y_u <- f(X_u) + 0.1 * rnorm(nrow(X_u))
+points(X_u, y_u, col = "red")
 
 ## change the content of the object 'k'
-update(k, newy, rep(0.1^2,3), newX)
+update(k, y_u, rep(0.1^2,3), X_u)
 
-x <- seq(from = 0, to = 1, length.out = 101)
+## include design points to see interpolation
+x <- sort(c(X,X_u,seq(from = 0, to = 1, length.out = 101)))
 p2 <- predict(k, x)
 lines(x, p2$mean, col = "red")
 polygon(c(x, rev(x)), c(p2$mean - 2 * p2$stdev, rev(p2$mean + 2 * p2$stdev)),

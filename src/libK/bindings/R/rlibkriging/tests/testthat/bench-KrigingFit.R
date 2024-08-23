@@ -1,7 +1,4 @@
- pack=list.files(file.path("bindings","R"),pattern = ".tar.gz",full.names = T)
- install.packages(pack,repos=NULL)
- library(rlibkriging)
-
+library(rlibkriging, lib.loc="bindings/R/Rlibs")
 library(testthat)
 
 f <- function(X) apply(X, 1, function(x) prod(sin((x-.5)^2)))
@@ -46,7 +43,7 @@ for (i in 1:N) {
 
 plot(times$R,times$cpp, xlim=range(c(times$R,times$cpp)),ylim=range(c(times$R,times$cpp)))
 abline(a=0,b=1,col='red')
-abline(a=0,b=2,col='red')
-abline(a=0,b=0.5,col='red')
+abline(a=0,b=2,col='orange')
+abline(a=0,b=0.5,col='orange')
 
 

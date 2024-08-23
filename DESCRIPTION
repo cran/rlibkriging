@@ -1,8 +1,8 @@
 Package: rlibkriging
 Type: Package
 Title: Kriging Models using the 'libKriging' Library
-Version: 0.8-0.1
-Date: 2023-11-21
+Version: 0.9-0
+Date: 2024-08-23
 Authors@R: 
     c(person(given = "Yann",
              family = "Richet",
@@ -44,20 +44,18 @@ Description: Interface to 'libKriging' 'C++' library <https://github.com/libKrig
     (like in 'DiceKriging', 'kergp' or 'RobustGaSP' packages).
     'libKriging' relies on Armadillo linear algebra library (Apache 2 license) by Conrad Sanderson, 
     'lbfgsb_cpp' is a 'C++' port around 'lbfgsb' library (BSD-3 license) by 
-    Ciyou Zhu, Richard Byrd, Jorge Nocedal and Jose Luis Morales used for hyperparameters optimization,
-    and HDF5 features coming from HDF Group (see HDF5_LICENSE file)
-    possibly provided by Rhdf5lib by Mike Smith (Artistic-2.0 license).
+    Ciyou Zhu, Richard Byrd, Jorge Nocedal and Jose Luis Morales used for hyperparameters optimization.
 License: Apache License (>= 2)
 Encoding: UTF-8
 LinkingTo: Rcpp, RcppArmadillo
 Depends: R (>= 4.2)
 Imports: Rcpp (>= 0.12.11), methods, DiceKriging
 Suggests: testthat, RobustGaSP, utils, DiceDesign, foreach
-SystemRequirements: GNU make, cmake (>= 3.2.0), gcc, gfortran, HDF5
+SystemRequirements: GNU make, cmake (>= 3.2.0), gcc, gfortran
 URL: https://github.com/libKriging
-RoxygenNote: 7.2.3
+RoxygenNote: 7.3.1
 NeedsCompilation: yes
-Packaged: 2023-11-21 20:42:14 UTC; richet
+Packaged: 2024-08-23 15:23:54 UTC; richet
 Author: Yann Richet [aut, cre] (<https://orcid.org/0000-0002-5677-8458>),
   Pascal Havé [aut],
   Yves Deville [aut],
@@ -68,4 +66,4 @@ Author: Yann Richet [aut, cre] (<https://orcid.org/0000-0002-5677-8458>),
   Jose Luis Morales [ctb],
   Mike Smith [ctb]
 Repository: CRAN
-Date/Publication: 2023-11-28 12:10:03 UTC
+Date/Publication: 2024-08-23 16:00:02 UTC

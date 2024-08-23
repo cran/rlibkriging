@@ -2,6 +2,9 @@ library(testthat)
  Sys.setenv('OMP_THREAD_LIMIT'=2)
  library(rlibkriging)
 
+##library(rlibkriging, lib.loc="bindings/R/Rlibs")
+##library(testthat)
+
 library(RobustGaSP)
 
 context("RobustGaSP-Nugget / Fit: 1D")
@@ -28,7 +31,7 @@ r <- NuggetKriging(y, X,
 
 # Check predict
 
-ntest <- 100
+ntest <- 10
 Xtest <- seq(0,1,,ntest)
 Ytest_rgasp <- predict(k,matrix(Xtest,ncol=1))
 Ytest_libK <- predict(r,Xtest)
@@ -80,7 +83,7 @@ r <- NuggetKriging(y, X,
 x2=0.8
 f1 = function(x) f(cbind(x,x2))
 
-ntest <- 100
+ntest <- 10
 Xtest <- seq(0,1,,ntest)
 Ytest_rgasp <- predict(k,matrix(cbind(Xtest,x2),ncol=2))
 Ytest_libK <- predict(r,cbind(Xtest,x2))

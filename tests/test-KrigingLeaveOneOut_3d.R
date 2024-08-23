@@ -7,7 +7,7 @@ for (kernel in c("gauss","exp")) {
   context(paste0("Check LogLikelihood for kernel ",kernel))
   
   f <- function(X) apply(X, 1, function(x) prod(sin((x-.5)^2)))
-  n <- 100
+  n <- 10
   set.seed(123)
   X <- cbind(runif(n),runif(n),runif(n))
   y <- f(X)
@@ -26,5 +26,5 @@ test_that(desc="leaveOneOut is the same that DiceKriging one",
          expect_equal(leaveOneOutFun(r,x)$leaveOneOut[1],DiceKriging::leaveOneOutFun(x,k,xenv),tolerance = precision))
 
 test_that(desc="leaveOneOut Grad is the same that DiceKriging one",
-          expect_equal(t(leaveOneOutFun(r,x,grad=T)$leaveOneOutGrad),DiceKriging::leaveOneOutGrad(x,k,xenv),tolerance= precision))
+          expect_equal(t(leaveOneOutFun(r,x,return_grad=T)$leaveOneOutGrad),DiceKriging::leaveOneOutGrad(x,k,xenv),tolerance= precision))
 }

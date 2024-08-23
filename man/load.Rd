@@ -26,7 +26,7 @@ y <- f(X)
 k <- Kriging(y, X, kernel = "matern3_2", objective="LMP")
 print(k)
 
-outfile = tempfile("k.h5") 
+outfile = tempfile("k.json") 
 save(k,outfile)
 
 print(load(outfile))

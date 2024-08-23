@@ -6,7 +6,7 @@
 \title{Compute the log-marginal posterior of a kriging model, using the
 prior XXXY.}
 \usage{
-\method{logMargPostFun}{Kriging}(object, theta, grad = FALSE, bench = FALSE, ...)
+\method{logMargPostFun}{Kriging}(object, theta, return_grad = FALSE, bench = FALSE, ...)
 }
 \arguments{
 \item{object}{S3 Kriging object.}
@@ -14,7 +14,7 @@ prior XXXY.}
 \item{theta}{Numeric vector of correlation range parameters at
 which the function is to be evaluated.}
 
-\item{grad}{Logical. Should the function return the gradient
+\item{return_grad}{Logical. Should the function return the gradient
 (w.r.t theta)?}
 
 \item{bench}{Logical. Should the function display benchmarking output?}

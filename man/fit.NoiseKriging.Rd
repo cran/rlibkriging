@@ -9,7 +9,7 @@
   y,
   noise,
   X,
-  regmodel = c("constant", "linear", "interactive"),
+  regmodel = c("constant", "linear", "interactive", "none"),
   normalize = FALSE,
   optim = c("BFGS", "none"),
   objective = c("LL"),
@@ -26,7 +26,8 @@
 
 \item{X}{Numeric matrix of input design.}
 
-\item{regmodel}{Universal NoiseKriging linear trend.}
+\item{regmodel}{Universal NoiseKriging 
+\code{"linear"}, \code{"interactive"}, \code{"quadratic"}.}
 
 \item{normalize}{Logical. If \code{TRUE} both the input matrix
 \code{X} and the response \code{y} in normalized to take
@@ -36,7 +37,8 @@ values in the interval \eqn{[0, 1]}.}
 hyper-parameters. Possible values are: \code{"BFGS"} and \code{"none"},
 the later simply keeping
 the values given in \code{parameters}. The method
-\code{"BFGS"} uses the gradient of the objective.}
+\code{"BFGS"} uses the gradient of the objective 
+(note that \code{"BGFS10"} means 10 multi-start of BFGS).}
 
 \item{objective}{Character giving the objective function to
 optimize. Possible values are: \code{"LL"} for the
