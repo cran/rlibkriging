@@ -84,7 +84,7 @@ if [ -d $LIBKRIGING_SRC_PATH/.travis-ci ]; then
   mv $LIBKRIGING_SRC_PATH/.travis-ci $LIBKRIGING_SRC_PATH/travis-ci
 fi
 # rename .travis-ci in travis-ci everywhere. Use temp .bak for sed OSX compliance
-find $LIBKRIGING_SRC_PATH -type f -exec sed -i.bak "s/\.travis-ci/travis-ci/g" {} +
+find $LIBKRIGING_SRC_PATH -type f -name *.sh -exec sed -i.bak "s/\.travis-ci/travis-ci/g" {} +
 # remove usages of 'git rev-parse', which is not a standard requirement fo R
 GIT_ROOT=$(pwd);
 while [ "$GIT_ROOT" != "/" ]; do
@@ -94,7 +94,7 @@ while [ "$GIT_ROOT" != "/" ]; do
   GIT_ROOT=$(dirname "$GIT_ROOT");
 done
 export GIT_ROOT
-find $LIBKRIGING_SRC_PATH -type f -exec sed -i.bak "s|\$(git rev-parse --show-toplevel)|$GIT_ROOT|g" {} +
+find $LIBKRIGING_SRC_PATH -type f -name *.sh -exec sed -i.bak "s|\$(git rev-parse --show-toplevel)|$GIT_ROOT|g" {} +
 # cleanup
 find $LIBKRIGING_SRC_PATH -type f -name *.bak -exec rm -f {} +;
 

@@ -1,4 +1,4 @@
-87edcb36297ef5ea1b0bdf402fb90d46 *DESCRIPTION
+2a90467a485a921cda2390c453105fb8 *DESCRIPTION
 2d2feda0a82ae5ba6bfb06ba9bc14ade *NAMESPACE
 6eb7dda65db3668a04e1673d273fd16e *R/KMClass.R
 cf9f0de1d740969b5a8f7e4836258040 *R/KrigingClass.R
@@ -105,7 +105,7 @@ e605c5b044eee0cf11ef8638cd96ac63 *man/update_simulate.NoiseKriging.Rd
 8f45efb21b17ad4e48e9e09dac2b0295 *src/libK/CMakeLists.txt
 105067fee326767af5bb48e3aa83899b *src/libK/CONTRIBUTING.md
 86d3f3a95c324c9479bd8986968f4327 *src/libK/LICENSE
-7f2eed4ecf07cd7f8929940cc6a7f95e *src/libK/README.md
+568b3d298f1e94428d2b8c917b30a2da *src/libK/README.md
 9601070d213eaf79cccb36f2cef7a4ad *src/libK/armadillo/CMakeLists.txt
 0c401b53d171564038efca165a6b95a2 *src/libK/armadillo/cmake_aux/InstallFiles/ArmadilloConfig.cmake.in
 1de02204b93d602153a652fcaf0bb462 *src/libK/armadillo/cmake_aux/InstallFiles/ArmadilloConfigVersion.cmake.in
@@ -888,7 +888,7 @@ ca20863f1f79d1ab7f026b1438844c1e *src/libK/bindings/R/rlibkriging/tests/testthat
 6ffc5ab8a677d30d70c818e9a2611be2 *src/libK/bindings/R/rlibkriging/tests/testthat/test-KrigingSimulate.R
 cd6090e0d712ca7dab6356ea29bad272 *src/libK/bindings/R/rlibkriging/tests/testthat/test-KrigingUpdate.R
 1c28a7d5c17083274bebca4c47fe963f *src/libK/bindings/R/rlibkriging/tests/testthat/test-KrigingUpdateSimulate.R
-0dd4a721b5736dc8aff8e3be3ea1429f *src/libK/bindings/R/rlibkriging/tests/testthat/test-LinearAlgebra.R
+7f759fbfac7df781a4a05a6eb59bc80e *src/libK/bindings/R/rlibkriging/tests/testthat/test-LinearAlgebra.R
 f0fc9c4b35cc1b5f1041c643b0080fe6 *src/libK/bindings/R/rlibkriging/tests/testthat/test-NoiseKrigingFit.R
 77dc5d35959c72bc9a674dbe7e2d5d7d *src/libK/bindings/R/rlibkriging/tests/testthat/test-NoiseKrigingLogLik.R
 22e485a95b9f40d49f14e16870609330 *src/libK/bindings/R/rlibkriging/tests/testthat/test-NoiseKrigingMethods.R
@@ -955,13 +955,13 @@ a308525ff1d9ad0ba2f07444bee8db83 *src/libK/lbfgsb_cpp/include/lbfgsb_cpp/lbfgsb.
 943111d5d4503685f53c1e7815a95058 *src/libK/src/lib/CMakeLists.txt
 3a2da6ce599c225ea93040b1530b44e9 *src/libK/src/lib/CacheFunction.cpp
 30eba98d704e26bf86bd866e3e9d33e9 *src/libK/src/lib/Covariance.cpp
-9bff842051d57d22eb64bded1e24edc0 *src/libK/src/lib/Kriging.cpp
+ec6575e9c31f0053ae7d9b94e9051db7 *src/libK/src/lib/Kriging.cpp
 917933d2603990eb276840509479db1c *src/libK/src/lib/KrigingLoader.cpp
 a7c8fcc08a0580d06e0d77592d5fe38c *src/libK/src/lib/LinearAlgebra.cpp
 e541ac347b3dd7cdd5155ffe02eb74ca *src/libK/src/lib/LinearRegression.cpp
 39303e7c5cee6f4b6a8b412578f48f21 *src/libK/src/lib/LinearRegressionOptim.cpp
-7432fb4a34779dcaab93404a53770f68 *src/libK/src/lib/NoiseKriging.cpp
-4f44659b144092169ef0c3b422951785 *src/libK/src/lib/NuggetKriging.cpp
+a505cd205207e7c5da236d9c90983af5 *src/libK/src/lib/NoiseKriging.cpp
+a353e86543121e9bebdb002e0305f317 *src/libK/src/lib/NuggetKriging.cpp
 1cdd5aea683e1c74b8995d9871cfce53 *src/libK/src/lib/Optim.cpp
 563b5702245adc4fe09b35f42e1304ac *src/libK/src/lib/Random.cpp
 0431ebc1157eace51d766c01708c2e33 *src/libK/src/lib/Trend.cpp
@@ -972,14 +972,14 @@ ec72e81e0a251dafa467c601fab9406d *src/libK/src/lib/include/CMakeLists.txt
 63f213bdbbb30dddfe357985d4f1effa *src/libK/src/lib/include/libKriging/Bench.hpp
 24b8b1adef1bc60eef977849e2c17e77 *src/libK/src/lib/include/libKriging/CacheFunction.hpp
 37425bf6669465a5c918db6b716f0157 *src/libK/src/lib/include/libKriging/Covariance.hpp
-fa34f84c9fea1df9a13c347302d15121 *src/libK/src/lib/include/libKriging/Kriging.hpp
+981a736ca1e72fd9e53527a1e902915c *src/libK/src/lib/include/libKriging/Kriging.hpp
 85c7d7fed30b25e201b3ac9656b62c4c *src/libK/src/lib/include/libKriging/KrigingException.hpp
 b74bfe40020ff43ee081fa6a384d0c53 *src/libK/src/lib/include/libKriging/KrigingLoader.hpp
 5c1deb362314b34d840a46ae5d5895a2 *src/libK/src/lib/include/libKriging/LinearAlgebra.hpp
 3a0cdace1cb1917ea8168e2c0ff9d3fa *src/libK/src/lib/include/libKriging/LinearRegression.hpp
 3ffd7cb6e11580bb0650cc0a64d73390 *src/libK/src/lib/include/libKriging/LinearRegressionOptim.hpp
-4ab40a1b14ca0d552820320e84217a31 *src/libK/src/lib/include/libKriging/NoiseKriging.hpp
-9f972dbbc921b72ac19e5856fab68c6a *src/libK/src/lib/include/libKriging/NuggetKriging.hpp
+3d2dad7f9e634382061d7053add76b4c *src/libK/src/lib/include/libKriging/NoiseKriging.hpp
+fac56a758ea7f1b409a18cb4add8e8b2 *src/libK/src/lib/include/libKriging/NuggetKriging.hpp
 bfbecf5e20f4524b5e72201e94ad2f39 *src/libK/src/lib/include/libKriging/Optim.hpp
 eb34321e00c891e92fd5aa9436d238ee *src/libK/src/lib/include/libKriging/Random.hpp
 027e3a5a12839498697bcd370e556db6 *src/libK/src/lib/include/libKriging/Trend.hpp
@@ -2185,7 +2185,7 @@ ae0e325055dc4a66200916405bafc199 *tests/test-KrigingMethods.R
 2927c2bdcd0db2c1418a221b49997f19 *tests/test-KrigingSimulate.R
 523e31981f7a376f8ff7ea9e6bfe2db2 *tests/test-KrigingUpdate.R
 dc4cad6155f802f3dd36a642b1ad13a1 *tests/test-KrigingUpdateSimulate.R
-6b0971dc1991f9f90a2d3f8dabbee08a *tests/test-LinearAlgebra.R
+7f0fedc0dce5dd36800aa6bff9a36a30 *tests/test-LinearAlgebra.R
 5f2fd2cc40ef2e88b0e4a9e8821baea0 *tests/test-NoiseKrigingFit.R
 bce1524df4e84a2ee63fd849e3123efe *tests/test-NoiseKrigingLogLik.R
 983858b171862a205bbadf3ef5248ae8 *tests/test-NoiseKrigingMethods.R
@@ -2216,4 +2216,4 @@ d0117a736b0c58e0b610b17da3f80581 *tools/build.sh
 abc2c149c1ddbdd6b325b82f381bae0c *tools/cmake_config.sh
 6f054c2a36d1d4c9f3624f373b12d9ff *tools/install_packages.R
 be0a67a9b80eb7e01196d5345a0372b6 *tools/r_config.sh
-143a54ea1406fba7342c181938d64971 *tools/setup.sh
+8efe9fd12b98f707e2fbd406420d1394 *tools/setup.sh

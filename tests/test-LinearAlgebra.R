@@ -82,7 +82,7 @@ rlibkriging:::linalg_set_num_nugget(1e-15) # default setup
 
 #######################################################################
 
-n = 1000
+n = 100
 R = matrix(rnorm(n*n),n,n)
 R = t(R) %*% R
 
