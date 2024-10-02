@@ -7,7 +7,7 @@ if [ $# -ne 3 ]; then
   exit 1
 fi
 
-BASEDIR=/home/richet/Sync/Open/libKriging/zzz/rlibkriging
+BASEDIR=/home/richet/Sync/Open/libKriging/alien/rlibKriging-UBSAN
 
 KRIGING_VERSION_MAJOR=$1
 KRIGING_VERSION_MINOR=$2

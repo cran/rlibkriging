@@ -83,7 +83,7 @@ if [[ "$DEBUG_CI" == "true" ]]; then
     echo "------------------------------------"
 
     # Python3 is named python in Windows, but we add a symlink
-    ROOT_DIR=/home/richet/Sync/Open/libKriging/zzz/rlibkriging
+    ROOT_DIR=/home/richet/Sync/Open/libKriging/alien/rlibKriging-UBSAN
     if [[ -f "${ROOT_DIR}"/venv/bin/activate ]]; then
       echo "Loading virtual environment from ${ROOT_DIR}/venv"
       . "${ROOT_DIR}"/venv/bin/activate

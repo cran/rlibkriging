@@ -1,8 +1,8 @@
 Package: rlibkriging
 Type: Package
 Title: Kriging Models using the 'libKriging' Library
-Version: 0.9-0.1
-Date: 2024-08-26
+Version: 0.9-0.4
+Date: 2024-09-29
 Authors@R: 
     c(person(given = "Yann",
              family = "Richet",
@@ -55,7 +55,7 @@ SystemRequirements: GNU make, cmake (>= 3.2.0), gcc, gfortran
 URL: https://github.com/libKriging
 RoxygenNote: 7.3.1
 NeedsCompilation: yes
-Packaged: 2024-08-26 12:47:44 UTC; richet
+Packaged: 2024-09-29 09:20:31 UTC; richet
 Author: Yann Richet [aut, cre] (<https://orcid.org/0000-0002-5677-8458>),
   Pascal Havé [aut],
   Yves Deville [aut],
@@ -66,4 +66,4 @@ Author: Yann Richet [aut, cre] (<https://orcid.org/0000-0002-5677-8458>),
   Jose Luis Morales [ctb],
   Mike Smith [ctb]
 Repository: CRAN
-Date/Publication: 2024-08-27 04:30:02 UTC
+Date/Publication: 2024-10-02 22:40:03 UTC

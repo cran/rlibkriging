@@ -8,7 +8,7 @@ else
   CTEST_FLAGS=--output-on-failure
 fi
 
-ROOT_DIR=/home/richet/Sync/Open/libKriging/zzz/rlibkriging
+ROOT_DIR=/home/richet/Sync/Open/libKriging/alien/rlibKriging-UBSAN
 if [[ "$ENABLE_PYTHON_BINDING" == "on" && ! -d "$VIRTUAL_ENV" ]]; then
   echo "Loading virtual environment from ${ROOT_DIR}/venv"
   . "${ROOT_DIR}"/venv/bin/activate
