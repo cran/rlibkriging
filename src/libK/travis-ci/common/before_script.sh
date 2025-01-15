@@ -67,7 +67,7 @@ if [[ "$DEBUG_CI" == "true" ]]; then
 
     if ( command -v matlab >/dev/null 2>&1 ); then
       echo "Matlab config: $(command -v matlab)"
-      matlab -batch "ver; exit" 2>&1 | sed 's/^/  /'
+      LD_PRELOAD=/lib/x86_64-linux-gnu/libstdc++.so.6 matlab -batch "ver; exit" 2>&1 | sed 's/^/  /'
     else
       echo "No matlab command found"
     fi
@@ -83,7 +83,7 @@ if [[ "$DEBUG_CI" == "true" ]]; then
     echo "------------------------------------"
 
     # Python3 is named python in Windows, but we add a symlink
-    ROOT_DIR=/home/richet/Sync/Open/libKriging/alien/rlibKriging-UBSAN
+    ROOT_DIR=/home/richet/Sync/Open/libKriging/alien/rlibkriging
     if [[ -f "${ROOT_DIR}"/venv/bin/activate ]]; then
       echo "Loading virtual environment from ${ROOT_DIR}/venv"
       . "${ROOT_DIR}"/venv/bin/activate

@@ -19,6 +19,7 @@
 #include <climits>
 #include <limits>
 #include <complex>
+#include <random>
 
 #include "armadillo_bits/config.hpp"
 
@@ -29,29 +30,11 @@
 #include "armadillo_bits/typedef_elem.hpp"
 #include "armadillo_bits/include_superlu.hpp"
 
-
-#if defined(ARMA_USE_EXTERN_RNG)
-  #include <random>
-  
-  namespace arma
-    {
-    thread_local std::mt19937_64 mt19937_64_instance;
-    }
-#endif
-
-#if defined(ARMA_USE_HDF5_CMAKE)
-  
-  #undef  H5_USE_110_API
-  #define H5_USE_110_API
-  
-  #include <hdf5.h>
-  
-  #if defined(H5_USE_16_API) || defined(H5_USE_16_API_DEFAULT)
-    #pragma message ("WARNING: use of HDF5 disabled; incompatible configuration: H5_USE_16_API or H5_USE_16_API_DEFAULT")
-    #undef ARMA_USE_HDF5_CMAKE
-  #endif
-
-#endif
+namespace arma
+  {
+  // kept for compatibility with programs compiled with older versions of Armadillo
+  thread_local std::mt19937_64 mt19937_64_instance;
+  }
 
 namespace arma
 {
@@ -61,22 +44,6 @@ namespace arma
 #include "armadillo_bits/def_lapack.hpp"
 #include "armadillo_bits/def_arpack.hpp"
 #include "armadillo_bits/def_superlu.hpp"
-// no need to include def_hdf5.hpp -- it only contains #defines for when ARMA_USE_HDF5_CMAKE is not defined.
-
-
-#if defined(ARMA_USE_HDF5_CMAKE)
-  // Wrapper functions: arma::H5open() and arma::H5check_version() to hijack calls to H5open() and H5check_version()
-  herr_t H5open()
-    {
-    return ::H5open();
-    }
-  
-  herr_t H5check_version(unsigned majnum, unsigned minnum, unsigned relnum)
-    {
-    return ::H5check_version(majnum, minnum, relnum);
-    }
-#endif
-
 
 
 // at this stage we have prototypes for actual BLAS and LAPACK functions
@@ -1320,6 +1287,102 @@ extern "C"
       arma_fortran_sans_prefix(arma_zpstrf)(uplo, n, a, lda, piv, rank, tol, work, info);
       }
     
+    
+    
+    void arma_fortran_with_prefix(arma_ssytrf)(const char* uplo, const blas_int* n, float*  a, const blas_int* lda, blas_int* ipiv, float*  work, const blas_int* lwork, blas_int* info)
+      {
+      arma_fortran_sans_prefix(arma_ssytrf)(uplo, n, a, lda, ipiv, work, lwork, info);
+      }
+    
+    void arma_fortran_with_prefix(arma_dsytrf)(const char* uplo, const blas_int* n, double* a, const blas_int* lda, blas_int* ipiv, double* work, const blas_int* lwork, blas_int* info)
+      {
+      arma_fortran_sans_prefix(arma_dsytrf)(uplo, n, a, lda, ipiv, work, lwork, info);
+      }
+    
+    
+    
+    void arma_fortran_with_prefix(arma_chetrf)(const char* uplo, const blas_int* n, blas_cxf* a, const blas_int* lda, blas_int* ipiv, blas_cxf* work, const blas_int* lwork, blas_int* info)
+      {
+      arma_fortran_sans_prefix(arma_chetrf)(uplo, n, a, lda, ipiv, work, lwork, info);
+      }
+    
+    void arma_fortran_with_prefix(arma_zhetrf)(const char* uplo, const blas_int* n, blas_cxd* a, const blas_int* lda, blas_int* ipiv, blas_cxd* work, const blas_int* lwork, blas_int* info)
+      {
+      arma_fortran_sans_prefix(arma_zhetrf)(uplo, n, a, lda, ipiv, work, lwork, info);
+      }
+    
+    
+    
+    void arma_fortran_with_prefix(arma_ssytrs)(const char* uplo, const blas_int* n, const blas_int* nrhs, const float*  a, const blas_int* lda, const blas_int* ipiv, float*  b, const blas_int* ldb, blas_int* info)
+      {
+      arma_fortran_sans_prefix(arma_ssytrs)(uplo, n, nrhs, a, lda, ipiv, b, ldb, info);
+      }
+    
+    void arma_fortran_with_prefix(arma_dsytrs)(const char* uplo, const blas_int* n, const blas_int* nrhs, const double* a, const blas_int* lda, const blas_int* ipiv, double* b, const blas_int* ldb, blas_int* info)
+      {
+      arma_fortran_sans_prefix(arma_dsytrs)(uplo, n, nrhs, a, lda, ipiv, b, ldb, info);
+      }
+    
+    
+    
+    void arma_fortran_with_prefix(arma_chetrs)(const char* uplo, const blas_int* n, const blas_int* nrhs, const blas_cxf* a, const blas_int* lda, const blas_int* ipiv, blas_cxf* b, const blas_int* ldb, blas_int* info)
+      {
+      arma_fortran_sans_prefix(arma_chetrs)(uplo, n, nrhs, a, lda, ipiv, b, ldb, info);
+      }
+    
+    void arma_fortran_with_prefix(arma_zhetrs)(const char* uplo, const blas_int* n, const blas_int* nrhs, const blas_cxd* a, const blas_int* lda, const blas_int* ipiv, blas_cxd* b, const blas_int* ldb, blas_int* info)
+      {
+      arma_fortran_sans_prefix(arma_zhetrs)(uplo, n, nrhs, a, lda, ipiv, b, ldb, info);
+      }
+    
+    
+    
+    void arma_fortran_with_prefix(arma_ssytri)(const char* uplo, const blas_int* n, float*  a, const blas_int* lda, const blas_int* ipiv, float*  work, blas_int* info)
+      {
+      arma_fortran_sans_prefix(arma_ssytri)(uplo, n, a, lda, ipiv, work, info);
+      }
+    
+    void arma_fortran_with_prefix(arma_dsytri)(const char* uplo, const blas_int* n, double* a, const blas_int* lda, const blas_int* ipiv, double* work, blas_int* info)
+      {
+      arma_fortran_sans_prefix(arma_dsytri)(uplo, n, a, lda, ipiv, work, info);
+      }
+    
+    
+    
+    void arma_fortran_with_prefix(arma_chetri)(const char* uplo, const blas_int* n, blas_cxf* a, const blas_int* lda, const blas_int* ipiv, blas_cxf* work, blas_int* info)
+      {
+      arma_fortran_sans_prefix(arma_chetri)(uplo, n, a, lda, ipiv, work, info);
+      }
+    
+    void arma_fortran_with_prefix(arma_zhetri)(const char* uplo, const blas_int* n, blas_cxd* a, const blas_int* lda, const blas_int* ipiv, blas_cxd* work, blas_int* info)
+      {
+      arma_fortran_sans_prefix(arma_zhetri)(uplo, n, a, lda, ipiv, work, info);
+      }
+    
+    
+    
+    void arma_fortran_with_prefix(arma_ssycon)(const char* uplo, const blas_int* n, const float*  a, const blas_int* lda, const blas_int* ipiv, const float*  anorm, float*  rcond, float*  work, blas_int* iwork, blas_int* info)
+      {
+      arma_fortran_sans_prefix(arma_ssycon)(uplo, n, a, lda, ipiv, anorm, rcond, work, iwork, info);
+      }
+    
+    void arma_fortran_with_prefix(arma_dsycon)(const char* uplo, const blas_int* n, const double* a, const blas_int* lda, const blas_int* ipiv, const double* anorm, double* rcond, double* work, blas_int* iwork, blas_int* info)
+      {
+      arma_fortran_sans_prefix(arma_dsycon)(uplo, n, a, lda, ipiv, anorm, rcond, work, iwork, info);
+      }
+    
+    
+    
+    void arma_fortran_with_prefix(arma_checon)(const char* uplo, const blas_int* n, const blas_cxf* a, const blas_int* lda, const blas_int* ipiv, const float*  anorm, float*  rcond, blas_cxf* work, blas_int* info)
+      {
+      arma_fortran_sans_prefix(arma_checon)(uplo, n, a, lda, ipiv, anorm, rcond, work, info);
+      }
+    
+    void arma_fortran_with_prefix(arma_zhecon)(const char* uplo, const blas_int* n, const blas_cxd* a, const blas_int* lda, const blas_int* ipiv, const double* anorm, double* rcond, blas_cxd* work, blas_int* info)
+      {
+      arma_fortran_sans_prefix(arma_zhecon)(uplo, n, a, lda, ipiv, anorm, rcond, work, info);
+      }
+    
   #endif
   
   
@@ -1592,169 +1655,6 @@ extern "C"
       }
     
   #endif
-  
-  
-  
-  #if defined(ARMA_USE_HDF5_CMAKE)
-  
-    hid_t arma_H5Tcopy(hid_t dtype_id)
-      {
-      return H5Tcopy(dtype_id);
-      }
-    
-    hid_t arma_H5Tcreate(H5T_class_t cl, size_t size)
-      {
-      return H5Tcreate(cl, size);
-      }
-    
-    herr_t arma_H5Tinsert(hid_t dtype_id, const char* name, size_t offset, hid_t field_id)
-      {
-      return H5Tinsert(dtype_id, name, offset, field_id);
-      }
-    
-    htri_t arma_H5Tequal(hid_t dtype_id1, hid_t dtype_id2)
-      {
-      return H5Tequal(dtype_id1, dtype_id2);
-      }
-    
-    herr_t arma_H5Tclose(hid_t dtype_id)
-      {
-      return H5Tclose(dtype_id);
-      }
-    
-    hid_t arma_H5Dopen(hid_t loc_id, const char* name, hid_t dapl_id)
-      {
-      return H5Dopen(loc_id, name, dapl_id);
-      }
-    
-    hid_t arma_H5Dget_type(hid_t dataset_id)
-      {
-      return H5Dget_type(dataset_id);
-      }
-    
-    hid_t arma_H5Dcreate(hid_t loc_id, const char* name, hid_t dtype_id, hid_t space_id, hid_t lcpl_id, hid_t dcpl_id, hid_t dapl_id)
-      {
-      return H5Dcreate(loc_id, name, dtype_id, space_id, lcpl_id, dcpl_id, dapl_id);
-      }
-    
-    herr_t arma_H5Dwrite(hid_t dataset_id, hid_t mem_type_id, hid_t mem_space_id, hid_t file_space_id, hid_t xfer_plist_id, const void* buf)
-      {
-      return H5Dwrite(dataset_id, mem_type_id, mem_space_id, file_space_id, xfer_plist_id, buf);
-      }
-    
-    herr_t arma_H5Dclose(hid_t dataset_id)
-      {
-      return H5Dclose(dataset_id);
-      }
-    
-    hid_t arma_H5Dget_space(hid_t dataset_id)
-      {
-      return H5Dget_space(dataset_id);
-      }
-    
-    herr_t arma_H5Dread(hid_t dataset_id, hid_t mem_type_id, hid_t mem_space_id, hid_t file_space_id, hid_t xfer_plist_id, void* buf)
-      {
-      return H5Dread(dataset_id, mem_type_id, mem_space_id, file_space_id, xfer_plist_id, buf);
-      }
-    
-    int arma_H5Sget_simple_extent_ndims(hid_t space_id)
-      {
-      return H5Sget_simple_extent_ndims(space_id);
-      }
-    
-    int arma_H5Sget_simple_extent_dims(hid_t space_id, hsize_t* dims, hsize_t* maxdims)
-      {
-      return H5Sget_simple_extent_dims(space_id, dims, maxdims);
-      }
-    
-    herr_t arma_H5Sclose(hid_t space_id)
-      {
-      return H5Sclose(space_id);
-      }
-    
-    hid_t arma_H5Screate_simple(int rank, const hsize_t* current_dims, const hsize_t* maximum_dims)
-      {
-      return H5Screate_simple(rank, current_dims, maximum_dims);
-      }
-    
-    herr_t arma_H5Ovisit(hid_t object_id, H5_index_t index_type, H5_iter_order_t order, H5O_iterate_t op, void* op_data)
-      {
-      return H5Ovisit(object_id, index_type, order, op, op_data);
-      }
-    
-    herr_t arma_H5Eset_auto(hid_t estack_id, H5E_auto_t func, void* client_data)
-      {
-      return H5Eset_auto(estack_id, func, client_data);
-      }
-    
-    herr_t arma_H5Eget_auto(hid_t estack_id, H5E_auto_t* func, void** client_data)
-      {
-      return H5Eget_auto(estack_id, func, client_data);
-      }
-    
-    hid_t arma_H5Fopen(const char* name, unsigned flags, hid_t fapl_id)
-      {
-      return H5Fopen(name, flags, fapl_id);
-      }
-    
-    hid_t arma_H5Fcreate(const char* name, unsigned flags, hid_t fcpl_id, hid_t fapl_id)
-      {
-      return H5Fcreate(name, flags, fcpl_id, fapl_id);
-      }
-    
-    herr_t arma_H5Fclose(hid_t file_id)
-      {
-      return H5Fclose(file_id);
-      }
-    
-    htri_t arma_H5Fis_hdf5(const char* name)
-      {
-      return H5Fis_hdf5(name);
-      }
-    
-    hid_t arma_H5Gcreate(hid_t loc_id, const char* name, hid_t lcpl_id, hid_t gcpl_id, hid_t gapl_id)
-      {
-      return H5Gcreate(loc_id, name, lcpl_id, gcpl_id, gapl_id);
-      }
-    
-    hid_t arma_H5Gopen(hid_t loc_id, const char* name, hid_t gapl_id)
-      {
-      return H5Gopen(loc_id, name, gapl_id);
-      }
-    
-    herr_t arma_H5Gclose(hid_t group_id)
-      {
-      return H5Gclose(group_id);
-      }
-    
-    htri_t arma_H5Lexists(hid_t loc_id, const char* name, hid_t lapl_id)
-      {
-      return H5Lexists(loc_id, name, lapl_id);
-      }
-    
-    herr_t arma_H5Ldelete(hid_t loc_id, const char* name, hid_t lapl_id)
-      {
-      return H5Ldelete(loc_id, name, lapl_id);
-      }
-    
-    
-    // H5T_NATIVE_* types.  The rhs here expands to some macros.
-    hid_t arma_H5T_NATIVE_UCHAR  = H5T_NATIVE_UCHAR;
-    hid_t arma_H5T_NATIVE_CHAR   = H5T_NATIVE_CHAR;
-    hid_t arma_H5T_NATIVE_SHORT  = H5T_NATIVE_SHORT;
-    hid_t arma_H5T_NATIVE_USHORT = H5T_NATIVE_USHORT;
-    hid_t arma_H5T_NATIVE_INT    = H5T_NATIVE_INT;
-    hid_t arma_H5T_NATIVE_UINT   = H5T_NATIVE_UINT;
-    hid_t arma_H5T_NATIVE_LONG   = H5T_NATIVE_LONG;
-    hid_t arma_H5T_NATIVE_ULONG  = H5T_NATIVE_ULONG;
-    hid_t arma_H5T_NATIVE_LLONG  = H5T_NATIVE_LLONG;
-    hid_t arma_H5T_NATIVE_ULLONG = H5T_NATIVE_ULLONG;
-    hid_t arma_H5T_NATIVE_FLOAT  = H5T_NATIVE_FLOAT;
-    hid_t arma_H5T_NATIVE_DOUBLE = H5T_NATIVE_DOUBLE;
-
-  #endif
-  
-  
   }  // end of extern "C"
 
 

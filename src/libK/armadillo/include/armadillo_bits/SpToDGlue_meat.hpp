@@ -16,18 +16,29 @@
 // ------------------------------------------------------------------------
 
 
-//! \addtogroup spop_sum
+//! \addtogroup SpToDGlue
 //! @{
 
 
-class spop_sum
-  : public traits_op_xvec
+
+template<typename T1, typename T2, typename glue_type>
+inline
+SpToDGlue<T1,T2,glue_type>::SpToDGlue(const T1& in_A, const T2& in_B)
+  : A(in_A)
+  , B(in_B)
   {
-  public:
-  
-  template<typename T1>
-  arma_hot inline static void apply(SpMat<typename T1::elem_type>& out, const SpOp<T1, spop_sum>& in);
-  };
+  arma_debug_sigprint();
+  }
+
+
+
+template<typename T1, typename T2, typename glue_type>
+inline
+SpToDGlue<T1,T2,glue_type>::~SpToDGlue()
+  {
+  arma_debug_sigprint();
+  }
+
 
 
 //! @}

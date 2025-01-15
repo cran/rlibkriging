@@ -1156,6 +1156,102 @@ extern "C"
       arma_fortran_sans_prefix(arma_zpstrf)(uplo, n, a, lda, piv, rank, tol, work, info, uplo_len);
       }
     
+    
+    
+    void arma_fortran_with_prefix(arma_ssytrf)(const char* uplo, const blas_int* n, float*  a, const blas_int* lda, blas_int* ipiv, float*  work, const blas_int* lwork, blas_int* info, blas_len uplo_len)
+      {
+      arma_fortran_sans_prefix(arma_ssytrf)(uplo, n, a, lda, ipiv, work, lwork, info, uplo_len);
+      }
+    
+    void arma_fortran_with_prefix(arma_dsytrf)(const char* uplo, const blas_int* n, double* a, const blas_int* lda, blas_int* ipiv, double* work, const blas_int* lwork, blas_int* info, blas_len uplo_len)
+      {
+      arma_fortran_sans_prefix(arma_dsytrf)(uplo, n, a, lda, ipiv, work, lwork, info, uplo_len);
+      }
+    
+    
+    
+    void arma_fortran_with_prefix(arma_chetrf)(const char* uplo, const blas_int* n, blas_cxf* a, const blas_int* lda, blas_int* ipiv, blas_cxf* work, const blas_int* lwork, blas_int* info, blas_len uplo_len)
+      {
+      arma_fortran_sans_prefix(arma_chetrf)(uplo, n, a, lda, ipiv, work, lwork, info, uplo_len);
+      }
+    
+    void arma_fortran_with_prefix(arma_zhetrf)(const char* uplo, const blas_int* n, blas_cxd* a, const blas_int* lda, blas_int* ipiv, blas_cxd* work, const blas_int* lwork, blas_int* info, blas_len uplo_len)
+      {
+      arma_fortran_sans_prefix(arma_zhetrf)(uplo, n, a, lda, ipiv, work, lwork, info, uplo_len);
+      }
+    
+    
+    
+    void arma_fortran_with_prefix(arma_ssytrs)(const char* uplo, const blas_int* n, const blas_int* nrhs, const float*  a, const blas_int* lda, const blas_int* ipiv, float*  b, const blas_int* ldb, blas_int* info, blas_len uplo_len)
+      {
+      arma_fortran_sans_prefix(arma_ssytrs)(uplo, n, nrhs, a, lda, ipiv, b, ldb, info, uplo_len);
+      }
+    
+    void arma_fortran_with_prefix(arma_dsytrs)(const char* uplo, const blas_int* n, const blas_int* nrhs, const double* a, const blas_int* lda, const blas_int* ipiv, double* b, const blas_int* ldb, blas_int* info, blas_len uplo_len)
+      {
+      arma_fortran_sans_prefix(arma_dsytrs)(uplo, n, nrhs, a, lda, ipiv, b, ldb, info, uplo_len);
+      }
+    
+    
+    
+    void arma_fortran_with_prefix(arma_chetrs)(const char* uplo, const blas_int* n, const blas_int* nrhs, const blas_cxf* a, const blas_int* lda, const blas_int* ipiv, blas_cxf* b, const blas_int* ldb, blas_int* info, blas_len uplo_len)
+      {
+      arma_fortran_sans_prefix(arma_chetrs)(uplo, n, nrhs, a, lda, ipiv, b, ldb, info, uplo_len);
+      }
+    
+    void arma_fortran_with_prefix(arma_zhetrs)(const char* uplo, const blas_int* n, const blas_int* nrhs, const blas_cxd* a, const blas_int* lda, const blas_int* ipiv, blas_cxd* b, const blas_int* ldb, blas_int* info, blas_len uplo_len)
+      {
+      arma_fortran_sans_prefix(arma_zhetrs)(uplo, n, nrhs, a, lda, ipiv, b, ldb, info, uplo_len);
+      }
+    
+    
+    
+    void arma_fortran_with_prefix(arma_ssytri)(const char* uplo, const blas_int* n, float*  a, const blas_int* lda, const blas_int* ipiv, float*  work, blas_int* info, blas_len uplo_len)
+      {
+      arma_fortran_sans_prefix(arma_ssytri)(uplo, n, a, lda, ipiv, work, info, uplo_len);
+      }
+    
+    void arma_fortran_with_prefix(arma_dsytri)(const char* uplo, const blas_int* n, double* a, const blas_int* lda, const blas_int* ipiv, double* work, blas_int* info, blas_len uplo_len)
+      {
+      arma_fortran_sans_prefix(arma_dsytri)(uplo, n, a, lda, ipiv, work, info, uplo_len);
+      }
+    
+    
+    
+    void arma_fortran_with_prefix(arma_chetri)(const char* uplo, const blas_int* n, blas_cxf* a, const blas_int* lda, const blas_int* ipiv, blas_cxf* work, blas_int* info, blas_len uplo_len)
+      {
+      arma_fortran_sans_prefix(arma_chetri)(uplo, n, a, lda, ipiv, work, info, uplo_len);
+      }
+    
+    void arma_fortran_with_prefix(arma_zhetri)(const char* uplo, const blas_int* n, blas_cxd* a, const blas_int* lda, const blas_int* ipiv, blas_cxd* work, blas_int* info, blas_len uplo_len)
+      {
+      arma_fortran_sans_prefix(arma_zhetri)(uplo, n, a, lda, ipiv, work, info, uplo_len);
+      }
+    
+    
+    
+    void arma_fortran_with_prefix(arma_ssycon)(const char* uplo, const blas_int* n, const float*  a, const blas_int* lda, const blas_int* ipiv, const float*  anorm, float*  rcond, float*  work, blas_int* iwork, blas_int* info, blas_len uplo_len)
+      {
+      arma_fortran_sans_prefix(arma_ssycon)(uplo, n, a, lda, ipiv, anorm, rcond, work, iwork, info, uplo_len);
+      }
+    
+    void arma_fortran_with_prefix(arma_dsycon)(const char* uplo, const blas_int* n, const double* a, const blas_int* lda, const blas_int* ipiv, const double* anorm, double* rcond, double* work, blas_int* iwork, blas_int* info, blas_len uplo_len)
+      {
+      arma_fortran_sans_prefix(arma_dsycon)(uplo, n, a, lda, ipiv, anorm, rcond, work, iwork, info, uplo_len);
+      }
+    
+    
+    
+    void arma_fortran_with_prefix(arma_checon)(const char* uplo, const blas_int* n, const blas_cxf* a, const blas_int* lda, const blas_int* ipiv, const float*  anorm, float*  rcond, blas_cxf* work, blas_int* info, blas_len uplo_len)
+      {
+      arma_fortran_sans_prefix(arma_checon)(uplo, n, a, lda, ipiv, anorm, rcond, work, info, uplo_len);
+      }
+    
+    void arma_fortran_with_prefix(arma_zhecon)(const char* uplo, const blas_int* n, const blas_cxd* a, const blas_int* lda, const blas_int* ipiv, const double* anorm, double* rcond, blas_cxd* work, blas_int* info, blas_len uplo_len)
+      {
+      arma_fortran_sans_prefix(arma_zhecon)(uplo, n, a, lda, ipiv, anorm, rcond, work, info, uplo_len);
+      }
+    
   #endif
   
   

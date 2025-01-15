@@ -16,33 +16,49 @@
 # ------------------------------------------------------------------------
 
 
-## NOTE: If you prefer to link your programs _directly_ with OpenBLAS, BLAS or LAPACK,
-## NOTE: do not use this installer.
-## NOTE: To use Armadillo without installation, compile your programs along these lines:
-## NOTE: g++ prog.cpp -o prog -O2 -I /home/blah/armadillo-7.200.3/include -DARMA_DONT_USE_WRAPPER -lopenblas -llapack
-## NOTE: The above command line assumes that you have unpacked the armadillo archive into /home/blah/  
-## NOTE: You will need to adjust this for later versions of Armadillo (ie. change the 7.200.3 part)
-## NOTE: and/or if you have unpacked the armadillo archive into a different directory.
+## NOTE: This installation script by default generates a runtime wrapper library,
+## NOTE: which links with OpenBLAS, LAPACK, etc.
+## NOTE: 
+## NOTE: If you prefer to link your programs directly with OpenBLAS, LAPACK, etc
+## NOTE: there are two options:
+## NOTE: (1) use the HEADER_ONLY option when running this installation script,
+## NOTE: or
+## NOTE: (2) do not use this installation script, and instead compile your programs
+## NOTE: using the include folder directly obtained from the armadillo archive.
+## NOTE: 
+## NOTE: To forcefully disable use of the runtime wrapper library,
+## NOTE: compile your programs with ARMA_DONT_USE_WRAPPER enabled.
+## NOTE: For example:
+## NOTE: g++ prog.cpp -o prog -O2 -I /home/user/armadillo-14.0.0/include -DARMA_DONT_USE_WRAPPER -lopenblas -llapack
+## NOTE: 
+## NOTE: The above command line assumes that you have unpacked the armadillo archive into /home/user/  
+## NOTE: This needs to be adjusted for newer versions of Armadillo (ie. change "14.0.0"),
+## NOTE: and/or if the armadillo archive has been unpacked into a different folder.
+## NOTE: 
 ## NOTE: Replace -lopenblas with -lblas if you don't have OpenBLAS.
 ## NOTE: On macOS, replace -lblas -llapack with -framework Accelerate
-## NOTE: More details: http://arma.sourceforge.net/faq.html
+## NOTE: More details: https://arma.sourceforge.net/faq.html
 
 
-cmake_minimum_required(VERSION 2.8.12 FATAL_ERROR)
+cmake_minimum_required(VERSION 3.5 FATAL_ERROR)
 
-if(NOT (${CMAKE_MAJOR_VERSION} LESS 3))
-  if(POLICY CMP0025)
-    # enable differentiation between vanilla Clang and AppleClang
-    cmake_policy(SET CMP0025 NEW)
-    message(STATUS "*** set cmake policy CMP0025 to NEW")
-  endif()
+if(POLICY CMP0025)
+  # enable differentiation between vanilla Clang and AppleClang
+  cmake_policy(SET CMP0025 NEW)
+  message(STATUS "*** set cmake policy CMP0025 to NEW")
 endif()
 
-if(NOT (CMAKE_VERSION VERSION_LESS "3.1"))
-  set(CMAKE_CXX_STANDARD 11)
-  set(CMAKE_CXX_STANDARD_REQUIRED ON)
-  set(CMAKE_CXX_EXTENSIONS OFF)
-  message(STATUS "CMAKE_CXX_STANDARD = ${CMAKE_CXX_STANDARD}")
+set(CMAKE_CXX_STANDARD 14)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_EXTENSIONS OFF)
+message(STATUS "CMAKE_CXX_STANDARD = ${CMAKE_CXX_STANDARD}")
+
+if(WIN32)
+  message(STATUS "")
+  message(STATUS "*** WARNING: installation via cmake is not supported on this platform.")
+  message(STATUS "*** WARNING: suggest to use manual installation instead;")
+  message(STATUS "*** WARNING: see README for details")
+  message(STATUS "")
 endif()
 
 project(armadillo CXX C)
@@ -53,16 +69,15 @@ set(ARMA_USE_WRAPPER true)
 
 # the settings below will be automatically configured by the rest of this script
 
-set(ARMA_USE_LAPACK     false)
-set(ARMA_USE_BLAS       false)
-set(ARMA_USE_ATLAS      false)
-set(ARMA_USE_HDF5_CMAKE false)
-set(ARMA_USE_ARPACK     false)
-set(ARMA_USE_EXTERN_RNG false)
-set(ARMA_USE_SUPERLU    false)  # Caveat: only SuperLU version 5.x can be used!
+##set(ARMA_USE_WRAPPER false)
+set(ARMA_USE_LAPACK  false)
+set(ARMA_USE_BLAS    false)
+set(ARMA_USE_ATLAS   false)
+set(ARMA_USE_ARPACK  false)
+set(ARMA_USE_SUPERLU false)  # Caveat: only SuperLU version 5.x can be used!
 
 
-## extract version from sources
+# extract version from sources
 
 set(ARMA_VERSION_FILE_NAME "${PROJECT_SOURCE_DIR}/include/armadillo_bits/arma_version.hpp")
 
@@ -85,31 +100,21 @@ if(NOT CXX_FLAGS_EMPTY)
 endif()
 
 
-# NOTE: ARMA_USE_EXTERN_RNG requires compiler support for thread_local and C++11
-# NOTE: for Linux, this is available with gcc 4.8.3 onwards
-# NOTE: for macOS, thread_local is supoported in Xcode 8 (mid 2016 onwards) in C++11 mode
-
-# NOTE: thread_local appears broken again on macOS 11 (Big Sur) and/or AppleClang 12.0
-# NOTE: see comments in include/armadillo_bits/arma_rng.hpp
-
 if(DEFINED CMAKE_CXX_COMPILER_ID AND DEFINED CMAKE_CXX_COMPILER_VERSION)
   if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
-    if(NOT (${CMAKE_CXX_COMPILER_VERSION} VERSION_LESS 4.8.3))
-      set(ARMA_USE_EXTERN_RNG true)
-      message(STATUS "Detected gcc 4.8.3 or later")
+    if(NOT (${CMAKE_CXX_COMPILER_VERSION} VERSION_LESS 6.1.0))
       if(NOT DEFINED CMAKE_CXX_STANDARD)
-        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
-        message(STATUS "Added '-std=c++11' to compiler flags")
+        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14")
+        message(STATUS "Added '-std=c++14' to compiler flags")
       endif()
     else()
-      message(FATAL_ERROR "Compiler too old")
+      message(FATAL_ERROR "Compiler too old; need at least gcc 6.1")
     endif()
   else()
     if(NOT (${CMAKE_MAJOR_VERSION} LESS 3))
       if(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
         if(NOT ${CMAKE_CXX_COMPILER_VERSION} VERSION_LESS 6.0)
-          set(ARMA_USE_EXTERN_RNG true)
-          message(STATUS "Detected Clang 6.0 or later")
+          message(STATUS "Detected Clang 6.0 or newer")
           if(NOT DEFINED CMAKE_CXX_STANDARD)
             set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14")
             message(STATUS "Added '-std=c++14' to compiler flags")
@@ -119,8 +124,7 @@ if(DEFINED CMAKE_CXX_COMPILER_ID AND DEFINED CMAKE_CXX_COMPILER_VERSION)
         endif()
       elseif(CMAKE_CXX_COMPILER_ID STREQUAL "AppleClang")
         if(NOT ${CMAKE_CXX_COMPILER_VERSION} VERSION_LESS 8.0)
-          set(ARMA_USE_EXTERN_RNG true)
-          message(STATUS "Detected AppleClang 8.0 or later")
+          message(STATUS "Detected AppleClang 8.0 or newer")
           if(NOT DEFINED CMAKE_CXX_STANDARD)
             set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14")
             message(STATUS "Added '-std=c++14' to compiler flags")
@@ -133,13 +137,6 @@ if(DEFINED CMAKE_CXX_COMPILER_ID AND DEFINED CMAKE_CXX_COMPILER_VERSION)
   endif()
 endif()
 
-if(MINGW OR MSYS OR CYGWIN OR MSVC)
-  # MinGW doesn't correctly handle thread_local
-  set(ARMA_USE_EXTERN_RNG false)
-endif()
-
-message(STATUS "ARMA_USE_EXTERN_RNG = ${ARMA_USE_EXTERN_RNG}")
-
 
 # As Red Hat Enterprise Linux (and related systems such as Fedora)
 # does not search /usr/local/lib by default, we need to place the
@@ -147,6 +144,7 @@ message(STATUS "ARMA_USE_EXTERN_RNG = ${ARMA_USE_EXTERN_RNG}")
 
 if(NOT APPLE)
   if(CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
+    message(STATUS "")
     message(STATUS "*** CMAKE_INSTALL_PREFIX was initalised by cmake to the default value of ${CMAKE_INSTALL_PREFIX}")
     message(STATUS "*** CMAKE_INSTALL_PREFIX changed to /usr")
     set(CMAKE_INSTALL_PREFIX "/usr" CACHE PATH "Standard install prefix" FORCE)
@@ -186,17 +184,21 @@ if(INSTALL_BIN_DIR)
 endif()
 
 
-if(MSVC)
-  option(BUILD_SHARED_LIBS "build shared library" OFF)
-else()
-  option(BUILD_SHARED_LIBS "build shared library" ON)
-endif()
 
-option(DETECT_HDF5 "Detect HDF5 and include HDF5 support, if found" ON)
-# set(DETECT_HDF5 false)
-## uncomment the above line to disable the detection of the HDF5 library;
-## you can also disable HDF5 detection directly on the command line:
-## cmake -D DETECT_HDF5=false .
+option(HEADER_ONLY "Do not generate the wrapper library" OFF)
+## Example use on the command line:
+## cmake -D HEADER_ONLY=true .
+
+if(MSVC)
+  option(STATIC_LIB "Generate static library instead of shared library" ON)
+else()
+  option(STATIC_LIB "Generate static library instead of shared library" OFF)
+endif()
+## Example use on the command line:
+## cmake -D STATIC_LIB=true .
+
+## Get previous option setup for static/shared
+option(STATIC_LIB "Generate shared library instead of static library" ${BUILD_SHARED_LIBS})
 
 option(OPENBLAS_PROVIDES_LAPACK "Assume that OpenBLAS provides LAPACK functions" OFF)
 ## Example use on the command line:
@@ -227,31 +229,40 @@ option(BUILD_SMOKE_TEST "Build the smoke test" ON)
 ## ctest
 
 
-if(WIN32)
-  message(STATUS "")
-  message(STATUS "*** WARNING: automatic installation is experimental for this platform.")
-  message(STATUS "*** WARNING: if anything breaks, you get to keep all the pieces.")
-  message(STATUS "*** WARNING: manual installation is described in the README file.")
-  message(STATUS "")
+if(MSVC)
+  if(NOT STATIC_LIB)
+    message(STATUS "")
+    message(STATUS "*** WARNING: building shared library with MSVC is not supported." )
+    message(STATUS "*** WARNING: use manual installation instead; see README for details")
+    message(STATUS "")
+    
+    set(STATIC_LIB ON)
+  endif()
 endif()
 
-if(MSVC AND BUILD_SHARED_LIBS)
-  message(STATUS "")
-  message(STATUS "*** WARNING: building shared library with MSVC is not supported." )
-  message(STATUS "*** WARNING: if anything breaks, you get to keep all the pieces.")
-  message(STATUS "")
+if(HEADER_ONLY)
+  set(BUILD_WRAPPER false)
+else()
+  set(BUILD_WRAPPER true)
+endif()
+
+if(BUILD_WRAPPER)
+  set(ARMA_USE_WRAPPER true)
+else()
+  set(ARMA_USE_WRAPPER false)
 endif()
 
 
+message(STATUS "")
 message(STATUS "CMAKE_SYSTEM_NAME          = ${CMAKE_SYSTEM_NAME}"         )
 message(STATUS "CMAKE_CXX_COMPILER_ID      = ${CMAKE_CXX_COMPILER_ID}"     )
 message(STATUS "CMAKE_CXX_COMPILER_VERSION = ${CMAKE_CXX_COMPILER_VERSION}")
 message(STATUS "CMAKE_COMPILER_IS_GNUCXX   = ${CMAKE_COMPILER_IS_GNUCXX}"  )
 
 message(STATUS "")
-message(STATUS "*** Options:"                                           )
-message(STATUS "BUILD_SHARED_LIBS         = ${BUILD_SHARED_LIBS}"       )
-message(STATUS "DETECT_HDF5               = ${DETECT_HDF5}"             )
+message(STATUS "*** options:"                                           )
+message(STATUS "HEADER_ONLY               = ${HEADER_ONLY}"             )
+message(STATUS "STATIC_LIB                = ${STATIC_LIB}"              )
 message(STATUS "OPENBLAS_PROVIDES_LAPACK  = ${OPENBLAS_PROVIDES_LAPACK}")
 message(STATUS "ALLOW_FLEXIBLAS_LINUX     = ${ALLOW_FLEXIBLAS_LINUX}"   )
 message(STATUS "ALLOW_OPENBLAS_MACOS      = ${ALLOW_OPENBLAS_MACOS}"    )
@@ -455,75 +466,6 @@ else()
 endif()
 
 
-find_package(PkgConfig)
-
-
-if(DETECT_HDF5)
-  find_package(HDF5 QUIET COMPONENTS C)
-
-  if(NOT HDF5_FOUND)
-    # On Debian systems, the HDF5 package has been split into multiple packages
-    # so that it is co-installable.  But this may mean that the include files
-    # are hidden somewhere very odd that the FindHDF5.cmake script will not
-    # find.  Thus, we'll also quickly check pkgconfig to see if there is
-    # information on what to use there.
-    if (PKG_CONFIG_FOUND)
-      pkg_check_modules(HDF5 hdf5)
-      # But using pkgconfig is a little weird because HDF5_LIBRARIES won't be
-      # filled with exact library paths, like the other scripts.  So instead
-      # what we get is HDF5_LIBRARY_DIRS which is the equivalent of what we'd
-      # pass to -L.  So we have to add those...
-      if (HDF5_FOUND)
-        link_directories("${HDF5_LIBRARY_DIRS}")
-      endif()
-    endif()
-  endif()
- 
-  message(STATUS "HDF5_FOUND = ${HDF5_FOUND}")
-  if(HDF5_FOUND)
-    set(ARMA_USE_HDF5_CMAKE true)
-    set(CMAKE_REQUIRED_INCLUDES ${CMAKE_REQUIRED_INCLUDES} ${HDF5_INCLUDE_DIRS})
-    
-    # HACK TO DETECT RHDF5 which has implicit dependencies to libs sz, aec and z
-    string(FIND "${HDF5_LIBRARIES}" Rhdf5lib IS_RHDF5LIB)
-    if (IS_RHDF5LIB)
-      foreach(_hdf5_lib IN LISTS HDF5_LIBRARIES)
-        get_filename_component(_hdf5_libdir ${_hdf5_lib} DIRECTORY)
-        find_library(SZ_LIBRARY NAMES sz PATHS ${_hdf5_libdir})
-        if (SZ_LIBRARY)
-          set(HDF5_LIBRARIES ${HDF5_LIBRARIES} ${SZ_LIBRARY})
-        endif()
-        find_library(AEC_LIBRARY NAMES aec PATHS ${_hdf5_libdir})
-        if (AEC_LIBRARY)
-          set(HDF5_LIBRARIES ${HDF5_LIBRARIES} ${AEC_LIBRARY})
-        endif()
-        if (SZ_LIBRARY AND AEC_LIBRARY)
-          find_library(Z_LIBRARY NAMES z)
-          if (Z_LIBRARY)
-            set(HDF5_LIBRARIES ${HDF5_LIBRARIES} ${Z_LIBRARY})
-          endif()
-        endif()
-      endforeach()
-    endif()
-
-    set(ARMA_LIBS ${ARMA_LIBS} ${HDF5_LIBRARIES})
-    # Since we called HDF5 with no arguments, the script will find only the C
-    # bindings.  So HDF5_INCLUDE_DIRS may now contain one or two elements; if it
-    # contains two, the first is what the user passed as HDF5_INCLUDE_DIR and we
-    # should use that as ARMA_HDF5_INCLUDE_DIR.  Otherwise, the one entry in
-    # HDF5_INCLUDE_DIRS is the correct include directory.  So, in either case we
-    # can use the first element in the list.  Issue a status message, too, just
-    # for good measure.
-    list(GET HDF5_INCLUDE_DIRS 0 ARMA_HDF5_INCLUDE_DIR)
-    message(STATUS "ARMA_HDF5_INCLUDE_DIR = ${ARMA_HDF5_INCLUDE_DIR}")
-    message(STATUS "")
-    message(STATUS "*** If use of HDF5 is causing problems,")
-    message(STATUS "*** rerun cmake with HDF5 detection disabled:")
-    message(STATUS "*** cmake -D DETECT_HDF5=false .")
-    message(STATUS "")
-  endif()
-endif()
-
 include(ARMA_FindARPACK)
 message(STATUS "ARPACK_FOUND = ${ARPACK_FOUND}")
 
@@ -563,24 +505,30 @@ endif()
 
 message(STATUS "")
 message(STATUS "*** Result of configuration:")
-message(STATUS "*** ARMA_USE_WRAPPER    = ${ARMA_USE_WRAPPER}")
-message(STATUS "*** ARMA_USE_LAPACK     = ${ARMA_USE_LAPACK}")
-message(STATUS "*** ARMA_USE_BLAS       = ${ARMA_USE_BLAS}")
-message(STATUS "*** ARMA_USE_ATLAS      = ${ARMA_USE_ATLAS}")
-message(STATUS "*** ARMA_USE_HDF5_CMAKE = ${ARMA_USE_HDF5_CMAKE}")
-message(STATUS "*** ARMA_USE_ARPACK     = ${ARMA_USE_ARPACK}")
-message(STATUS "*** ARMA_USE_EXTERN_RNG = ${ARMA_USE_EXTERN_RNG}")
-message(STATUS "*** ARMA_USE_SUPERLU    = ${ARMA_USE_SUPERLU}")
-message(STATUS "")
-message(STATUS "*** Armadillo wrapper library will use the following libraries:")
-message(STATUS "*** ARMA_LIBS = ${ARMA_LIBS}")
-message(STATUS "")
+message(STATUS "*** ARMA_USE_WRAPPER = ${ARMA_USE_WRAPPER}")
+message(STATUS "*** ARMA_USE_LAPACK  = ${ARMA_USE_LAPACK}")
+message(STATUS "*** ARMA_USE_BLAS    = ${ARMA_USE_BLAS}")
+message(STATUS "*** ARMA_USE_ATLAS   = ${ARMA_USE_ATLAS}")
+message(STATUS "*** ARMA_USE_ARPACK  = ${ARMA_USE_ARPACK}")
+message(STATUS "*** ARMA_USE_SUPERLU = ${ARMA_USE_SUPERLU}")
 
 
+if(BUILD_WRAPPER)
+  message(STATUS "")
+  message(STATUS "*** Armadillo wrapper library links with these libraries:")
+  message(STATUS "*** ARMA_LIBS = ${ARMA_LIBS}")
+else()
+  message(STATUS "")
+  message(STATUS "*** Armadillo programs must be manually linked with:")
+  message(STATUS "*** ARMA_LIBS = ${ARMA_LIBS}")
+endif()
+
+
+message(STATUS "")
 message(STATUS "Copying ${PROJECT_SOURCE_DIR}/include/ to ${PROJECT_BINARY_DIR}/tmp/include/")
 file(COPY ${PROJECT_SOURCE_DIR}/include/ DESTINATION ${PROJECT_BINARY_DIR}/tmp/include/)
 
-message(STATUS "Generating ${PROJECT_BINARY_DIR}/tmp/include/config.hpp")
+message(STATUS "Generating ${PROJECT_BINARY_DIR}/tmp/include/armadillo_bits/config.hpp")
 configure_file(${PROJECT_BINARY_DIR}/tmp/include/armadillo_bits/config.hpp.cmake ${PROJECT_BINARY_DIR}/tmp/include/armadillo_bits/config.hpp)
 
 
@@ -620,13 +568,25 @@ else()
 endif()
 
 
+message(STATUS "")
 message(STATUS "CMAKE_CXX_FLAGS           = ${CMAKE_CXX_FLAGS}"          )
 message(STATUS "CMAKE_SHARED_LINKER_FLAGS = ${CMAKE_SHARED_LINKER_FLAGS}")
 message(STATUS "CMAKE_REQUIRED_INCLUDES   = ${CMAKE_REQUIRED_INCLUDES}"  )
 
 
-add_library( armadillo ${PROJECT_SOURCE_DIR}/src/wrapper1.cpp ${PROJECT_SOURCE_DIR}/src/wrapper2.cpp )
-target_link_libraries( armadillo ${ARMA_LIBS} )
+if(BUILD_WRAPPER)
+  if(STATIC_LIB)
+    set(BUILD_SHARED_LIBS OFF)
+  else()
+    set(BUILD_SHARED_LIBS ON)
+  endif()
+  
+  add_library( armadillo ${PROJECT_SOURCE_DIR}/src/wrapper1.cpp ${PROJECT_SOURCE_DIR}/src/wrapper2.cpp )
+  target_link_libraries( armadillo ${ARMA_LIBS} )
+else()
+  add_library( armadillo INTERFACE )
+endif()
+
 # target_include_directories(armadillo INTERFACE $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include> $<INSTALL_INTERFACE:include>)
 target_include_directories(armadillo INTERFACE $<BUILD_INTERFACE:${PROJECT_BINARY_DIR}/tmp/include> $<INSTALL_INTERFACE:include>)
 set_target_properties(armadillo PROPERTIES VERSION ${ARMA_VERSION_MAJOR}.${ARMA_VERSION_MINOR_ALT}.${ARMA_VERSION_PATCH} SOVERSION ${ARMA_VERSION_MAJOR})
@@ -647,7 +607,7 @@ message(STATUS "CMAKE_INSTALL_BINDIR     = ${CMAKE_INSTALL_BINDIR}"    )
 # Note that the trailing / character in "include/" is critical
 
 install(DIRECTORY ${PROJECT_BINARY_DIR}/tmp/include/ DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
-PATTERN ".svn" EXCLUDE
+PATTERN ".git" EXCLUDE
 PATTERN "*.cmake" EXCLUDE
 PATTERN "*~" EXCLUDE
 PATTERN "*orig" EXCLUDE
@@ -658,6 +618,42 @@ install(TARGETS armadillo EXPORT ArmadilloLibraryDepends
   LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
   RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
   
+## smoke test
+
+if(BUILD_SMOKE_TEST)
+  if(HEADER_ONLY)
+    ## TODO: update to link smoke_test with ARMA_LIBS when HEADER_ONLY option is enabled
+    message(STATUS "*** building smoke_test not suported when HEADER_ONLY enabled")
+  else()
+    message(STATUS "*** configuring smoke_test")
+    enable_testing()
+    add_subdirectory(tests1)
+  endif()
+endif()
+
+## pkgconfig related
+## TODO: this currently doesn't handle the required SuperLU include dir
+## TODO: update armadillo.pc.in to link with ARMA_LIBS when HEADER_ONLY option is enabled
+
+if(HEADER_ONLY)
+  message(STATUS "*** generating pkgconfig files not suported when HEADER_ONLY enabled")
+else()
+  message(STATUS "*** copying ${PROJECT_SOURCE_DIR}/misc/ to ${PROJECT_BINARY_DIR}/tmp/misc/")
+  file(COPY ${PROJECT_SOURCE_DIR}/misc/ DESTINATION ${PROJECT_BINARY_DIR}/tmp/misc/)
+  
+  message(STATUS "*** generating '${PROJECT_BINARY_DIR}/tmp/misc/armadillo.pc'")
+  configure_file(${PROJECT_BINARY_DIR}/tmp/misc/armadillo.pc.in "${PROJECT_BINARY_DIR}/tmp/misc/armadillo.pc" @ONLY)
+  install(FILES "${PROJECT_BINARY_DIR}/tmp/misc/armadillo.pc" DESTINATION ${CMAKE_INSTALL_LIBDIR}/pkgconfig)
+endif()
+
+
+if(HEADER_ONLY)
+  message(STATUS "")
+  message(STATUS "*** HEADER_ONLY mode is enabled; skipping rest of configuration script")
+  return()
+endif()
+
+
 # Export the package for use from the build-tree
 # (this registers the build-tree with a global CMake-registry)
 export(PACKAGE armadillo)
@@ -667,7 +663,6 @@ export(PACKAGE armadillo)
 set(ARMADILLO_INCLUDE_DIRS "${PROJECT_BINARY_DIR}/tmp/include")
 set(ARMADILLO_LIB_DIR      "${PROJECT_BINARY_DIR}")
 set(ARMADILLO_CMAKE_DIR    "${PROJECT_BINARY_DIR}")
-
 
 message(STATUS "Generating '${PROJECT_BINARY_DIR}/ArmadilloConfig.cmake'")
 # copy/change config and configVersion file (modify only the @xyz@ variables)
@@ -706,23 +701,3 @@ install(FILES
   "${PROJECT_BINARY_DIR}/InstallFiles/ArmadilloConfig.cmake"
   "${PROJECT_BINARY_DIR}/InstallFiles/ArmadilloConfigVersion.cmake"
   DESTINATION "${ARMADILLO_CMAKE_DIR}" COMPONENT dev)
-
-
-# pkgconfig related
-
-message(STATUS "Copying ${PROJECT_SOURCE_DIR}/misc/ to ${PROJECT_BINARY_DIR}/tmp/misc/")
-file(COPY ${PROJECT_SOURCE_DIR}/misc/ DESTINATION ${PROJECT_BINARY_DIR}/tmp/misc/)
-
-message(STATUS "Generating '${PROJECT_BINARY_DIR}/tmp/misc/armadillo.pc'")
-configure_file(${PROJECT_BINARY_DIR}/tmp/misc/armadillo.pc.in "${PROJECT_BINARY_DIR}/tmp/misc/armadillo.pc" @ONLY)
-
-install(FILES "${PROJECT_BINARY_DIR}/tmp/misc/armadillo.pc" DESTINATION ${CMAKE_INSTALL_LIBDIR}/pkgconfig)
-
-
-# smoke test
-
-if(BUILD_SMOKE_TEST)
-  message(STATUS "*** configuring smoke_test")
-  enable_testing()
-  add_subdirectory(tests1)
-endif()

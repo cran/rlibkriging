@@ -115,6 +115,9 @@ foreach (MKL_NAME ${MKL_NAMES})
     /usr/local/mkl/*/lib/em64t
     /usr/local/mkl/*/lib/lib64
     /usr/local/mkl/*/lib/32
+    /usr/local/intel/oneapi/mkl/latest/lib
+    /opt/intel/oneapi/mkl/latest/lib
+    /opt/intel/oneapi/mkl/*/lib
     )
 
   set(TMP_LIBRARY ${${MKL_NAME}_LIBRARY})

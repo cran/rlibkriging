@@ -2,20 +2,20 @@
 % Please edit documentation in R/allGenerics.R
 \name{load}
 \alias{load}
-\title{Load any Kriging Model from a file storage.}
+\title{Load any Kriging Model from a file storage. Back to base::load if not a Kriging object.}
 \usage{
 load(filename, ...)
 }
 \arguments{
 \item{filename}{A file holding any Kriging object.}
 
-\item{...}{Not used.}
+\item{...}{Arguments used by base::load.}
 }
 \value{
-The loaded "*"Kriging object.
+The loaded "*"Kriging object, or nothing if base::load is used (update parent environment).
 }
 \description{
-Load any Kriging Model from a file storage.
+Load any Kriging Model from a file storage. Back to base::load if not a Kriging object.
 }
 \examples{
 f <- function(x) 1 - 1 / 2 * (sin(12 * x) / (1 + x) + 2 * cos(7 * x) * x^5 + 0.7)

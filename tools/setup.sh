@@ -67,6 +67,11 @@ sed -i.bak -e "s|add_subdirectory(tests)|##&|g" \
 sed -i.bak -e '/^add_custom_target(run_unit_tests$/,/^        )$/d;//d' \
   $LIBKRIGING_SRC_PATH/CMakeLists.txt
 rm -rf $LIBKRIGING_SRC_PATH/CMakeLists.txt.bak
+# also let libKriging Cmake search libs in R_HOME/... (eg. armadillo will search lapack in R_HOME/../libRlapack)
+sed -i.bak -e "s|APPEND CMAKE_SYSTEM_LIBRARY_PATH |APPEND CMAKE_SYSTEM_LIBRARY_PATH ${R_HOME}/lib |g" \
+  $LIBKRIGING_SRC_PATH/CMakeLists.txt
+rm -rf $LIBKRIGING_SRC_PATH/CMakeLists.txt.bak
+
 
 # Disable pragma that inhibit warnings
 sed -i.bak -e "s|#pragma|//&|g" \
@@ -154,5 +159,5 @@ rm -rf tests/bug*
 
 # sync man content
 rm -rf man
-"${R_HOME}"/bin/R -e "roxygen2::roxygenise(package.dir = '.')"
+"${R_HOME}"/bin/R -e "devtools::document('.')"
 rm -rf $LIBKRIGING_SRC_PATH/build

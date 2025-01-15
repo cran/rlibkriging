@@ -39,7 +39,7 @@ if test -z "$CXX"; then
     echo >&2 "Could not detect C++ compiler with R CMD config."
 fi
 
-${R_HOME}/bin${R_ARCH_BIN}/Rscript --vanilla -e "getRversion() > '4.0.0'" | grep TRUE > /dev/null
+${R_HOME}/bin${R_ARCH_BIN}/R --vanilla -e "getRversion() > '4.0.0'" | grep TRUE > /dev/null
 if [ $? -eq 0 ]; then
  	AR=`"${R_HOME}/bin${R_ARCH_BIN}/R" CMD config AR`
  	AR=`which $AR`

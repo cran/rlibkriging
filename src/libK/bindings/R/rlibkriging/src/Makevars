@@ -10,6 +10,7 @@
 ##        $ install_name_tool -delete_rpath ${__OLD_LC_RPATH__} ./Rlibs/rlibkriging/libs/rlibkriging.so
 
 MAKE_SHARED_LIBS=off
+STATIC_LIB=on
 export LIBKRIGING_PATH=$(shell pwd)/../inst/
 
 ifneq ("${MAKE_SHARED_LIBS}","off")
@@ -37,7 +38,7 @@ ifneq ($(USE_FLANG),)
   $(info Use FLANG with FLIBS: $(FLIBS))
 endif
 
-EXTERNAL_LIBS=$(shell LIBKRIGING_PATH=${LIBKRIGING_PATH} ../src/libK/bindings/R/tools/ExternalLibsExtractor.sh)
+EXTERNAL_LIBS=$(subst $\",,$(shell LIBKRIGING_PATH=${LIBKRIGING_PATH} ../src/libK/bindings/R/tools/ExternalLibsExtractor.sh))
 
 CXX_STD = CXX17
 

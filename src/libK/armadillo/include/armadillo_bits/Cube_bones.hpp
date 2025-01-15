@@ -62,7 +62,7 @@ class Cube : public BaseCube< eT, Cube<eT> >
   #if defined(ARMA_USE_OPENMP)
     using    raw_mat_ptr_type = mat_type*;
     using atomic_mat_ptr_type = mat_type*;
-  #elif (!defined(ARMA_DONT_USE_STD_MUTEX))
+  #elif defined(ARMA_USE_STD_MUTEX)
     using    raw_mat_ptr_type = mat_type*;
     using atomic_mat_ptr_type = std::atomic<mat_type*>;
   #else
@@ -72,7 +72,7 @@ class Cube : public BaseCube< eT, Cube<eT> >
   
   atomic_mat_ptr_type* mat_ptrs = nullptr;
   
-  #if (!defined(ARMA_DONT_USE_STD_MUTEX))
+  #if defined(ARMA_USE_STD_MUTEX)
     mutable std::mutex mat_mutex;   // required for slice()
   #endif
   
@@ -197,10 +197,10 @@ class Cube : public BaseCube< eT, Cube<eT> >
   template<typename T1> inline       subview_cube_each2<eT, T1> each_slice(const Base<uword, T1>& indices);
   template<typename T1> inline const subview_cube_each2<eT, T1> each_slice(const Base<uword, T1>& indices) const;
   
-  inline const Cube& each_slice(const std::function< void(      Mat<eT>&) >& F);
+  inline       Cube& each_slice(const std::function< void(      Mat<eT>&) >& F);
   inline const Cube& each_slice(const std::function< void(const Mat<eT>&) >& F) const;
   
-  inline const Cube& each_slice(const std::function< void(      Mat<eT>&) >& F, const bool use_mp);
+  inline       Cube& each_slice(const std::function< void(      Mat<eT>&) >& F, const bool use_mp);
   inline const Cube& each_slice(const std::function< void(const Mat<eT>&) >& F, const bool use_mp) const;
   
   
@@ -282,27 +282,27 @@ class Cube : public BaseCube< eT, Cube<eT> >
   template<typename T1, typename T2, typename glue_type> inline Cube& operator/=(const mtGlueCube<eT, T1, T2, glue_type>& X);
   
   
-  arma_inline arma_warn_unused const eT& at_alt     (const uword i) const;
+  arma_warn_unused arma_inline const eT& at_alt     (const uword i) const;
   
-  arma_inline arma_warn_unused       eT& operator[] (const uword i);
-  arma_inline arma_warn_unused const eT& operator[] (const uword i) const;
+  arma_warn_unused arma_inline       eT& operator[] (const uword i);
+  arma_warn_unused arma_inline const eT& operator[] (const uword i) const;
   
-  arma_inline arma_warn_unused       eT& at(const uword i);
-  arma_inline arma_warn_unused const eT& at(const uword i) const;
+  arma_warn_unused arma_inline       eT& at(const uword i);
+  arma_warn_unused arma_inline const eT& at(const uword i) const;
   
-  arma_inline arma_warn_unused       eT& operator() (const uword i);
-  arma_inline arma_warn_unused const eT& operator() (const uword i) const;
+  arma_warn_unused arma_inline       eT& operator() (const uword i);
+  arma_warn_unused arma_inline const eT& operator() (const uword i) const;
   
   #if defined(__cpp_multidimensional_subscript)
-  arma_inline arma_warn_unused       eT& operator[] (const uword in_row, const uword in_col, const uword in_slice);
-  arma_inline arma_warn_unused const eT& operator[] (const uword in_row, const uword in_col, const uword in_slice) const;
+  arma_warn_unused arma_inline       eT& operator[] (const uword in_row, const uword in_col, const uword in_slice);
+  arma_warn_unused arma_inline const eT& operator[] (const uword in_row, const uword in_col, const uword in_slice) const;
   #endif
   
-  arma_inline arma_warn_unused       eT& at         (const uword in_row, const uword in_col, const uword in_slice);
-  arma_inline arma_warn_unused const eT& at         (const uword in_row, const uword in_col, const uword in_slice) const;
+  arma_warn_unused arma_inline       eT& at         (const uword in_row, const uword in_col, const uword in_slice);
+  arma_warn_unused arma_inline const eT& at         (const uword in_row, const uword in_col, const uword in_slice) const;
   
-  arma_inline arma_warn_unused       eT& operator() (const uword in_row, const uword in_col, const uword in_slice);
-  arma_inline arma_warn_unused const eT& operator() (const uword in_row, const uword in_col, const uword in_slice) const;
+  arma_warn_unused arma_inline       eT& operator() (const uword in_row, const uword in_col, const uword in_slice);
+  arma_warn_unused arma_inline const eT& operator() (const uword in_row, const uword in_col, const uword in_slice) const;
   
   arma_inline const Cube& operator++();
   arma_inline void        operator++(int);
@@ -310,71 +310,71 @@ class Cube : public BaseCube< eT, Cube<eT> >
   arma_inline const Cube& operator--();
   arma_inline void        operator--(int);
   
-       inline arma_warn_unused bool is_finite() const;
-  arma_inline arma_warn_unused bool is_empty()  const;
+  arma_warn_unused arma_inline bool is_empty()  const;
   
-  inline arma_warn_unused bool has_inf()       const;
-  inline arma_warn_unused bool has_nan()       const;
-  inline arma_warn_unused bool has_nonfinite() const;
+  arma_warn_unused inline bool internal_is_finite()     const;
+  arma_warn_unused inline bool internal_has_inf()       const;
+  arma_warn_unused inline bool internal_has_nan()       const;
+  arma_warn_unused inline bool internal_has_nonfinite() const;
   
-  arma_inline arma_warn_unused bool in_range(const uword i) const;
-  arma_inline arma_warn_unused bool in_range(const span& x) const;
+  arma_warn_unused arma_inline bool in_range(const uword i) const;
+  arma_warn_unused arma_inline bool in_range(const span& x) const;
   
-  arma_inline arma_warn_unused bool in_range(const uword   in_row, const uword   in_col, const uword   in_slice) const;
-       inline arma_warn_unused bool in_range(const span& row_span, const span& col_span, const span& slice_span) const;
+  arma_warn_unused arma_inline bool in_range(const uword   in_row, const uword   in_col, const uword   in_slice) const;
+  arma_warn_unused      inline bool in_range(const span& row_span, const span& col_span, const span& slice_span) const;
   
-       inline arma_warn_unused bool in_range(const uword   in_row, const uword   in_col, const uword   in_slice, const SizeCube& s) const;
+  arma_warn_unused      inline bool in_range(const uword   in_row, const uword   in_col, const uword   in_slice, const SizeCube& s) const;
   
-  arma_inline arma_warn_unused       eT* memptr();
-  arma_inline arma_warn_unused const eT* memptr() const;
+  arma_warn_unused arma_inline       eT* memptr();
+  arma_warn_unused arma_inline const eT* memptr() const;
   
-  arma_inline arma_warn_unused       eT* slice_memptr(const uword slice);
-  arma_inline arma_warn_unused const eT* slice_memptr(const uword slice) const;
+  arma_warn_unused arma_inline       eT* slice_memptr(const uword slice);
+  arma_warn_unused arma_inline const eT* slice_memptr(const uword slice) const;
   
-  arma_inline arma_warn_unused       eT* slice_colptr(const uword in_slice, const uword in_col);
-  arma_inline arma_warn_unused const eT* slice_colptr(const uword in_slice, const uword in_col) const;
+  arma_warn_unused arma_inline       eT* slice_colptr(const uword in_slice, const uword in_col);
+  arma_warn_unused arma_inline const eT* slice_colptr(const uword in_slice, const uword in_col) const;
   
-  inline void set_size(const uword new_n_rows, const uword new_n_cols, const uword new_n_slices);
-  inline void set_size(const SizeCube& s);
+  inline Cube& set_size(const uword new_n_rows, const uword new_n_cols, const uword new_n_slices);
+  inline Cube& set_size(const SizeCube& s);
   
-  inline void reshape(const uword new_n_rows, const uword new_n_cols, const uword new_n_slices);
-  inline void reshape(const SizeCube& s);
+  inline Cube& reshape(const uword new_n_rows, const uword new_n_cols, const uword new_n_slices);
+  inline Cube& reshape(const SizeCube& s);
                   
-  inline void resize(const uword new_n_rows, const uword new_n_cols, const uword new_n_slices);
-  inline void resize(const SizeCube& s);
+  inline Cube& resize(const uword new_n_rows, const uword new_n_cols, const uword new_n_slices);
+  inline Cube& resize(const SizeCube& s);
   
   
-  template<typename eT2> inline void copy_size(const Cube<eT2>& m);
+  template<typename eT2> inline Cube& copy_size(const Cube<eT2>& m);
   
-  template<typename functor> inline const Cube&  for_each(functor F);
+  template<typename functor> inline       Cube&  for_each(functor F);
   template<typename functor> inline const Cube&  for_each(functor F) const;
   
-  template<typename functor> inline const Cube& transform(functor F);
-  template<typename functor> inline const Cube&     imbue(functor F);
+  template<typename functor> inline       Cube& transform(functor F);
+  template<typename functor> inline       Cube&     imbue(functor F);
   
-  inline const Cube& replace(const eT old_val, const eT new_val);
+  inline Cube& replace(const eT old_val, const eT new_val);
   
-  inline const Cube& clean(const pod_type threshold);
+  inline Cube& clean(const pod_type threshold);
   
-  inline const Cube& clamp(const eT min_val, const eT max_val);
+  inline Cube& clamp(const eT min_val, const eT max_val);
   
-  inline const Cube& fill(const eT val);
+  inline Cube& fill(const eT val);
   
-  inline const Cube& zeros();
-  inline const Cube& zeros(const uword new_n_rows, const uword new_n_cols, const uword new_n_slices);
-  inline const Cube& zeros(const SizeCube& s);
+  inline Cube& zeros();
+  inline Cube& zeros(const uword new_n_rows, const uword new_n_cols, const uword new_n_slices);
+  inline Cube& zeros(const SizeCube& s);
   
-  inline const Cube& ones();
-  inline const Cube& ones(const uword new_n_rows, const uword new_n_cols, const uword new_n_slices);
-  inline const Cube& ones(const SizeCube& s);
+  inline Cube& ones();
+  inline Cube& ones(const uword new_n_rows, const uword new_n_cols, const uword new_n_slices);
+  inline Cube& ones(const SizeCube& s);
   
-  inline const Cube& randu();
-  inline const Cube& randu(const uword new_n_rows, const uword new_n_cols, const uword new_n_slices);
-  inline const Cube& randu(const SizeCube& s);
+  inline Cube& randu();
+  inline Cube& randu(const uword new_n_rows, const uword new_n_cols, const uword new_n_slices);
+  inline Cube& randu(const SizeCube& s);
   
-  inline const Cube& randn();
-  inline const Cube& randn(const uword new_n_rows, const uword new_n_cols, const uword new_n_slices);
-  inline const Cube& randn(const SizeCube& s);
+  inline Cube& randn();
+  inline Cube& randn(const uword new_n_rows, const uword new_n_cols, const uword new_n_slices);
+  inline Cube& randn(const SizeCube& s);
   
   inline void      reset();
   inline void soft_reset();
@@ -384,31 +384,30 @@ class Cube : public BaseCube< eT, Cube<eT> >
   template<typename T1> inline void set_imag(const BaseCube<pod_type,T1>& X);
   
   
-  inline arma_warn_unused eT min() const;
-  inline arma_warn_unused eT max() const;
+  arma_warn_unused inline eT min() const;
+  arma_warn_unused inline eT max() const;
   
-  inline eT min(uword& index_of_min_val) const;
-  inline eT max(uword& index_of_max_val) const;
+  arma_frown("use .index_min() instead") inline eT min(uword& index_of_min_val) const;
+  arma_frown("use .index_max() instead") inline eT max(uword& index_of_max_val) const;
   
-  inline eT min(uword& row_of_min_val, uword& col_of_min_val, uword& slice_of_min_val) const;
-  inline eT max(uword& row_of_max_val, uword& col_of_max_val, uword& slice_of_max_val) const;
+  arma_frown("use .index_min() with ind2sub() instead") inline eT min(uword& row_of_min_val, uword& col_of_min_val, uword& slice_of_min_val) const;
+  arma_frown("use .index_max() with ind2sub() instead") inline eT max(uword& row_of_max_val, uword& col_of_max_val, uword& slice_of_max_val) const;
   
+  arma_cold inline bool save(const std::string   name, const file_type type = arma_binary) const;
+  arma_cold inline bool save(const hdf5_name&    spec, const file_type type = hdf5_binary) const;
+  arma_cold inline bool save(      std::ostream& os,   const file_type type = arma_binary) const;
   
-  inline arma_cold bool save(const std::string   name, const file_type type = arma_binary) const;
-  inline arma_cold bool save(const hdf5_name&    spec, const file_type type = hdf5_binary) const;
-  inline arma_cold bool save(      std::ostream& os,   const file_type type = arma_binary) const;
+  arma_cold inline bool load(const std::string   name, const file_type type = auto_detect);
+  arma_cold inline bool load(const hdf5_name&    spec, const file_type type = hdf5_binary);
+  arma_cold inline bool load(      std::istream& is,   const file_type type = auto_detect);
   
-  inline arma_cold bool load(const std::string   name, const file_type type = auto_detect);
-  inline arma_cold bool load(const hdf5_name&    spec, const file_type type = hdf5_binary);
-  inline arma_cold bool load(      std::istream& is,   const file_type type = auto_detect);
+  arma_deprecated inline bool quiet_save(const std::string   name, const file_type type = arma_binary) const;
+  arma_deprecated inline bool quiet_save(const hdf5_name&    spec, const file_type type = hdf5_binary) const;
+  arma_deprecated inline bool quiet_save(      std::ostream& os,   const file_type type = arma_binary) const;
   
-  inline arma_cold bool quiet_save(const std::string   name, const file_type type = arma_binary) const;
-  inline arma_cold bool quiet_save(const hdf5_name&    spec, const file_type type = hdf5_binary) const;
-  inline arma_cold bool quiet_save(      std::ostream& os,   const file_type type = arma_binary) const;
-  
-  inline arma_cold bool quiet_load(const std::string   name, const file_type type = auto_detect);
-  inline arma_cold bool quiet_load(const hdf5_name&    spec, const file_type type = hdf5_binary);
-  inline arma_cold bool quiet_load(      std::istream& is,   const file_type type = auto_detect);
+  arma_deprecated inline bool quiet_load(const std::string   name, const file_type type = auto_detect);
+  arma_deprecated inline bool quiet_load(const hdf5_name&    spec, const file_type type = hdf5_binary);
+  arma_deprecated inline bool quiet_load(      std::istream& is,   const file_type type = auto_detect);
   
   
   // iterators
@@ -437,11 +436,11 @@ class Cube : public BaseCube< eT, Cube<eT> >
   inline bool  empty() const;
   inline uword size()  const;
   
-  inline arma_warn_unused       eT& front();
-  inline arma_warn_unused const eT& front() const;
+  arma_warn_unused inline       eT& front();
+  arma_warn_unused inline const eT& front() const;
   
-  inline arma_warn_unused       eT& back();
-  inline arma_warn_unused const eT& back() const;
+  arma_warn_unused inline       eT& back();
+  arma_warn_unused inline const eT& back() const;
   
   inline void swap(Cube& B);
   
@@ -486,6 +485,9 @@ class Cube<eT>::fixed : public Cube<eT>
   {
   private:
   
+  using Cube<eT>::mat_ptrs_local;
+  using Cube<eT>::mem_local;
+  
   static constexpr uword fixed_n_elem       = fixed_n_rows * fixed_n_cols * fixed_n_slices;
   static constexpr uword fixed_n_elem_slice = fixed_n_rows * fixed_n_cols;
   
@@ -513,25 +515,25 @@ class Cube<eT>::fixed : public Cube<eT>
   inline Cube& operator=(const fixed<fixed_n_rows, fixed_n_cols, fixed_n_slices>& X);
   
   
-  arma_inline arma_warn_unused       eT& operator[] (const uword i);
-  arma_inline arma_warn_unused const eT& operator[] (const uword i) const;
+  arma_warn_unused arma_inline       eT& operator[] (const uword i);
+  arma_warn_unused arma_inline const eT& operator[] (const uword i) const;
   
-  arma_inline arma_warn_unused       eT& at         (const uword i);
-  arma_inline arma_warn_unused const eT& at         (const uword i) const;
+  arma_warn_unused arma_inline       eT& at         (const uword i);
+  arma_warn_unused arma_inline const eT& at         (const uword i) const;
   
-  arma_inline arma_warn_unused       eT& operator() (const uword i);
-  arma_inline arma_warn_unused const eT& operator() (const uword i) const;
+  arma_warn_unused arma_inline       eT& operator() (const uword i);
+  arma_warn_unused arma_inline const eT& operator() (const uword i) const;
   
   #if defined(__cpp_multidimensional_subscript)
-  arma_inline arma_warn_unused       eT& operator[] (const uword in_row, const uword in_col, const uword in_slice);
-  arma_inline arma_warn_unused const eT& operator[] (const uword in_row, const uword in_col, const uword in_slice) const;
+  arma_warn_unused arma_inline       eT& operator[] (const uword in_row, const uword in_col, const uword in_slice);
+  arma_warn_unused arma_inline const eT& operator[] (const uword in_row, const uword in_col, const uword in_slice) const;
   #endif
   
-  arma_inline arma_warn_unused       eT& at         (const uword in_row, const uword in_col, const uword in_slice);
-  arma_inline arma_warn_unused const eT& at         (const uword in_row, const uword in_col, const uword in_slice) const;
+  arma_warn_unused arma_inline       eT& at         (const uword in_row, const uword in_col, const uword in_slice);
+  arma_warn_unused arma_inline const eT& at         (const uword in_row, const uword in_col, const uword in_slice) const;
   
-  arma_inline arma_warn_unused       eT& operator() (const uword in_row, const uword in_col, const uword in_slice);
-  arma_inline arma_warn_unused const eT& operator() (const uword in_row, const uword in_col, const uword in_slice) const;
+  arma_warn_unused arma_inline       eT& operator() (const uword in_row, const uword in_col, const uword in_slice);
+  arma_warn_unused arma_inline const eT& operator() (const uword in_row, const uword in_col, const uword in_slice) const;
   };
 
 

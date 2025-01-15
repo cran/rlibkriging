@@ -29,7 +29,7 @@ as.km <- function(x, ...) {
 
 ## True generic
 setGeneric(name = "covMat",
-           def = function(object, ...) standardGeneric("covMat"))
+                     def = function(object, ...) standardGeneric("covMat"))
 
 ## *****************************************************************************
 ##' Compute the covariance matrix of a model given in \code{object},
@@ -48,13 +48,13 @@ covMat <- function(object, ...) {
 
 
 setGeneric(name = "logLikelihoodFun",
-           def = function(object, ...) standardGeneric("logLikelihoodFun"))
+                     def = function(object, ...) standardGeneric("logLikelihoodFun"))
 
 setGeneric(name = "logMargPostFun",
-           def = function(object, ...) standardGeneric("logMargPostFun"))
+                     def = function(object, ...) standardGeneric("logMargPostFun"))
 
 setGeneric(name = "leaveOneOutFun",
-           def = function(object, ...) standardGeneric("leaveOneOutFun"))
+                     def = function(object, ...) standardGeneric("leaveOneOutFun"))
 
 ## *****************************************************************************
 ##' Compute the leave-One-Out error of a model given in \code{object},
@@ -215,31 +215,73 @@ fit <- function(object, ...) {
     UseMethod("fit")
 }
 
-
 ## *****************************************************************************
-##' Save a model given in
-##' \code{object}.
-##'
-##' @title Save object.
-##'
-##' @param object An object representing a fitted model.
-##' @param ... Ignored.
-##'
-##' @return The saved object.
+##' Save a Kriging Model inside a file. Back to base::save if argument 
+##' is not a Kriging object.
+##' 
+##' @author Yann Richet \email{yann.richet@irsn.fr}
+##' 
+##' @param object An object representing a model.
+##' @param filename A file to save the object.
+##' @param ... Arguments used by base::save.
+##' 
 ##' @export
-save <- function(object, ...) {
-    UseMethod("save")
+save <- function(object=NULL, filename=NULL, ...) {
+    if (is.null(object) || !isTRUE(class(object) %in% c("Kriging","NuggetKriging","NoiseKriging"))) {# back to base::save
+        # warning("Using base::save")
+        if (!is.null(filename)) {
+            if (!is.null(object)) {
+                if ("envir" %in% names(list(...)))
+                    base::save(list=as.character(substitute(object)), file=filename, ...)
+                else
+                    base::save(list=as.character(substitute(object)), file=filename, envir=parent.frame(n=1), ...)
+            } else {
+                if ("envir" %in% names(list(...)))
+                    base::save(..., file=filename)
+                else
+                    base::save(..., file=filename, envir=parent.frame(n=1))
+            }
+        } else {
+            if (!is.null(object)) {
+                if ("envir" %in% names(list(...)))
+                    base::save(list=as.character(substitute(object)), ...)
+                else
+                    base::save(list=as.character(substitute(object)), envir=parent.frame(n=1), ...)
+            } else {
+                if ("envir" %in% names(list(...)))
+                    base::save(...)
+                else
+                    base::save(..., envir=parent.frame(n=1))
+            }
+        }
+    } else {
+        if (is.null(filename) || !is.character(filename))
+            stop("'filename' must be a string")
+        if (length(L <- list(...)) > 0) warnOnDots(L)
+        k_class = class(object)
+        if (is.null(k_class))
+            stop("No class for: ",as.character(substitute(object)))
+        
+        if (k_class=="Kriging")
+            return(save.Kriging(object, filename))
+        else if (k_class=="NuggetKriging")
+            return(save.NuggetKriging(object, filename))
+        else if (k_class=="NoiseKriging")
+            return(save.NoiseKriging(object, filename))
+        else 
+            stop("Unknown Kriging class: ",k_class)
+    }
 }
 
 ## *****************************************************************************
-##' Load any Kriging Model from a file storage.
+##' Load any Kriging Model from a file storage. Back to base::load if not a Kriging object.
 ##'
 ##' @author Yann Richet \email{yann.richet@irsn.fr}
 ##'
 ##' @param filename A file holding any Kriging object.
-##' @param ... Not used.
+##' @param ... Arguments used by base::load.
 ##'
-##' @return The loaded "*"Kriging object.
+##' @return The loaded "*"Kriging object, or nothing if base::load is used (update parent environment).
 ##'
 ##' @export
 ##' 
@@ -257,29 +299,54 @@ save <- function(object, ...) {
 ##'
 ##' print(load(outfile))
 load <- function(filename, ...) {
-    if (!is.character(filename) ||
-        endsWith(filename,"Rdata") ||
-        endsWith(filename,"RData") ||
-        endsWith(filename,"rdata") ||
-        endsWith(filename,"Rds") ||
-        endsWith(filename,"rds")
-        ) # back to base::load
-        base::load(file=filename,...)
-        #stop("'filename' must be a string")
-    else {
+    if (is.null(filename) ||
+            !is.character(filename) ||
+            endsWith(filename,"Rdata") ||
+            endsWith(filename,"RData") ||
+            endsWith(filename,"rdata") ||
+            endsWith(filename,"Rds") ||
+            endsWith(filename,"rds")
+    ) {# back to base::load
+        # warning("Using base::load")
+        if (! "envir" %in% names(list(...))) {
+            envir = parent.frame(n=2)
+            if (is.null(filename) || !is.character(filename))
+                base::load(...,envir=envir)
+            else 
+                base::load(file=filename,...,envir=envir)
+        } else {
+            if (is.null(filename) || !is.character(filename))
+                base::load(...)
+            else 
+                base::load(file=filename,...)
+        }
+    } else {
         if (length(L <- list(...)) > 0) warnOnDots(L)
         k_class = NULL
         base::try(k_class <- class_saved(filename))
-        if (is.null(k_class))
-            return(base::load(file=filename,...))
-        else
+        if (is.null(k_class)) {# back to base::load
+            # warning("Using base::load")
+            if (! "envir" %in% names(list(...))) {
+                envir = parent.frame(n=2)
+                if (is.null(filename) || !is.character(filename))
+                    base::load(...,envir=envir)
+                else 
+                    base::load(file=filename,...,envir=envir)
+            } else {
+                if (is.null(filename) || !is.character(filename))
+                    base::load(...)
+                else 
+                    base::load(file=filename,...)
+            }
+        } else {
             if (k_class=="Kriging")
-                return(load.Kriging(filename))
+                    return(load.Kriging(filename))
             else if (k_class=="NuggetKriging")
                 return(load.NuggetKriging(filename))
             else if (k_class=="NoiseKriging")
                 return(load.NoiseKriging(filename))
             else 
                 stop("Unknown Kriging class: ",k_class)
+        }
     }
 }

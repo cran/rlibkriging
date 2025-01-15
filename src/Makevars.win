@@ -2,6 +2,7 @@
 ## https://cran.r-project.org/doc/manuals/r-release/R-exts.html#Using-Makevars
 
 MAKE_SHARED_LIBS=off
+STATIC_LIB=on
 export LIBKRIGING_PATH=$(shell pwd)/../inst/
 EXTRA_SYSTEM_LIBRARY_PATH="."
 
@@ -11,7 +12,7 @@ else
 	LIB_SUFFIX=a
 endif
 
-EXTERNAL_LIBS=$(shell LIBKRIGING_PATH=${LIBKRIGING_PATH} ../src/libK/bindings/R/tools/ExternalLibsExtractor.sh | sed 's|\S*libopenblas\S*||g')
+EXTERNAL_LIBS=$(subst $\",,$(shell LIBKRIGING_PATH=${LIBKRIGING_PATH} ../src/libK/bindings/R/tools/ExternalLibsExtractor.sh | sed 's|\S*libopenblas\S*||g'))
 
 CXX_STD = CXX17
 

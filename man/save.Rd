@@ -2,19 +2,22 @@
 % Please edit documentation in R/allGenerics.R
 \name{save}
 \alias{save}
-\title{Save object.}
+\title{Save a Kriging Model inside a file. Back to base::save if argument 
+is not a Kriging object.}
 \usage{
-save(object, ...)
+save(object = NULL, filename = NULL, ...)
 }
 \arguments{
-\item{object}{An object representing a fitted model.}
+\item{object}{An object representing a model.}
 
-\item{...}{Ignored.}
-}
-\value{
-The saved object.
+\item{filename}{A file to save the object.}
+
+\item{...}{Arguments used by base::save.}
 }
 \description{
-Save a model given in
-\code{object}.
+Save a Kriging Model inside a file. Back to base::save if argument 
+is not a Kriging object.
+}
+\author{
+Yann Richet \email{yann.richet@irsn.fr}
 }
