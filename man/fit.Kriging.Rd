@@ -75,5 +75,5 @@ fit(k,y,X)
 print(k)
 }
 \author{
-Yann Richet \email{yann.richet@irsn.fr}
+Yann Richet \email{yann.richet@asnr.fr}
 }

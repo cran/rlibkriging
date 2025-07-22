@@ -88,7 +88,7 @@ k <- tryCatch( # needed to catch warning due to %dopar% usage when using multist
     withCallingHandlers(
       {
         error_text <- "No error."
-        DiceKriging::km(design=X,response=y,covtype = "gauss",multistart = 10, parinit=parinit,control = list(trace=F))
+        DiceKriging::km(design=X,response=y,covtype = "gauss", multistart = 1 , parinit=parinit,control = list(trace=F))
       },
       warning = function(e) {
         error_text <<- trimws(paste0("WARNING: ", e))

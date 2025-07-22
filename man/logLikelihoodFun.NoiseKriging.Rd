@@ -54,5 +54,5 @@ contour(t,s2,matrix(ncol=length(s2),ll(expand.grid(t,s2))),xlab="theta",ylab="si
 points(k$theta(),k$sigma2(),col='blue')
 }
 \author{
-Yann Richet \email{yann.richet@irsn.fr}
+Yann Richet \email{yann.richet@asnr.fr}
 }

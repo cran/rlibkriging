@@ -105,5 +105,5 @@ lines(x, p2_x$upper95, col = "red")
     class \code{"km"}.
 }
 \author{
-Yann Richet \email{yann.richet@irsn.fr}
+Yann Richet \email{yann.richet@asnr.fr}
 }

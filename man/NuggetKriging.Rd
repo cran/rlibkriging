@@ -80,5 +80,5 @@ s <- simulate(k, nsim = 10, seed = 123, x = x)
 matlines(x, s, col = rgb(0, 0, 1, 0.2), type = "l", lty = 1)
 }
 \author{
-Yann Richet \email{yann.richet@irsn.fr}
+Yann Richet \email{yann.richet@asnr.fr}
 }

@@ -1,3 +1,4 @@
+if(requireNamespace('RobustGaSP', quietly = TRUE)) {
 library(testthat)
  Sys.setenv('OMP_THREAD_LIMIT'=2)
  library(rlibkriging)
@@ -93,4 +94,5 @@ for (kernel in c("matern5_2","matern3_2")) {
   
   test_that(desc="logMargPost Grad is the same that RobustGaSP one", 
             expect_equal(logMargPostFun(r,c(x,1/(1+k@nugget)),return_grad = T)$logMargPostGrad[1],lmp_deriv(x),tolerance= precision))
+}
 }

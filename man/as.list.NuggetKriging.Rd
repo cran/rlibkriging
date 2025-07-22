@@ -36,5 +36,5 @@ l <- as.list(k)
 cat(paste0(names(l), " =" , l, collapse = "\n"))
 }
 \author{
-Yann Richet \email{yann.richet@irsn.fr}
+Yann Richet \email{yann.richet@asnr.fr}
 }

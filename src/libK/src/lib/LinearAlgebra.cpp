@@ -62,10 +62,10 @@ arma::mat LinearAlgebra::safe_chol_lower_retry(arma::mat X, int inc_cond) {
   }
   if (!ok || wrong_rcond) {
     if (inc_cond > max_inc_choldiag) {
-      throw std::runtime_error("[ERROR] Exceed max numerical nugget (" + std::to_string(inc_cond) + " x 1e"
+      Rcpp::stop("[ERROR] Exceed max numerical nugget (" + std::to_string(inc_cond) + " x 1e"
                                + std::to_string(log10(LinearAlgebra::num_nugget)) + ") added to force chol matrix");
     } else if (LinearAlgebra::num_nugget <= 0.0) {
-      throw std::runtime_error("[ERROR] Cannot add numerical nugget which is not strictly positive: "
+      Rcpp::stop("[ERROR] Cannot add numerical nugget which is not strictly positive: "
                                + std::to_string(LinearAlgebra::num_nugget));
     } else {
       X.diag() += LinearAlgebra::num_nugget;  // inc diagonal
@@ -73,8 +73,9 @@ arma::mat LinearAlgebra::safe_chol_lower_retry(arma::mat X, int inc_cond) {
     }
     // t0 = Bench::toc(nullptr, "        inc_cond" ,t0);
   } else {
-    if (warn_chol && (inc_cond > 0))
-      arma::cout << "[WARNING] Added " << inc_cond << " numerical nugget to force Cholesky decomposition" << arma::endl;
+    if (warn_chol && (inc_cond > 0)) {
+      Rcpp::Rcout << "[WARNING] Added " << inc_cond << " numerical nugget to force Cholesky decomposition" << arma::endl;
+    }
     return L;
   }
 }
@@ -85,8 +86,9 @@ LIBKRIGING_EXPORT double LinearAlgebra::rcond_chol(arma::mat chol) {
   double rcond = arma::rcond(chol);
   rcond *= rcond;
   if (warn_chol)
-    if (rcond < (chol.n_rows * min_rcond))
-      arma::cout << "[WARNING] rcond " << rcond << " is below minimal value." << arma::endl;
+    if (rcond < (chol.n_rows * min_rcond)) {
+      Rcpp::Rcout << "[WARNING] rcond " << rcond << " is below minimal value." << arma::endl;
+    }
   return rcond;
 }
 
@@ -109,8 +111,9 @@ LIBKRIGING_EXPORT double LinearAlgebra::rcond_approx_chol(arma::mat chol) {
   double rcond = m / M;
   rcond = rcond * rcond;
   if (warn_chol)
-    if (rcond < (chol.n_rows * min_rcond_approx))
-      arma::cout << "[WARNING] rcond_approx " << rcond << " is below minimal value." << arma::endl;
+    if (rcond < (chol.n_rows * min_rcond_approx)) {
+      Rcpp::Rcout << "[WARNING] rcond_approx " << rcond << " is below minimal value." << arma::endl;
+    }
   return rcond;
 }
 

@@ -33,7 +33,7 @@ classKriging <- function(nk) {
 #' are estimated thanks to the optimization of a criterion given by
 #' \code{objective}, using the method given in \code{optim}.
 #'
-#' @author Yann Richet \email{yann.richet@irsn.fr}
+#' @author Yann Richet \email{yann.richet@asnr.fr}
 #'
 #' @param y Numeric vector of response values.
 #' @param X Numeric matrix of input design.
@@ -120,7 +120,7 @@ Kriging <- function(y=NULL, X=NULL, kernel=NULL,
 
 #' Coerce a \code{Kriging} Object into a List
 #'
-#' @author Yann Richet \email{yann.richet@irsn.fr}
+#' @author Yann Richet \email{yann.richet@asnr.fr}
 #'
 #' @param x An object with class \code{"Kriging"}.
 #' @param ... Ignored
@@ -155,7 +155,7 @@ as.list.Kriging <- function(x, ...) {
 #' Coerce a \code{Kriging} object into the \code{"km"} class of the
 #' \pkg{DiceKriging} package.
 #'
-#' @author Yann Richet \email{yann.richet@irsn.fr}
+#' @author Yann Richet \email{yann.richet@asnr.fr}
 #'
 #' @param x An object with S3 class \code{"Kriging"}.
 #' @param .call Force the \code{call} slot to be filled in the
@@ -270,7 +270,7 @@ as.km.Kriging <- function(x, .call = NULL, ...) {
 
 #' Print the content of a \code{Kriging} object.
 #'
-#' @author Yann Richet \email{yann.richet@irsn.fr}
+#' @author Yann Richet \email{yann.richet@asnr.fr}
 #'
 #' @param x A (S3) \code{Kriging} Object.
 #' @param ... Ignored.
@@ -305,7 +305,7 @@ print.Kriging <- function(x, ...) {
 #' are estimated thanks to the optimization of a criterion given by
 #' \code{objective}, using the method given in \code{optim}.
 #'
-#' @author Yann Richet \email{yann.richet@irsn.fr}
+#' @author Yann Richet \email{yann.richet@asnr.fr}
 #'
 #' @param object S3 Kriging object.
 #' @param y Numeric vector of response values.
@@ -382,7 +382,7 @@ fit.Kriging <- function(object, y, X,
 #' stochastic process, conditional on the values at the input points
 #' used when fitting the model.
 #'
-#' @author Yann Richet \email{yann.richet@irsn.fr}
+#' @author Yann Richet \email{yann.richet@asnr.fr}
 #'
 #' @param object S3 Kriging object.
 #' @param x Input points where the prediction must be computed.
@@ -425,13 +425,9 @@ fit.Kriging <- function(object, y, X,
 #'  border = NA, col = rgb(0, 0, 1, 0.2))
 predict.Kriging <- function(object, x, return_stdev = TRUE, return_cov = FALSE, return_deriv = FALSE, ...) {
     if (length(L <- list(...)) > 0) warnOnDots(L)
-    k <- kriging_model(object)
     ## manage the data frame case. Ideally we should then warn
     if (is.data.frame(x)) x = data.matrix(x)
-    if (!is.matrix(x)) x=matrix(x,ncol=ncol(k$X))
-    if (ncol(x) != ncol(k$X))
-        stop("Input x must have ", ncol(k$X), " columns (instead of ",
-             ncol(x), ")")
+    if (!is.matrix(x)) x=matrix(x,ncol=ncol(object$X()))
     return(kriging_predict(object, x, return_stdev, return_cov, return_deriv))
 }
 
@@ -442,7 +438,7 @@ predict.Kriging <- function(object, x, return_stdev = TRUE, return_cov = FALSE, 
 #' points conditional on the values at the input points used in the
 #' fit.
 #'
-#' @author Yann Richet \email{yann.richet@irsn.fr}
+#' @author Yann Richet \email{yann.richet@asnr.fr}
 #'
 #' @param object S3 Kriging object.
 #' @param nsim Number of simulations to perform.
@@ -484,13 +480,9 @@ predict.Kriging <- function(object, x, return_stdev = TRUE, return_cov = FALSE, 
 #' lines(x, s[ , 3], col = "blue")
 simulate.Kriging <- function(object, nsim = 1, seed = 123, x, will_update = FALSE, ...) {
     if (length(L <- list(...)) > 0) warnOnDots(L)
-    k <- kriging_model(object)
+    ## manage the data frame case. Ideally we should then warn
     if (is.data.frame(x)) x = data.matrix(x)
-    if (!is.matrix(x)) x = matrix(x, ncol = ncol(k$X))
-    if (ncol(x) != ncol(k$X))
-        stop("Input x must have ", ncol(k$X), " columns (instead of ",
-             ncol(x),")")
-    ## XXXY
+    if (!is.matrix(x)) x=matrix(x,ncol=ncol(object$X()))
     if (is.null(seed)) seed <- floor(runif(1) * 99999)
     return(kriging_simulate(object, nsim = nsim, seed = seed, X_n = x, will_update = will_update))
 }
@@ -500,7 +492,7 @@ simulate.Kriging <- function(object, nsim = 1, seed = 123, x, will_update = FALS
 #' This method draws paths of the stochastic process conditional on the values at the input points used in the
 #' fit, plus the new input points and their values given as argument (knonw as 'update' points).
 #'
-#' @author Yann Richet \email{yann.richet@irsn.fr}
+#' @author Yann Richet \email{yann.richet@asnr.fr}
 #'
 #' @param object S3 Kriging object.
 #' @param y_u Numeric vector of new responses (output).
@@ -542,24 +534,17 @@ simulate.Kriging <- function(object, nsim = 1, seed = 123, x, will_update = FALS
 #' lines(x, su[ , 3], col = "blue", lty=2)
 update_simulate.Kriging <- function(object, y_u, X_u, ...) {
     if (length(L <- list(...)) > 0) warnOnDots(L)
-    k <- kriging_model(object)
     if (is.data.frame(X_u)) X_u = data.matrix(X_u)
-    if (!is.matrix(X_u)) X_u <- matrix(X_u, ncol = ncol(k$X))
+    if (!is.matrix(X_u)) X_u <- matrix(X_u, ncol = ncol(object$X()))
     if (is.data.frame(y_u)) y_u = data.matrix(y_u)
-    if (!is.matrix(y_u)) y_u <- matrix(y_u, ncol = ncol(k$y))
-    if (ncol(X_u) != ncol(k$X))
-        stop("Object 'X_u' must have ", ncol(k$X), " columns (instead of ",
-             ncol(X_u), ")")
-    if (nrow(y_u) != nrow(X_u))
-        stop("Objects 'X_u' and 'y_u' must have the same number of rows.")
-
+    if (!is.matrix(y_u)) y_u <- matrix(y_u, ncol = 1)
     ## Modify 'object' in the parent environment
     return(kriging_update_simulate(object, y_u, X_u))
 }
 
 #' Update a \code{Kriging} model object with new points
 #'
-#' @author Yann Richet \email{yann.richet@irsn.fr}
+#' @author Yann Richet \email{yann.richet@asnr.fr}
 #'
 #' @param object S3 Kriging object.
 #' @param y_u Numeric vector of new responses (output).
@@ -610,17 +595,10 @@ update_simulate.Kriging <- function(object, y_u, X_u, ...) {
 #'  border = NA, col = rgb(1, 0, 0, 0.2))
 update.Kriging <- function(object, y_u, X_u, refit=TRUE,...) {
     if (length(L <- list(...)) > 0) warnOnDots(L)
-    k <- kriging_model(object)
     if (is.data.frame(X_u)) X_u = data.matrix(X_u)
-    if (!is.matrix(X_u)) X_u <- matrix(X_u, ncol = ncol(k$X))
+    if (!is.matrix(X_u)) X_u <- matrix(X_u, ncol = ncol(object$X()))
     if (is.data.frame(y_u)) y_u = data.matrix(y_u)
-    if (!is.matrix(y_u)) y_u <- matrix(y_u, ncol = ncol(k$y))
-    if (ncol(X_u) != ncol(k$X))
-        stop("Object 'X_u' must have ", ncol(k$X), " columns (instead of ",
-             ncol(X_u), ")")
-    if (nrow(y_u) != nrow(X_u))
-        stop("Objects 'X_u' and 'y_u' must have the same number of rows.")
-
+    if (!is.matrix(y_u)) y_u <- matrix(y_u, ncol = 1)
     ## Modify 'object' in the parent environment
     kriging_update(object, y_u, X_u, refit)
 
@@ -629,7 +607,7 @@ update.Kriging <- function(object, y_u, X_u, refit=TRUE,...) {
 
 #' Save a Kriging Model to a file storage
 #'
-#' @author Yann Richet \email{yann.richet@irsn.fr}
+#' @author Yann Richet \email{yann.richet@asnr.fr}
 #'
 #' @param object An S3 Kriging object.
 #' @param filename File name to save in.
@@ -664,7 +642,7 @@ save.Kriging <- function(object, filename, ...) {
 
 #' Load a Kriging Model from a file storage
 #'
-#' @author Yann Richet \email{yann.richet@irsn.fr}
+#' @author Yann Richet \email{yann.richet@asnr.fr}
 #'
 #' @param filename File name to load from.
 #' @param ... Not used.
@@ -695,7 +673,7 @@ load.Kriging <- function(filename, ...) {
 
 #' Compute Covariance Matrix of Kriging Model
 #'
-#' @author Yann Richet \email{yann.richet@irsn.fr}
+#' @author Yann Richet \email{yann.richet@asnr.fr}
 #'
 #' @param object An S3 Kriging object.
 #' @param x1 Numeric matrix of input points.
@@ -722,23 +700,16 @@ load.Kriging <- function(filename, ...) {
 #' covMat(k, x1, x2)
 covMat.Kriging <- function(object, x1, x2, ...) {
     if (length(L <- list(...)) > 0) warnOnDots(L)
-    k <- kriging_model(object)
     if (is.data.frame(x1)) x1 = data.matrix(x1)
     if (is.data.frame(x2)) x2 = data.matrix(x2)
-    if (!is.matrix(x1)) x1 = matrix(x1, ncol = ncol(k$X))
-    if (!is.matrix(x2)) x2 = matrix(x2, ncol = ncol(k$X))
-    if (ncol(x1) != ncol(k$X))
-        stop("Input x1 must have ", ncol(k$X), " columns (instead of ",
-             ncol(x1), ")")
-    if (ncol(x2) != ncol(k$X))
-        stop("Input x2 must have ", ncol(k$X), " columns (instead of ",
-             ncol(x2), ")")
+    if (!is.matrix(x1)) x1 = matrix(x1, ncol = ncol(object$X()))
+    if (!is.matrix(x2)) x2 = matrix(x2, ncol = ncol(object$X()))
     return(kriging_covMat(object, x1, x2))
 }
 
 #' Compute Log-Likelihood of Kriging Model
 #'
-#' @author Yann Richet \email{yann.richet@irsn.fr}
+#' @author Yann Richet \email{yann.richet@asnr.fr}
 #'
 #' @param object An S3 Kriging object.
 #' @param theta A numeric vector of (positive) range parameters at
@@ -772,12 +743,8 @@ covMat.Kriging <- function(object, x1, x2, ...) {
 logLikelihoodFun.Kriging <- function(object, theta,
                                   return_grad = FALSE, return_hess = FALSE, bench=FALSE, ...) {
     if (length(L <- list(...)) > 0) warnOnDots(L)
-    k <- kriging_model(object)
     if (is.data.frame(theta)) theta = data.matrix(theta)
-    if (!is.matrix(theta)) theta <- matrix(theta, ncol = ncol(k$X))
-    if (ncol(theta) != ncol(k$X))
-        stop("Input theta must have ", ncol(k$X), " columns (instead of ",
-             ncol(theta),")")
+    if (!is.matrix(theta)) theta <- matrix(theta, ncol = ncol(object$X()))
     out <- list(logLikelihood = matrix(NA, nrow = nrow(theta)),
                 logLikelihoodGrad = matrix(NA,nrow=nrow(theta),
                                            ncol = ncol(theta)),
@@ -799,7 +766,7 @@ logLikelihoodFun.Kriging <- function(object, theta,
 
 #' Get Log-Likelihood of Kriging Model
 #'
-#' @author Yann Richet \email{yann.richet@irsn.fr}
+#' @author Yann Richet \email{yann.richet@asnr.fr}
 #'
 #' @param object An S3 Kriging object.
 #' @param ... Not used.
@@ -835,7 +802,7 @@ logLikelihood.Kriging <- function(object, ...) {
 #' prediction of \eqn{y_i}{y[i]} based on the the observations \eqn{y_j}{y[j]}
 #' with \eqn{j \neq i}{j != i}.
 #'
-#' @author Yann Richet \email{yann.richet@irsn.fr}
+#' @author Yann Richet \email{yann.richet@asnr.fr}
 #'
 #' @param object A \code{Kriging} object.
 #' @param theta A numeric vector of range parameters at which the LOO
@@ -868,12 +835,8 @@ logLikelihood.Kriging <- function(object, ...) {
 #' abline(v = k$theta(), col = "blue")
 leaveOneOutFun.Kriging <- function(object, theta, return_grad = FALSE, bench=FALSE, ...) {
     if (length(L <- list(...)) > 0) warnOnDots(L)
-    k <- kriging_model(object)
     if (is.data.frame(theta)) theta = data.matrix(theta)
-    if (!is.matrix(theta)) theta <- matrix(theta,ncol=ncol(k$X))
-    if (ncol(theta) != ncol(k$X))
-        stop("Input theta must have ", ncol(k$X), " columns (instead of ",
-             ncol(theta),")")
+    if (!is.matrix(theta)) theta <- matrix(theta, ncol = ncol(object$X()))
     out <- list(leaveOneOut = matrix(NA, nrow = nrow(theta)),
                 leaveOneOutGrad = matrix(NA, nrow = nrow(theta),
                                          ncol = ncol(theta)))
@@ -893,7 +856,7 @@ leaveOneOutFun.Kriging <- function(object, theta, return_grad = FALSE, bench=FAL
 #' prediction of \eqn{y_i}{y[i]} based on the the observations \eqn{y_j}{y[j]}
 #' with \eqn{j \neq i}{j != i}.
 #'
-#' @author Yann Richet \email{yann.richet@irsn.fr}
+#' @author Yann Richet \email{yann.richet@asnr.fr}
 #'
 #' @param object A \code{Kriging} object.
 #' @param theta A numeric vector of range parameters at which the LOO
@@ -954,7 +917,7 @@ leaveOneOutVec.Kriging <- function(object, theta, ...) {
 
 #' Get leaveOneOut of Kriging Model
 #'
-#' @author Yann Richet \email{yann.richet@irsn.fr}
+#' @author Yann Richet \email{yann.richet@asnr.fr}
 #'
 #' @param object An S3 Kriging object.
 #' @param ... Not used.
@@ -984,7 +947,7 @@ leaveOneOut.Kriging <- function(object, ...) {
 #' Compute the log-marginal posterior of a kriging model, using the
 #' prior XXXY.
 #'
-#' @author Yann Richet \email{yann.richet@irsn.fr}
+#' @author Yann Richet \email{yann.richet@asnr.fr}
 #'
 #' @param object S3 Kriging object.
 #' @param theta Numeric vector of correlation range parameters at
@@ -1022,12 +985,8 @@ leaveOneOut.Kriging <- function(object, ...) {
 #' abline(v = k$theta(), col = "blue")
 logMargPostFun.Kriging <- function(object, theta, return_grad = FALSE, bench=FALSE, ...) {
     if (length(L <- list(...)) > 0) warnOnDots(L)
-    k <- kriging_model(object)
     if (is.data.frame(theta)) theta = data.matrix(theta)
-    if (!is.matrix(theta)) theta <- matrix(theta,ncol=ncol(k$X))
-    if (ncol(theta) != ncol(k$X))
-        stop("Input theta must have ", ncol(k$X), " columns (instead of ",
-             ncol(theta), ")")
+    if (!is.matrix(theta)) theta <- matrix(theta, ncol = ncol(object$X()))
     out <- list(logMargPost = matrix(NA, nrow = nrow(theta)),
                 logMargPostGrad = matrix(NA, nrow = nrow(theta),
                                          ncol = ncol(theta)))
@@ -1043,7 +1002,7 @@ logMargPostFun.Kriging <- function(object, theta, return_grad = FALSE, bench=FAL
 
 #' Get logMargPost of Kriging Model
 #'
-#' @author Yann Richet \email{yann.richet@irsn.fr}
+#' @author Yann Richet \email{yann.richet@asnr.fr}
 #'
 #' @param object An S3 Kriging object.
 #' @param ... Not used.
@@ -1073,7 +1032,7 @@ logMargPost.Kriging <- function(object, ...) {
 
 #' Duplicate a Kriging Model
 #'
-#' @author Yann Richet \email{yann.richet@irsn.fr}
+#' @author Yann Richet \email{yann.richet@asnr.fr}
 #'
 #' @param object An S3 Kriging object.
 #' @param ... Not used.

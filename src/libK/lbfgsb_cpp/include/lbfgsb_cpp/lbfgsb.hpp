@@ -89,27 +89,27 @@ namespace lbfgsb {
         double time_spent_sec;
 
         void print() const {
-            std::cout << "f_opt: " << f_opt << '\n';
-            std::cout << "task: " << task << '\n';
-            std::cout << "warn_flag " << warn_flag << '\n';
-            std::cout << "num_fun_calls " << num_fun_calls << '\n';
-            std::cout << "num_iters " << num_iters << '\n';
+            //std::cout << "f_opt: " << f_opt << '\n';
+            //std::cout << "task: " << task << '\n';
+            //std::cout << "warn_flag " << warn_flag << '\n';
+            //std::cout << "num_fun_calls " << num_fun_calls << '\n';
+            //std::cout << "num_iters " << num_iters << '\n';
             if (max_iter_exceeded) {
-                std::cout << "stop due to max_iter_exceeded" << '\n';
+                //std::cout << "stop due to max_iter_exceeded" << '\n';
             }
             if (max_fun_exceeded) {
-                std::cout << "stop due to max_fun_exceeded" << '\n';
+                //std::cout << "stop due to max_fun_exceeded" << '\n';
             }
             if (time_limit_exceeded) {
-                std::cout << "stop due to time_limit_exceeded" << '\n';
+                //std::cout << "stop due to time_limit_exceeded" << '\n';
             }
-            std::cout << "total time spent " << time_spent_sec << " sec\n";
-            std::cout << "time spent on searching for Cauchy points " << time_on_cauchy_points << '\n';
-            std::cout << "time spent on subspace minimization " << time_on_subspace_minimization << '\n';
-            std::cout << "time spent on line search " << time_on_line_search << '\n';
-            std::cout << "f(x) in the previous iteration " << previous_fval << '\n';
-            std::cout << "factr * epsilon " << f_tol << '\n';
-            std::cout << std::endl;
+            //std::cout << "total time spent " << time_spent_sec << " sec\n";
+            //std::cout << "time spent on searching for Cauchy points " << time_on_cauchy_points << '\n';
+            //std::cout << "time spent on subspace minimization " << time_on_subspace_minimization << '\n';
+            //std::cout << "time spent on line search " << time_on_line_search << '\n';
+            //std::cout << "f(x) in the previous iteration " << previous_fval << '\n';
+            //std::cout << "factr * epsilon " << f_tol << '\n';
+            //std::cout << std::endl;
         }
 
     };
@@ -190,7 +190,7 @@ namespace lbfgsb {
                 set_char_array(task, "START");
 
                 while (true) {
-                    // std::cout << "task to do: " << string_from_fortran(task, N_TASK) << "--\n";
+                    // //std::cout << "task to do: " << string_from_fortran(task, N_TASK) << "--\n";
                     setulb_wrapper(
                         n, m, data(x0), lb, ub, bound_type,
                         &fval, data(grad), factr, pgtol,

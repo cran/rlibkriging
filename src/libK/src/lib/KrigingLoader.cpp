@@ -15,7 +15,7 @@ KrigingLoader::KrigingType KrigingLoader::describe(std::string filename) {
 
   uint32_t version = j["version"].template get<uint32_t>();
   if (version != 2) {
-    throw std::runtime_error(asString("Bad version to load from '", filename, "'; found ", version, ", requires 2"));
+    Rcpp::stop(asString("Bad version to load from '", filename, "'; found ", version, ", requires 2"));
   }
   content = j["content"].template get<std::string>();
 

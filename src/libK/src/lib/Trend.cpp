@@ -88,6 +88,6 @@ arma::mat Trend::regressionModelMatrix(const Trend::RegressionModel& regmodel, c
     } break;
 
     default:
-      throw std::runtime_error("Unreachable code");
+      Rcpp::stop("Unreachable code");
   }
 }

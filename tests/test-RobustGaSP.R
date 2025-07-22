@@ -1,3 +1,4 @@
+if(requireNamespace('RobustGaSP', quietly = TRUE)) {
 library(testthat)
  Sys.setenv('OMP_THREAD_LIMIT'=2)
  library(rlibkriging)
@@ -270,3 +271,4 @@ dlmp_lk = function(X) {if (!is.matrix(X)) X = matrix(X,ncol=2);
 precision <- 1e-1
 test_that(desc=paste0("Fit: 2D (Branin) / rgasp/lmp deriv is the same that lk/lmp deriv"),
           expect_equal(dlmp_rgasp(c(1,1)),-exp(-1)*dlmp_lk(c(1,1)),tol = precision))
+}

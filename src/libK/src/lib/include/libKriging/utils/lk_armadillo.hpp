@@ -3,6 +3,7 @@
 
 #include "lkalloc.hpp"
 
+#include <Rcpp.h>
 #include <armadillo>
 
 #endif  // LIBKRIGING_SRC_LIB_INCLUDE_LIBKRIGING_UTILS_LK_ARMADILLO_HPP

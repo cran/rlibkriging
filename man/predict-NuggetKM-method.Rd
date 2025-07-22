@@ -82,5 +82,5 @@ Pred <- predict(KM1, newdata = matrix(.5,ncol = 2), type = "UK",
 
 }
 \author{
-Yann Richet \email{yann.richet@irsn.fr}
+Yann Richet \email{yann.richet@asnr.fr}
 }

@@ -9,7 +9,7 @@
 
 CacheFunctionCommon::~CacheFunctionCommon() {
   //  if (!m_cache_hit.empty())
-  //    std::cout << stat() << std::endl;
+  //    Rcpp::Rcout << stat() << std::endl;
 }
 
 /* ----------------------------------------------------------------------------------------------------------------- */

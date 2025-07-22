@@ -36,7 +36,7 @@ int main() {
   result.print();
 
   // (0.5, 1) => 0
-  std::cout << "x0: (" << x0[0] << ", " << x0[1] << ")" << std::endl;
+  //std::cout << "x0: (" << x0[0] << ", " << x0[1] << ")" << std::endl;
 
   return 0;
 }

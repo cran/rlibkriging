@@ -18,11 +18,11 @@ double err_fn(const arma::vec& coef, arma::vec* grad_out, err_fn_data* fn_data) 
 
   arma::vec y_est = d->X * coef;
 
-  std::cout << "****************" << std::endl;
-  arma::cout << "coef: " << coef << arma::endl;
+  Rcpp::Rcout << "****************" << std::endl;
+  Rcpp::Rcout << "coef: " << coef << arma::endl;
 
   double err = arma::sum(arma::square(y_est - d->y));
-  std::cout << "Err: " << err << std::endl;
+  Rcpp::Rcout << "Err: " << err << std::endl;
 
   if (grad_out != nullptr) {
     int k = coef.n_elem;
@@ -35,9 +35,9 @@ double err_fn(const arma::vec& coef, arma::vec* grad_out, err_fn_data* fn_data) 
 
       (*grad_out)(i) = (err2 - err) / 0.0001;
     }
-    arma::cout << "Grad: " << *grad_out << arma::endl;
+    Rcpp::Rcout << "Grad: " << *grad_out << arma::endl;
   }
-  // arma::cout<<"Y = X * s :\n"<<y_est<<arma::endl;
+  // Rcpp::Rcout<<"Y = X * s :\n"<<y_est<<arma::endl;
 
   return err;
 }
@@ -51,7 +51,7 @@ void LinearRegressionOptim::fit(const arma::vec& y, const arma::mat& X) {
   // We will replace that by a BFGS optimization. Just as a proof of concept for BFGS usage.
   // coef = arma::solve(X, y);
   m_coef = arma::ones(k);
-  arma::cout << "Initial solution vector :\n" << m_coef << arma::endl;
+  Rcpp::Rcout << "Initial solution vector :\n" << m_coef << arma::endl;
 
   // like in Kriging.cpp
   arma::vec theta_lower = Optim::theta_lower_factor * trans(max(X, 0) - min(X, 0));
@@ -74,7 +74,7 @@ void LinearRegressionOptim::fit(const arma::vec& y, const arma::mat& X) {
                            gamma_lower.memptr(),
                            gamma_upper.memptr(),
                            bounds_type.memptr());
-  arma::cout << "Coef: " << m_coef << arma::endl;
+  Rcpp::Rcout << "Coef: " << m_coef << arma::endl;
   arma::colvec resid = y - X * m_coef;
 
   m_sig2 = arma::as_scalar(arma::trans(resid) * resid / (n - k));

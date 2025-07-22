@@ -23,7 +23,7 @@ fi
 # Static libKriging build (using libK/.ci)
 cd src/libK
 CI=`ls -a | grep travis-ci`
-echo $CI
+echo "CI: "$CI
 
 {
 $CI/common/before_script.sh
@@ -39,6 +39,20 @@ export FC=`${R_HOME}/bin/R CMD config FC`
 # These declarations help to skip declaration without full path in libKriging build scripts.
 export CMAKE_Fortran_COMPILER="$(${R_HOME}/bin/R CMD config FC | awk '{ print $1 }')"
 export Fortran_LINK_FLAGS="$(${R_HOME}/bin/R CMD config FLIBS)"
+
+if [ "$_R_CHECK_CRAN_INCOMING_" != "FALSE" ]; then
+  # enable Rcout & Rcerr:
+  # Get RcppArma include 
+  export RCPP_INCLUDE_PATH="$(${R_HOME}/bin/Rscript -e 'invisible(write(system.file(package="Rcpp"),stdout()))')"/include
+  echo "build: Rcpp include path ${RCPP_INCLUDE_PATH}"
+  # Get R include
+  export R_INCLUDE_PATH="$(${R_HOME}/bin/Rscript -e 'invisible(write(R.home("include"),stdout()))')"
+  echo "build: R include path ${R_INCLUDE_PATH}"
+  sed -i.bak -e "s|enable_language(CXX)|enable_language(CXX)\ninclude_directories(\${RCPP_INCLUDE_PATH} \${R_INCLUDE_PATH})\nmessage(STATUS \"Rcpp include path \${RCPP_INCLUDE_PATH}\")\nmessage(STATUS \"R include path \${R_INCLUDE_PATH}\")|g" \
+     CMakeLists.txt
+  rm -rf CMakeLists.txt.bak
+  EXTRA_CMAKE_OPTIONS="-DRCPP_INCLUDE_PATH=${RCPP_INCLUDE_PATH} -DR_INCLUDE_PATH=${R_INCLUDE_PATH} ${EXTRA_CMAKE_OPTIONS}"
+fi
 
 BUILD_TEST=false \
 MODE=Release \

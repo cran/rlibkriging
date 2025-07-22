@@ -21,10 +21,14 @@ rm -rf $LIBKRIGING_SRC_PATH/docs
  # then remove LinearRegressionOptim example
 sed -i.bak "s/LinearRegression/##LinearRegression/g" $LIBKRIGING_SRC_PATH/src/lib/CMakeLists.txt
 rm -f $LIBKRIGING_SRC_PATH/src/lib/CMakeLists.txt.bak
-
 rm -f $LIBKRIGING_SRC_PATH/bindings/R/rlibkriging/src/linear_regression*
  # & unsuitable tests
 rm -f $LIBKRIGING_SRC_PATH/bindings/R/rlibkriging/tests/testthat/test-binding-consistency.R
+ # and demo
+sed -i.bak "s|demo/|##demo/|g" $LIBKRIGING_SRC_PATH/src/lib/CMakeLists.txt
+rm -f $LIBKRIGING_SRC_PATH/src/lib/CMakeLists.txt.bak
+rm -rf $LIBKRIGING_SRC_PATH/src/lib/demo
+rm -rf $LIBKRIGING_SRC_PATH/src/lib/include/libKriging/demo
 
 # Move required on upper path to avoid path length issues
 if [ -d $LIBKRIGING_SRC_PATH/dependencies/lbfgsb_cpp ]; then
@@ -72,6 +76,33 @@ sed -i.bak -e "s|APPEND CMAKE_SYSTEM_LIBRARY_PATH |APPEND CMAKE_SYSTEM_LIBRARY_P
   $LIBKRIGING_SRC_PATH/CMakeLists.txt
 rm -rf $LIBKRIGING_SRC_PATH/CMakeLists.txt.bak
 
+# Because CRAN policy : disable or replace all *::cout ... in all .cpp and .hpp files
+if [ "$_R_CHECK_CRAN_INCOMING_" != "FALSE" ]; then
+  # Rcpp & R includes are now identified and added in CMakeLists.txt in (later) build.sh
+  # Following replacements assume that R & Rcpp are included
+  
+  # replace cout/cerr in libkriging
+  find $LIBKRIGING_SRC_PATH/src/lib -type f -name lk_armadillo.hpp -exec sed -i.bak "s|#include <armadillo>|#include <Rcpp.h>\n#include <armadillo>|g" {} +
+  find $LIBKRIGING_SRC_PATH/src/lib -type f -name *.*pp -exec sed -i.bak "s|arma\:\:cout|Rcpp::Rcout|g" {} +
+  find $LIBKRIGING_SRC_PATH/src/lib -type f -name *.*pp -exec sed -i.bak "s|std\:\:cout|Rcpp::Rcout|g" {} +
+  find $LIBKRIGING_SRC_PATH/src/lib -type f -name *.*pp -exec sed -i.bak "s|arma\:\:cerr|Rcpp::Rcerr|g" {} +
+  find $LIBKRIGING_SRC_PATH/src/lib -type f -name *.*pp -exec sed -i.bak "s|std\:\:cerr|Rcpp::Rcerr|g" {} +
+  # also replace std::runtime_error by Rcpp::stop
+  find $LIBKRIGING_SRC_PATH/src/lib -type f -name base64.cpp -exec sed -i.bak "s|#include \"base64.h\"|#include <Rcpp.h>\n#include \"base64.h\"|g" {} +
+  find $LIBKRIGING_SRC_PATH/src/lib -type f -name *.*pp -exec sed -i.bak "s|throw std\:\:runtime_error|Rcpp::stop|g" {} +
+
+  # disable cout/cerr in lbfgsb_cpp
+  find $LIBKRIGING_SRC_PATH/lbfgsb_cpp -type f -name *.*pp -exec sed -i.bak "s|std\:\:cout|//&|g" {} +
+  find $LIBKRIGING_SRC_PATH/lbfgsb_cpp -type f -name *.*pp -exec sed -i.bak "s|std\:\:cerr|//&|g" {} +
+  # disable cout/cerr in slapack
+  find $LIBKRIGING_SRC_PATH/../slapack -type f -name *.*pp -exec sed -i.bak "s|std\:\:cout|//&|g" {} +
+  find $LIBKRIGING_SRC_PATH/../slapack -type f -name *.*pp -exec sed -i.bak "s|std\:\:cerr|//&|g" {} +
+  # Replace or remove std::cout/cerr in armadillo
+  find $LIBKRIGING_SRC_PATH/armadillo -type f -name *.*pp* -exec sed -i.bak "s|using std\:\:cout;|//&|g" {} +
+  find $LIBKRIGING_SRC_PATH/armadillo -type f -name *.*pp* -exec sed -i.bak "s|using std\:\:cerr;|//&|g" {} +
+  find $LIBKRIGING_SRC_PATH/armadillo -type f -name *.*pp* -exec sed -i.bak "s|ARMA_COUT_STREAM std\:\:cout|ARMA_COUT_STREAM Rcpp::Rcout|g" {} +
+  find $LIBKRIGING_SRC_PATH/armadillo -type f -name *.*pp* -exec sed -i.bak "s|ARMA_CERR_STREAM std\:\:cerr|ARMA_CERR_STREAM Rcpp::Rcerr|g" {} +
+fi
 
 # Disable pragma that inhibit warnings
 sed -i.bak -e "s|#pragma|//&|g" \
@@ -148,6 +179,17 @@ for f in `ls -d tests/test-*.R`; do
   rm -f $f.bak
   sed -i.bak -e "s|\(.\+\)stdev_deriv\[i\]|#&|g" $f # rm some canary test
   rm -f $f.bak
+  sed -i.bak -r "s|km\((.+)multistart(\s*)=(\s*)([[:digit:]]+)|km(\1 multistart = 1 |g" $f # reduce multistart to 1
+  rm -f $f.bak
+  # if test file includes RobustGaSP, add conditional loading
+  if grep -q "RobustGaSP" $f; then
+    echo "if(requireNamespace('RobustGaSP', quietly = TRUE)) {" > $f.new
+    cat $f >> $f.new
+    #sed -i.bak -e "s|library(RobustGaSP)|if(!requireNamespace('RobustGaSP', quietly = TRUE)) {\n  print('RobustGaSP not available')\n} else {\nlibrary(RobustGaSP)|g" $f # disable tests if missing RobustGaSP
+    #rm -f $f.bak
+    echo "}" >> $f.new
+    mv $f.new $f
+  fi
 done
 rm -rf tests/testthat/
 rm -rf tests/testthat.R

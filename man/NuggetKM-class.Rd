@@ -51,5 +51,5 @@ the current \code{NuggetKM} object.}
     \pkg{DiceKriging} package. The creator \code{\link{NuggetKM}}.
 }
 \author{
-Yann Richet \email{yann.richet@irsn.fr}
+Yann Richet \email{yann.richet@asnr.fr}
 }

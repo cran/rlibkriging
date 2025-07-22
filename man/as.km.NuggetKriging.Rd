@@ -37,5 +37,5 @@ k_km <- as.km(k)
 print(k_km)
 }
 \author{
-Yann Richet \email{yann.richet@irsn.fr}
+Yann Richet \email{yann.richet@asnr.fr}
 }

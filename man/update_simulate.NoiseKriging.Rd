@@ -54,5 +54,5 @@ lines(x, su[ , 2], col = "blue", lty=2)
 lines(x, su[ , 3], col = "blue", lty=2)
 }
 \author{
-Yann Richet \email{yann.richet@irsn.fr}
+Yann Richet \email{yann.richet@asnr.fr}
 }

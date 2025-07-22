@@ -221,7 +221,7 @@
     // for compatibility with earlier versions of Armadillo
     #define ARMA_COUT_STREAM ARMA_DEFAULT_OSTREAM
   #else
-    #define ARMA_COUT_STREAM std::cout
+    #define ARMA_COUT_STREAM Rcpp::Rcout
   #endif
 #endif
 
@@ -230,7 +230,7 @@
     // for compatibility with earlier versions of Armadillo
     #define ARMA_CERR_STREAM ARMA_DEFAULT_OSTREAM
   #else
-    #define ARMA_CERR_STREAM std::cerr
+    #define ARMA_CERR_STREAM Rcpp::Rcerr
   #endif
 #endif
 

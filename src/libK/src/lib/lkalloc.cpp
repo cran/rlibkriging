@@ -54,7 +54,7 @@ void* malloc(size_t n_bytes) {
 #ifdef LIBKRIGING_DEBUG_ALLOC
   static int count = 0;
   ++count;
-  // std::cout << "Using lkalloc allocator " /* << custom_malloc */ << " (#" << count << ") in " << dllName() << "\n";
+  // Rcpp::Rcout << "Using lkalloc allocator " /* << custom_malloc */ << " (#" << count << ") in " << dllName() << "\n";
 #endif
   void* mem_ptr = nullptr;
   if (custom_malloc) {
@@ -78,9 +78,9 @@ void free(void* mem_ptr) {
 #ifdef LIBKRIGING_DEBUG_ALLOC
   static int count = 0;
   ++count;
-  // std::cout << "Using lkalloc deallocator " /* << custom_free */ << " (#" << count << ") in " << dllName() << "\n";
+  // Rcpp::Rcout << "Using lkalloc deallocator " /* << custom_free */ << " (#" << count << ") in " << dllName() << "\n";
   if (seens.find(mem_ptr) == seens.end()) {
-    std::cout << "### (#" << count << ") lkalloc allocator has never seen " << mem_ptr << " ##" << std::endl;
+    Rcpp::Rcout << "### (#" << count << ") lkalloc allocator has never seen " << mem_ptr << " ##" << std::endl;
     return;
   }
 #endif

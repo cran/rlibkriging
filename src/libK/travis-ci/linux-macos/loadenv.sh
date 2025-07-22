@@ -10,7 +10,7 @@ elif [ "$(uname -s)" == "Darwin" ]; then
     export PATH=$(brew --prefix gfortran)/bin:$PATH
 fi
 
-ROOT_DIR=/home/richet/Sync/Open/libKriging/alien/rlibkriging
+ROOT_DIR=/home/richet/Sync/Open/libKriging/alien/rlibkriging-master
 case $(uname -s) in
   Linux|Darwin)
     BIN_VENV=${ROOT_DIR}/venv/bin

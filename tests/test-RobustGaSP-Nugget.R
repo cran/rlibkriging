@@ -1,3 +1,4 @@
+if(requireNamespace('RobustGaSP', quietly = TRUE)) {
 library(testthat)
  Sys.setenv('OMP_THREAD_LIMIT'=2)
  library(rlibkriging)
@@ -104,3 +105,4 @@ test_that(desc=paste0("pred mean is the same that RobustGaSP one"),
           expect_equal(predict(r,c(0.7,x2))$mean[1],predict(k,matrix(c(0.7,x2),ncol=2))$mean,tol = precision))
 test_that(desc=paste0("pred sd is the same that RobustGaSP one"),
           expect_equal(predict(r,c(0.7,x2))$stdev[1],predict(k,matrix(c(0.7,x2),ncol=2))$sd,tol = precision))
+}

@@ -110,5 +110,5 @@ KM1 <- NoiseKM(design = design.fact, response = y, covtype = "gauss",
     package for more details on the slots.
 }
 \author{
-Yann Richet \email{yann.richet@irsn.fr}
+Yann Richet \email{yann.richet@asnr.fr}
 }

@@ -33,6 +33,9 @@ project(libKriging
 #------------------------------------------------------
 
 enable_language(CXX)
+include_directories(${RCPP_INCLUDE_PATH} ${R_INCLUDE_PATH})
+message(STATUS "Rcpp include path ${RCPP_INCLUDE_PATH}")
+message(STATUS "R include path ${R_INCLUDE_PATH}")
 
 #------------------------------------------------------
 
@@ -163,7 +166,7 @@ set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 #------------------------------------------------------
 
 option(EXTRA_SYSTEM_LIBRARY_PATH "Path to add to default system library path for finding libs")
-list(APPEND CMAKE_SYSTEM_LIBRARY_PATH /usr/lib/R/lib /usr/lib/R/lib /usr/lib/R/lib /usr/lib/R/lib /usr/lib/R/lib ${EXTRA_SYSTEM_LIBRARY_PATH})
+list(APPEND CMAKE_SYSTEM_LIBRARY_PATH /usr/lib/R/lib ${EXTRA_SYSTEM_LIBRARY_PATH})
 
 # Dependencies
 set(DETECT_HDF5 false CACHE BOOL "Disable HDF5 to avoid conflict with armadillo") # prevent issue #40
@@ -333,7 +336,7 @@ endif ()
 #------------------------------------------------------
 
 # valgrind must be checked before adding new subdirectories
-# before ##########include(CTest)
+# before ##include(CTest)
 if (ENABLE_MEMCHECK)
     find_program(VALGRIND_EXECUTABLE valgrind)
     if (NOT VALGRIND_EXECUTABLE)
@@ -541,12 +544,12 @@ endif()
 if (POLICY CMP0110)
     cmake_policy(SET CMP0110 NEW) # supports arbitrary characters in test names (requires in CMake 3.19)
 endif()
-##########set(CATCH_MODULE_PATH "${LIBKRIGING_SOURCE_DIR}/dependencies/Catch2")
-##########add_subdirectory("${CATCH_MODULE_PATH}")
-##########list(APPEND CMAKE_MODULE_PATH ${CATCH_MODULE_PATH}/contrib)
+##set(CATCH_MODULE_PATH "${LIBKRIGING_SOURCE_DIR}/dependencies/Catch2")
+##add_subdirectory("${CATCH_MODULE_PATH}")
+##list(APPEND CMAKE_MODULE_PATH ${CATCH_MODULE_PATH}/contrib)
 
-##########include(CTest)
-##########add_subdirectory(tests)
+##include(CTest)
+##add_subdirectory(tests)
 
 
 #------------------------------------------------------
@@ -667,7 +670,7 @@ if (DOXYGEN_FOUND)
     set(DOXYGEN_OUT ${CMAKE_BINARY_DIR}/Doxyfile)
 
     # request to configure the file
-    ##########configure_file(${DOXYGEN_IN} ${DOXYGEN_OUT} @ONLY)
+    ##configure_file(${DOXYGEN_IN} ${DOXYGEN_OUT} @ONLY)
 
     add_custom_target(doc # add ALL if build together with the code
             COMMAND echo "running doc generation ..."

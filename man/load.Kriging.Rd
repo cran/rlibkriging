@@ -32,5 +32,5 @@ save(k,outfile)
 print(load.Kriging(outfile)) 
 }
 \author{
-Yann Richet \email{yann.richet@irsn.fr}
+Yann Richet \email{yann.richet@asnr.fr}
 }

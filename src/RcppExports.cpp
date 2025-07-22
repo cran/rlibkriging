@@ -1245,16 +1245,16 @@ BEGIN_RCPP
 END_RCPP
 }
 // nuggetkriging_logMargPostFun
-Rcpp::List nuggetkriging_logMargPostFun(Rcpp::List k, arma::vec theta, bool return_grad, bool bench);
-RcppExport SEXP _rlibkriging_nuggetkriging_logMargPostFun(SEXP kSEXP, SEXP thetaSEXP, SEXP return_gradSEXP, SEXP benchSEXP) {
+Rcpp::List nuggetkriging_logMargPostFun(Rcpp::List k, arma::vec theta_alpha, bool return_grad, bool bench);
+RcppExport SEXP _rlibkriging_nuggetkriging_logMargPostFun(SEXP kSEXP, SEXP theta_alphaSEXP, SEXP return_gradSEXP, SEXP benchSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< Rcpp::List >::type k(kSEXP);
-    Rcpp::traits::input_parameter< arma::vec >::type theta(thetaSEXP);
+    Rcpp::traits::input_parameter< arma::vec >::type theta_alpha(theta_alphaSEXP);
     Rcpp::traits::input_parameter< bool >::type return_grad(return_gradSEXP);
     Rcpp::traits::input_parameter< bool >::type bench(benchSEXP);
-    rcpp_result_gen = Rcpp::wrap(nuggetkriging_logMargPostFun(k, theta, return_grad, bench));
+    rcpp_result_gen = Rcpp::wrap(nuggetkriging_logMargPostFun(k, theta_alpha, return_grad, bench));
     return rcpp_result_gen;
 END_RCPP
 }

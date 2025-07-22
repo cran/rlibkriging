@@ -51,5 +51,5 @@ plot(t, ll(t), type = 'l')
 abline(v = k$theta(), col = "blue")
 }
 \author{
-Yann Richet \email{yann.richet@irsn.fr}
+Yann Richet \email{yann.richet@asnr.fr}
 }

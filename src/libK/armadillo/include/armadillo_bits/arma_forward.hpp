@@ -16,8 +16,8 @@
 // ------------------------------------------------------------------------
 
 
-using std::cout;
-using std::cerr;
+//using std::cout;
+//using std::cerr;
 using std::endl;
 using std::ios;
 using std::size_t;

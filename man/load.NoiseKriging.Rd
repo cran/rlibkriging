@@ -33,5 +33,5 @@ save(k,outfile)
 print(load.NoiseKriging(outfile)) 
 }
 \author{
-Yann Richet \email{yann.richet@irsn.fr}
+Yann Richet \email{yann.richet@asnr.fr}
 }

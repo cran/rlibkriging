@@ -32,7 +32,7 @@ classNuggetKriging <-function(nk) {
 #' are estimated thanks to the optimization of a criterion given by
 #' \code{objective}, using the method given in \code{optim}.
 #'
-#' @author Yann Richet \email{yann.richet@irsn.fr}
+#' @author Yann Richet \email{yann.richet@asnr.fr}
 #'
 #' @param y Numeric vector of response values.
 #' @param X Numeric matrix of input design.
@@ -114,7 +114,7 @@ NuggetKriging <- function(y=NULL, X=NULL, kernel=NULL,
 
 #' Coerce a \code{NuggetKriging} Object into a List
 #'
-#' @author Yann Richet \email{yann.richet@irsn.fr}
+#' @author Yann Richet \email{yann.richet@asnr.fr}
 #'
 #' @param x An object with class \code{"NuggetKriging"}.
 #' @param ... Ignored
@@ -149,7 +149,7 @@ as.list.NuggetKriging <- function(x, ...) {
 #' Coerce a \code{NuggetKriging} object into the \code{"km"} class of the
 #' \pkg{DiceKriging} package.
 #'
-#' @author Yann Richet \email{yann.richet@irsn.fr}
+#' @author Yann Richet \email{yann.richet@asnr.fr}
 #'
 #' @param x An object with S3 class \code{"NuggetKriging"}.
 #' @param .call Force the \code{call} slot to be filled in the
@@ -260,7 +260,7 @@ as.km.NuggetKriging <- function(x, .call = NULL, ...) {
 
 #' Print the content of a \code{NuggetKriging} object.
 #'
-#' @author Yann Richet \email{yann.richet@irsn.fr}
+#' @author Yann Richet \email{yann.richet@asnr.fr}
 #'
 #' @param x A (S3) \code{NuggetKriging} Object.
 #' @param ... Ignored.
@@ -295,7 +295,7 @@ print.NuggetKriging <- function(x, ...) {
 #' are estimated thanks to the optimization of a criterion given by
 #' \code{objective}, using the method given in \code{optim}.
 #'
-#' @author Yann Richet \email{yann.richet@irsn.fr}
+#' @author Yann Richet \email{yann.richet@asnr.fr}
 #'
 #' @param object S3 NuggetKriging object.
 #'
@@ -373,7 +373,7 @@ fit.NuggetKriging <- function(object, y, X,
 #' stochastic process, conditional on the values at the input points
 #' used when fitting the model.
 #'
-#' @author Yann Richet \email{yann.richet@irsn.fr}
+#' @author Yann Richet \email{yann.richet@asnr.fr}
 #'
 #' @param object S3 NuggetKriging object.
 #' @param x Input points where the prediction must be computed.
@@ -417,13 +417,9 @@ fit.NuggetKriging <- function(object, y, X,
 #'  border = NA, col = rgb(0, 0, 1, 0.2))
 predict.NuggetKriging <- function(object, x, return_stdev = TRUE, return_cov = FALSE, return_deriv = FALSE, ...) {
     if (length(L <- list(...)) > 0) warnOnDots(L)
-    k <- nuggetkriging_model(object)
     ## manage the data frame case. Ideally we should then warn
     if (is.data.frame(x)) x = data.matrix(x)
-    if (!is.matrix(x)) x=matrix(x,ncol=ncol(k$X))
-    if (ncol(x) != ncol(k$X))
-        stop("Input x must have ", ncol(k$X), " columns (instead of ",
-             ncol(x), ")")
+    if (!is.matrix(x)) x=matrix(x,ncol=ncol(object$X()))
     return(nuggetkriging_predict(object, x, return_stdev, return_cov, return_deriv))
 }
 
@@ -433,7 +429,7 @@ predict.NuggetKriging <- function(object, x, return_stdev = TRUE, return_cov = F
 #' points conditional on the values at the input points used in the
 #' fit.
 #'
-#' @author Yann Richet \email{yann.richet@irsn.fr}
+#' @author Yann Richet \email{yann.richet@asnr.fr}
 #'
 #' @param object S3 NuggetKriging object.
 #' @param nsim Number of simulations to perform.
@@ -476,13 +472,9 @@ predict.NuggetKriging <- function(object, x, return_stdev = TRUE, return_cov = F
 #' lines(x, s[ , 3], col = "blue")
 simulate.NuggetKriging <- function(object, nsim = 1, seed = 123, x, with_nugget = TRUE, will_update = FALSE,  ...) {
     if (length(L <- list(...)) > 0) warnOnDots(L)
-    k <- nuggetkriging_model(object)
+    ## manage the data frame case. Ideally we should then warn
     if (is.data.frame(x)) x = data.matrix(x)
-    if (!is.matrix(x)) x = matrix(x, ncol = ncol(k$X))
-    if (ncol(x) != ncol(k$X))
-        stop("Input x must have ", ncol(k$X), " columns (instead of ",
-             ncol(x),")")
-    ## XXXY
+    if (!is.matrix(x)) x=matrix(x,ncol=ncol(object$X()))
     if (is.null(seed)) seed <- floor(runif(1) * 99999)
     return(nuggetkriging_simulate(object, nsim = nsim, seed = seed, X_n = x, with_nugget = with_nugget, will_update = will_update))
 }
@@ -492,7 +484,7 @@ simulate.NuggetKriging <- function(object, nsim = 1, seed = 123, x, with_nugget 
 #' This method draws paths of the stochastic process conditional on the values at the input points used in the
 #' fit, plus the new input points and their values given as argument (knonw as 'update' points).
 #'
-#' @author Yann Richet \email{yann.richet@irsn.fr}
+#' @author Yann Richet \email{yann.richet@asnr.fr}
 #'
 #' @param object S3 NuggetKriging object.
 #' @param y_u Numeric vector of new responses (output).
@@ -534,24 +526,17 @@ simulate.NuggetKriging <- function(object, nsim = 1, seed = 123, x, with_nugget 
 #' lines(x, su[ , 3], col = "blue", lty=2)
 update_simulate.NuggetKriging <- function(object, y_u, X_u, ...) {
     if (length(L <- list(...)) > 0) warnOnDots(L)
-    k <- nuggetkriging_model(object)
     if (is.data.frame(X_u)) X_u = data.matrix(X_u)
-    if (!is.matrix(X_u)) X_u <- matrix(X_u, ncol = ncol(k$X))
+    if (!is.matrix(X_u)) X_u <- matrix(X_u, ncol = ncol(object$X()))
     if (is.data.frame(y_u)) y_u = data.matrix(y_u)
-    if (!is.matrix(y_u)) y_u <- matrix(y_u, ncol = ncol(k$y))
-    if (ncol(X_u) != ncol(k$X))
-        stop("Object 'X_u' must have ", ncol(k$X), " columns (instead of ",
-             ncol(X_u), ")")
-    if (nrow(y_u) != nrow(X_u))
-        stop("Objects 'X_u' and 'y_u' must have the same number of rows.")
-
+    if (!is.matrix(y_u)) y_u <- matrix(y_u, ncol = 1)
     ## Modify 'object' in the parent environment
     return(nuggetkriging_update_simulate(object, y_u, X_u))
 }
 
 #' Update a \code{NuggetKriging} model object with new points
 #'
-#' @author Yann Richet \email{yann.richet@irsn.fr}
+#' @author Yann Richet \email{yann.richet@asnr.fr}
 #'
 #' @param object S3 NuggetKriging object.
 #' @param y_u Numeric vector of new responses (output).
@@ -603,27 +588,19 @@ update_simulate.NuggetKriging <- function(object, y_u, X_u, ...) {
 #'  border = NA, col = rgb(1, 0, 0, 0.2))
 update.NuggetKriging <- function(object, y_u, X_u, refit=TRUE, ...) {
     if (length(L <- list(...)) > 0) warnOnDots(L)
-    k <- nuggetkriging_model(object)
     if (is.data.frame(X_u)) X_u = data.matrix(X_u)
-    if (!is.matrix(X_u)) X_u <- matrix(X_u, ncol = ncol(k$X))
+    if (!is.matrix(X_u)) X_u <- matrix(X_u, ncol = ncol(object$X()))
     if (is.data.frame(y_u)) y_u = data.matrix(y_u)
-    if (!is.matrix(y_u)) y_u <- matrix(y_u, ncol = ncol(k$y))
-    if (ncol(X_u) != ncol(k$X))
-        stop("Object 'X_u' must have ", ncol(k$X), " columns (instead of ",
-             ncol(X_u), ")")
-    if (nrow(y_u) != nrow(X_u))
-        stop("Objects 'X_u' and 'y_u' must have the same number of rows.")
-
+    if (!is.matrix(y_u)) y_u <- matrix(y_u, ncol = 1)
     ## Modify 'object' in the parent environment
     nuggetkriging_update(object, y_u, X_u, refit)
-
     invisible(NULL)
 }
 
 
 #' Save a NuggetKriging Model to a file storage
 #'
-#' @author Yann Richet \email{yann.richet@irsn.fr}
+#' @author Yann Richet \email{yann.richet@asnr.fr}
 #'
 #' @param object An S3 NuggetKriging object.
 #' @param filename File name to save in.
@@ -660,7 +637,7 @@ save.NuggetKriging <- function(object, filename, ...) {
 
 #' Load a NuggetKriging Model from a file storage
 #'
-#' @author Yann Richet \email{yann.richet@irsn.fr}
+#' @author Yann Richet \email{yann.richet@asnr.fr}
 #'
 #' @param filename File name to load from.
 #' @param ... Not used.
@@ -692,7 +669,7 @@ load.NuggetKriging <- function(filename, ...) {
 
 #' Compute Covariance Matrix of NuggetKriging Model
 #'
-#' @author Yann Richet \email{yann.richet@irsn.fr}
+#' @author Yann Richet \email{yann.richet@asnr.fr}
 #'
 #' @param object An S3 NuggetKriging object.
 #' @param x1 Numeric matrix of input points.
@@ -719,23 +696,16 @@ load.NuggetKriging <- function(filename, ...) {
 #' covMat(k, x1, x2)
 covMat.NuggetKriging <- function(object, x1, x2, ...) {
     if (length(L <- list(...)) > 0) warnOnDots(L)
-    k <- nuggetkriging_model(object)
     if (is.data.frame(x1)) x1 = data.matrix(x1)
     if (is.data.frame(x2)) x2 = data.matrix(x2)
-    if (!is.matrix(x1)) x1 = matrix(x1, ncol = ncol(k$X))
-    if (!is.matrix(x2)) x2 = matrix(x2, ncol = ncol(k$X))
-    if (ncol(x1) != ncol(k$X))
-        stop("Input x1 must have ", ncol(k$X), " columns (instead of ",
-             ncol(x1), ")")
-    if (ncol(x2) != ncol(k$X))
-        stop("Input x2 must have ", ncol(k$X), " columns (instead of ",
-             ncol(x2), ")")
+    if (!is.matrix(x1)) x1 = matrix(x1, ncol = ncol(object$X()))
+    if (!is.matrix(x2)) x2 = matrix(x2, ncol = ncol(object$X()))
     return(nuggetkriging_covMat(object, x1, x2))
 }
 
 #' Compute Log-Likelihood of NuggetKriging Model
 #'
-#' @author Yann Richet \email{yann.richet@irsn.fr}
+#' @author Yann Richet \email{yann.richet@asnr.fr}
 #'
 #' @param object An S3 NuggetKriging object.
 #' @param theta_alpha A numeric vector of (positive) range parameters and variance over variance plus nugget at
@@ -780,12 +750,8 @@ covMat.NuggetKriging <- function(object, x1, x2, ...) {
 logLikelihoodFun.NuggetKriging <- function(object, theta_alpha,
                                   return_grad = FALSE, bench=FALSE, ...) {
     if (length(L <- list(...)) > 0) warnOnDots(L)
-    k <- nuggetkriging_model(object)
     if (is.data.frame(theta_alpha)) theta_alpha = data.matrix(theta_alpha)
-    if (!is.matrix(theta_alpha)) theta_alpha <- matrix(theta_alpha, ncol = ncol(k$X)+1)
-    if (ncol(theta_alpha) != ncol(k$X)+1)
-        stop("Input theta_alpha must have ", ncol(k$X)+1, " columns (instead of ",
-             ncol(theta_alpha),")")
+    if (!is.matrix(theta_alpha)) theta_alpha <- matrix(theta_alpha, ncol = ncol(object$X())+1)
     out <- list(logLikelihood = matrix(NA, nrow = nrow(theta_alpha)),
                 logLikelihoodGrad = matrix(NA,nrow=nrow(theta_alpha),
                                            ncol = ncol(theta_alpha)))
@@ -804,7 +770,7 @@ logLikelihoodFun.NuggetKriging <- function(object, theta_alpha,
 
 #' Get logLikelihood of NuggetKriging Model
 #'
-#' @author Yann Richet \email{yann.richet@irsn.fr}
+#' @author Yann Richet \email{yann.richet@asnr.fr}
 #'
 #' @param object An S3 NuggetKriging object.
 #' @param ... Not used.
@@ -834,7 +800,7 @@ logLikelihood.NuggetKriging <- function(object, ...) {
 #' Compute the log-marginal posterior of a kriging model, using the
 #' prior XXXY.
 #'
-#' @author Yann Richet \email{yann.richet@irsn.fr}
+#' @author Yann Richet \email{yann.richet@asnr.fr}
 #'
 #' @param object S3 NuggetKriging object.
 #' @param theta_alpha Numeric vector of correlation range and variance over variance plus nugget parameters at
@@ -885,12 +851,8 @@ logLikelihood.NuggetKriging <- function(object, ...) {
 #' points(k$theta(),k$sigma2()/(k$sigma2()+k$nugget()),col='blue')
 logMargPostFun.NuggetKriging <- function(object, theta_alpha, return_grad = FALSE, bench=FALSE, ...) {
     if (length(L <- list(...)) > 0) warnOnDots(L)
-    k <- nuggetkriging_model(object)
     if (is.data.frame(theta_alpha)) theta_alpha = data.matrix(theta_alpha)
-    if (!is.matrix(theta_alpha)) theta_alpha <- matrix(theta_alpha,ncol=ncol(k$X)+1)
-    if (ncol(theta_alpha) != ncol(k$X)+1)
-        stop("Input theta_alpha must have ", ncol(k$X)+1, " columns (instead of ",
-             ncol(theta_alpha), ")")
+    if (!is.matrix(theta_alpha)) theta_alpha <- matrix(theta_alpha,ncol=ncol(object$X())+1)
     out <- list(logMargPost = matrix(NA, nrow = nrow(theta_alpha)),
                 logMargPostGrad = matrix(NA, nrow = nrow(theta_alpha),
                                          ncol = ncol(theta_alpha)))
@@ -906,7 +868,7 @@ logMargPostFun.NuggetKriging <- function(object, theta_alpha, return_grad = FALS
 
 #' Get logMargPost of NuggetKriging Model
 #'
-#' @author Yann Richet \email{yann.richet@irsn.fr}
+#' @author Yann Richet \email{yann.richet@asnr.fr}
 #'
 #' @param object An S3 NuggetKriging object.
 #' @param ... Not used.
@@ -936,7 +898,7 @@ logMargPost.NuggetKriging <- function(object, ...) {
 
 #' Duplicate a NuggetKriging Model
 #'
-#' @author Yann Richet \email{yann.richet@irsn.fr}
+#' @author Yann Richet \email{yann.richet@asnr.fr}
 #'
 #' @param object An S3 NuggetKriging object.
 #' @param ... Not used.

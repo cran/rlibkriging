@@ -14,7 +14,7 @@ X <- as.matrix(runif(n))
 y = f(X)
 k = NULL
 r = NULL
-k = DiceKriging::km(design=X,response=y,covtype = "gauss",control = list(trace=F),nugget.estim=T,optim.method='BFGS',multistart = 20)
+k = DiceKriging::km(design=X,response=y,covtype = "gauss",control = list(trace=F),nugget.estim=T,optim.method='BFGS', multistart = 1 )
 r <- NuggetKriging(y, X, "gauss", optim = "BFGS20")
 l = as.list(r)
 
@@ -90,7 +90,7 @@ y = f(X)
 nu=0.1
 k = NULL
 r = NULL
-k = DiceKriging::km(design=X,response=y,covtype = "gauss",control = list(trace=F),nugget.estim=FALSE, nugget = nu,optim.method='BFGS',multistart = 20)
+k = DiceKriging::km(design=X,response=y,covtype = "gauss",control = list(trace=F),nugget.estim=FALSE, nugget = nu,optim.method='BFGS', multistart = 1 )
 #equivalent to NoiseKriging, not NuggetKriging: 
 rr <- NoiseKriging(y, rep(0.1,nrow(y)), X, "gauss", optim = "BFGS20")
 r <- NuggetKriging(y, X, "gauss", optim = "BFGS20", parameters=list(nugget=nu, is_nugget_estim=FALSE ))
@@ -179,7 +179,7 @@ X <- cbind(runif(n),runif(n))
 y = f(X)
 k = NULL
 r = NULL
-k = DiceKriging::km(design=X,response=y,covtype = "gauss",control = list(trace=F),nugget.estim=T,optim.method='BFGS',multistart = 1)
+k = DiceKriging::km(design=X,response=y,covtype = "gauss",control = list(trace=F),nugget.estim=T,optim.method='BFGS', multistart = 1 )
 #rlibkriging:::optim_log(4)
 #rlibkriging:::optim_use_variogram_bounds_heuristic(T)
 #rlibkriging:::optim_set_max_iteration(100)
@@ -234,7 +234,7 @@ k <- tryCatch( # needed to catch warning due to %dopar% usage when using multist
     withCallingHandlers(
       {
         error_text <- "No error."
-        DiceKriging::km(design=X,response=y,covtype = "gauss", parinit=parinit,control = list(trace=F),nugget.estim=T,optim.method='BFGS',multistart = 20)
+        DiceKriging::km(design=X,response=y,covtype = "gauss", parinit=parinit,control = list(trace=F),nugget.estim=T,optim.method='BFGS', multistart = 1 )
       },
       warning = function(e) {
         error_text <<- trimws(paste0("WARNING: ", e))
@@ -297,7 +297,7 @@ X <- cbind(runif(n,0,1),runif(n,0,15))
 y = f(X)
 k = NULL
 r = NULL
-k = DiceKriging::km(design=X,response=y,covtype = "gauss",control = list(trace=F),nugget.estim=TRUE,optim="BFGS",multistart=20)#,parinit = c(0.5,5))
+k = DiceKriging::km(design=X,response=y,covtype = "gauss",control = list(trace=F),nugget.estim=TRUE,optim="BFGS", multistart = 1 )#,parinit = c(0.5,5))
 r <- NuggetKriging(y, X, "gauss",, optim = "BFGS")#, parameters=list(theta=matrix(c(0.5,5),ncol=2)))
 l = as.list(r)
 

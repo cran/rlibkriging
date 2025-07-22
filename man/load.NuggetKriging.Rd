@@ -33,5 +33,5 @@ save(k,outfile)
 print(load.NuggetKriging(outfile)) 
 }
 \author{
-Yann Richet \email{yann.richet@irsn.fr}
+Yann Richet \email{yann.richet@asnr.fr}
 }

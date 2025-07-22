@@ -51,5 +51,5 @@ the current \code{KM} object.}
     \pkg{DiceKriging} package. The creator \code{\link{KM}}.
 }
 \author{
-Yann Richet \email{yann.richet@irsn.fr}
+Yann Richet \email{yann.richet@asnr.fr}
 }

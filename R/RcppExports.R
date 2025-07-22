@@ -413,8 +413,8 @@ nuggetkriging_logLikelihood <- function(k) {
     .Call(`_rlibkriging_nuggetkriging_logLikelihood`, k)
 }
 
-nuggetkriging_logMargPostFun <- function(k, theta, return_grad = FALSE, bench = FALSE) {
-    .Call(`_rlibkriging_nuggetkriging_logMargPostFun`, k, theta, return_grad, bench)
+nuggetkriging_logMargPostFun <- function(k, theta_alpha, return_grad = FALSE, bench = FALSE) {
+    .Call(`_rlibkriging_nuggetkriging_logMargPostFun`, k, theta_alpha, return_grad, bench)
 }
 
 nuggetkriging_logMargPost <- function(k) {

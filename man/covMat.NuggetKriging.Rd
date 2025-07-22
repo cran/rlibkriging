@@ -36,5 +36,5 @@ x2 = runif(10)
 covMat(k, x1, x2)
 }
 \author{
-Yann Richet \email{yann.richet@irsn.fr}
+Yann Richet \email{yann.richet@asnr.fr}
 }

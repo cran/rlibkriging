@@ -97,7 +97,7 @@ class CacheFunction<Callable, std::function<R(Args...)>, Contexts...> : public C
         // if (grad_out != nullptr) {
         //   *grad_out = arma::vec(_gamma.n_elem, arma::fill::zeros);
         // }
-        arma::cout << "[WARNING] Catched error " << error.what() << ": return -Inf." << arma::endl;
+        Rcpp::Rcout << "[WARNING] Catched error " << error.what() << ": return -Inf." << arma::endl;
         finder->second = -arma::datum::inf;
       }
       ANALYSE(m_eval_timer += diffAndUpdateTimer(t));

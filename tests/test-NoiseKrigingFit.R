@@ -14,7 +14,7 @@ X <- as.matrix(runif(n))
 y = f(X) + 0.1*rnorm(nrow(X))
 k = NULL
 r = NULL
-k = DiceKriging::km(design=X,response=y,noise.var=rep(0.1^2,nrow(X)),covtype = "gauss",control = list(trace=F),nugget.estim=F,optim.method='BFGS',multistart = 20)
+k = DiceKriging::km(design=X,response=y,noise.var=rep(0.1^2,nrow(X)),covtype = "gauss",control = list(trace=F),nugget.estim=F,optim.method='BFGS', multistart = 1 )
 r <- NoiseKriging(y,rep(0.1^2,nrow(X)), X, "gauss", optim = "BFGS")
 l = as.list(r)
 
@@ -61,7 +61,7 @@ X <- cbind(runif(n),runif(n))
 y = f(X)+ 10*rnorm(nrow(X))
 k = NULL
 r = NULL
-k = DiceKriging::km(design=X,response=y,noise.var=rep(10^2,nrow(X)),covtype = "gauss",control = list(trace=F),nugget.estim=F,optim.method='BFGS',multistart = 20)
+k = DiceKriging::km(design=X,response=y,noise.var=rep(10^2,nrow(X)),covtype = "gauss",control = list(trace=F),nugget.estim=F,optim.method='BFGS', multistart = 1 )
 r <- NoiseKriging(y, noise=rep(10^2,nrow(X)),X, "gauss", optim = "BFGS")
 #plot(Vectorize(function(a) r$logLikelihoodFun(c(r$theta(),a))$logLikelihood))
 l = as.list(r)
@@ -111,7 +111,7 @@ k <- tryCatch( # needed to catch warning due to %dopar% usage when using multist
     withCallingHandlers(
       {
         error_text <- "No error."
-        DiceKriging::km(design=X,response=y,noise.var=rep(10^2,nrow(X)),covtype = "gauss", parinit=parinit,control = list(trace=F),nugget.estim=F,optim.method='BFGS',multistart = 20)
+        DiceKriging::km(design=X,response=y,noise.var=rep(10^2,nrow(X)),covtype = "gauss", parinit=parinit,control = list(trace=F),nugget.estim=F,optim.method='BFGS', multistart = 1 )
       },
       warning = function(e) {
         error_text <<- trimws(paste0("WARNING: ", e))
@@ -176,7 +176,7 @@ X <- cbind(runif(n,0,1),runif(n,0,15))
 y = f(X) + 10*rnorm(nrow(X))
 k = NULL
 r = NULL
-k = DiceKriging::km(design=X,response=y,noise.var=rep(10^2,nrow(X)),covtype = "gauss",control = list(trace=F),nugget.estim=FALSE,optim="BFGS",multistart=20)#,parinit = c(0.5,5))
+k = DiceKriging::km(design=X,response=y,noise.var=rep(10^2,nrow(X)),covtype = "gauss",control = list(trace=F),nugget.estim=FALSE,optim="BFGS", multistart = 1 )#,parinit = c(0.5,5))
 r <- NoiseKriging(y,noise=rep(10^2,nrow(X)), X, "gauss",, optim = "BFGS")#, parameters=list(theta=matrix(c(0.5,5),ncol=2)))
 l = as.list(r)
 
