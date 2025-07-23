@@ -1,4 +1,4 @@
-5d2768f3fc49df9e84ef5c700bb61073 *DESCRIPTION
+a23732ee0711711ca21d0b66febc56ea *DESCRIPTION
 2d2feda0a82ae5ba6bfb06ba9bc14ade *NAMESPACE
 b962c5dab5d75e8f778f4666d3e9221c *R/KMClass.R
 effbfb92ac7f36b36518fb7a91a02ba9 *R/KrigingClass.R
@@ -10,8 +10,8 @@ aea7843e256395a318e76e0451bf940a *R/NoiseKMClass.R
 ab6de8ffc7018881964646288f4cbf9c *R/allGenerics.R
 c8e4338a787bdf8c789cd985193404e4 *R/miscUtils.R
 ee333fd06be86bf9fcf7930074d6191c *README.md
-7e161f80e39df150e6e7a4fe7428c63f *cleanup
-7e161f80e39df150e6e7a4fe7428c63f *cleanup.win
+65782b004281fe537b67b51e9bfb4e85 *cleanup
+65782b004281fe537b67b51e9bfb4e85 *cleanup.win
 d6e15635675da54ae4093531244536ca *configure
 447e666b20cb4763c24ce0436ad0c70f *configure.win
 cf1fede59351ea52c2a2dbc0f0aacce8 *man/KM-class.Rd
@@ -98,7 +98,7 @@ ec349e471895c83ddad65a6996cc9e45 *man/update_simulate.Kriging.Rd
 b701670b03a261f9250182922cc58ab7 *man/update_simulate.NoiseKriging.Rd
 efe6a1d73fb6e47097bf624d514814a4 *man/update_simulate.NuggetKriging.Rd
 592ca4d330b2dc218a4d0a99477a43c9 *man/update_simulate.Rd
-647b092c3636771b2dcd9a346b68cbde *src/Makevars
+9cea89502edbe74303fad3c43dfa7078 *src/Makevars
 5b161b3a375ea819e47052dce85d391b *src/Makevars.win
 6b5af2f5a746cc4a9a838a50674ea853 *src/RcppExports.cpp
 084e1fa21370a5d684001a6898258fc2 *src/kriging_binding.cpp
@@ -875,7 +875,7 @@ aea7843e256395a318e76e0451bf940a *src/libK/bindings/R/rlibkriging/R/NoiseKMClass
 ab6de8ffc7018881964646288f4cbf9c *src/libK/bindings/R/rlibkriging/R/allGenerics.R
 c8e4338a787bdf8c789cd985193404e4 *src/libK/bindings/R/rlibkriging/R/miscUtils.R
 602a7f7c608864dda11e6adb68482786 *src/libK/bindings/R/rlibkriging/install/install.R
-647b092c3636771b2dcd9a346b68cbde *src/libK/bindings/R/rlibkriging/src/Makevars
+9cea89502edbe74303fad3c43dfa7078 *src/libK/bindings/R/rlibkriging/src/Makevars
 5b161b3a375ea819e47052dce85d391b *src/libK/bindings/R/rlibkriging/src/Makevars.win
 084e1fa21370a5d684001a6898258fc2 *src/libK/bindings/R/rlibkriging/src/kriging_binding.cpp
 ce1d561ff1c8e983761522b5f66999d2 *src/libK/bindings/R/rlibkriging/src/linalg.cpp
@@ -950,7 +950,7 @@ f8da223c1fda211439bee09a15c5543b *src/libK/bindings/R/tools/ExternalLibsExtracto
 7ccfb23259cdf2c7cbae879463ef2801 *src/libK/cmake/GetGitRevisionDescription.cmake.in
 55f07b81c7cd8b6b33f5ef238020a029 *src/libK/cmake/configuration.cmake
 9ac5885ba78f46252a56be8a57a655c9 *src/libK/cmake/configureOctave.cmake
-0a979ffa67c2534ca4a0776c957f519a *src/libK/cmake/update_version.sh
+e010e7aafbeb64b8685bc28c479c5e01 *src/libK/cmake/update_version.sh
 045f61e40135406f24d41a7a36ff197e *src/libK/cmake/version.cmake
 04197afe679ab3975056b39f0159b088 *src/libK/lbfgsb_cpp/CMakeLists.txt
 4ec801ab0c957b0313a44ffcc9c840ab *src/libK/lbfgsb_cpp/Lbfgsb.3.0/CMakeLists.txt
@@ -975,7 +975,7 @@ f5f975a50ec7e7564edc28ef334dcb2f *src/libK/lbfgsb_cpp/examples/CMakeLists.txt
 5238e97eb30fed165411c4d82f9272ee *src/libK/lbfgsb_cpp/examples/CTestCustom.cmake.in
 2f015937d226fde369e009e016101474 *src/libK/lbfgsb_cpp/examples/example.cpp
 fd0db2ab6df10236801ba1a210c2ab98 *src/libK/lbfgsb_cpp/examples/strncmp_debug.cpp
-7b4e0b4f6dc4b7180fe423c791de32f4 *src/libK/lbfgsb_cpp/include/lbfgsb_cpp/lbfgsb.hpp
+817ac87dc9f09287718ceb1bd866d669 *src/libK/lbfgsb_cpp/include/lbfgsb_cpp/lbfgsb.hpp
 0e850790e65630598cc41ea0f9391f7a *src/libK/setup.py
 71b9e4136439a4407f9d39f50a3b897e *src/libK/src/CMakeLists.txt
 32a4aa52fa37a3489687ef16cbda1681 *src/libK/src/lib/Bench.cpp
@@ -1089,14 +1089,14 @@ f8e752c95e48c0b1721a4a8487cb8b5e *src/libK/tests/regression_unit_test.cpp
 b924f0cb2d3b57ddfc4c9d0b210f65bb *src/libK/travis-ci/checks/git-clang-format
 7cf7a21f59bbac5687c4d28082658a09 *src/libK/travis-ci/checks/install.sh
 295189334403283619ba070c02c3f61e *src/libK/travis-ci/checks/test.sh
-fe9ab7b0344f4f1fe773b52464502b67 *src/libK/travis-ci/common/before_script.sh
+319f6563eab3f6c55e4450eea2d618f7 *src/libK/travis-ci/common/before_script.sh
 7cf7a21f59bbac5687c4d28082658a09 *src/libK/travis-ci/dummy/build.sh
 7cf7a21f59bbac5687c4d28082658a09 *src/libK/travis-ci/dummy/install.sh
 7cf7a21f59bbac5687c4d28082658a09 *src/libK/travis-ci/dummy/test.sh
 f1a45283333caa8747554369067c948a *src/libK/travis-ci/linux-macos/build.sh
-9eea71dd6a694c40e2da1582f09e93e9 *src/libK/travis-ci/linux-macos/install.sh
-57c65180008d86fe41ec707f8b9fb8cc *src/libK/travis-ci/linux-macos/loadenv.sh
-19fe6e6d11540299988410b8420cb9bc *src/libK/travis-ci/linux-macos/test.sh
+d95a992292a4fba0d09ae6e82204978d *src/libK/travis-ci/linux-macos/install.sh
+e5f2ff2d75f9d52f94746e9a9c43cd7a *src/libK/travis-ci/linux-macos/loadenv.sh
+090aeb1b1d2da22fa38c0e9ff56a063b *src/libK/travis-ci/linux-macos/test.sh
 dca374c1bb086e0aee4da045f19497e5 *src/libK/travis-ci/octave-windows/build.sh
 2bd59a8e4e8c991b84915f8315db2239 *src/libK/travis-ci/octave-windows/install.sh
 57bbc44168ce6132b0a71ae2a6a16119 *src/libK/travis-ci/octave-windows/loadenv.sh
@@ -2236,4 +2236,4 @@ d5325fced1133db4bf341f9b4f389934 *tools/build.sh
 abc2c149c1ddbdd6b325b82f381bae0c *tools/cmake_config.sh
 6f054c2a36d1d4c9f3624f373b12d9ff *tools/install_packages.R
 c98c61b1a720b95e8f36a69d2e7b4710 *tools/r_config.sh
-53febb0744c05e6c89c52d51b11dd00c *tools/setup.sh
+a8b850daa85dbe44c01ffc9e029bedfd *tools/setup.sh

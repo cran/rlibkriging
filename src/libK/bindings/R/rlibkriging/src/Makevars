@@ -31,9 +31,9 @@ else
 	LIB_SUFFIX=a
 endif
 
-USE_FLANG=$(shell echo $(FC) | egrep "flang")
+USE_FLANG=$(shell echo $(FC) | grep -E "flang")
 ifneq ($(USE_FLANG),)
-  LLVM_PATH=$(shell $(USE_FLANG) --version | egrep "InstalledDir" | cut -d: -f2 | tr -d ' ')
+  LLVM_PATH=$(shell $(USE_FLANG) --version | grep -E "InstalledDir" | cut -d: -f2 | tr -d ' ')
   FLIBS=-L$(LLVM_PATH)/../lib -flang-experimental-exec -lFortran_main -lFortranRuntime -lFortranDecimal -lm
   $(info Use FLANG with FLIBS: $(FLIBS))
 endif

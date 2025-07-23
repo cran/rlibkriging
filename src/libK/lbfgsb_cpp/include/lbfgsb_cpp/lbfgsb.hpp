@@ -10,7 +10,7 @@
 
 namespace lbfgsb {
     extern "C" {
-        void setulb_(
+        int setulb_(
             const int* n, const int* m, double* x,
             const double* l, const double* u, const int* nbd,
             double* f, double* g,
